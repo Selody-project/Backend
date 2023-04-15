@@ -1,4 +1,5 @@
 /* istanbul ignore file */
+require('dotenv').config();
 
 const testEnv = process.env.NODE_ENV === 'test';
 const dbHost = testEnv ? process.env.DB_TEST_HOST : process.env.DB_HOST;
@@ -17,11 +18,12 @@ const config = {
 };
 
 const dbConfig = {
-  HOST: dbHost,
-  PORT: dbPort,
-  USERNAME: dbUsername,
-  PASSWORD: dbPassword,
-  NAME: dbName,
+  username: dbUsername,
+  password: dbPassword,
+  database: dbName,
+  host: dbHost,
+  dialect: 'mysql',
+  port: dbPort,
 };
 
 module.exports = {
