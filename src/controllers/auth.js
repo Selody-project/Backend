@@ -13,7 +13,7 @@ exports.getNaverUserInfo = async (req, res, next) => {
   request.get(options, async (error, response, body) => {
     if (!error && response.statusCode == 200) {
       // res.writeHead(200, {'Content-Type': 'text/json;charset=utf-8'});
-      req.data = JSON.parse(body).response;
+      req.body = JSON.parse(body).response;
       next();
     } else {
       console.log('error');
@@ -32,12 +32,12 @@ exports.getGoogleUserInfo = async (req, res, next) => {
 */
 
 exports.createSocialUser = async (req, res, next) => {
-  const exUser = await User.findOne({ where: { snsId: req.data.id } });
+  const exUser = await User.findOne({ where: { snsId: req.body.id } });
   if (!exUser) {
     await User.create({
-      nick: req.data.nickname,
+      nick: req.body.nickname,
       provider: 'NAVER',
-      snsId: req.data.id,
+      snsId: req.body.id,
     });
   }
   next();
