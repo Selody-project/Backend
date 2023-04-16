@@ -4,19 +4,17 @@ const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
 const REFRESH_SECRET_KEY = process.env.JWT_SECRET;
 
 const token = () => ({
-  access(id, nick) {
+  access(nickname) {
     return jwt.sign({
-      id,
-      nick,
+      nickname,
     }, ACCESS_SECRET_KEY, {
       expiresIn: '60m',
       issuer: 'xernserver',
     });
   },
-  refresh(id, nick) {
+  refresh(nickname) {
     return jwt.sign({
-      id,
-      nick,
+      nickname,
     }, REFRESH_SECRET_KEY, {
       expiresIn: '180 days',
       issuer: 'xernserver',
@@ -31,12 +29,11 @@ exports.createToken = (req, res) => {
       status: 200,
       message: 'success',
       jwt: {
-        accessToken: token().access(req.body.id ? req.body.id : req.body.email, req.body.nickname),
-        refeshToken: token().refresh(req.body.id ? req.body.id : req.body.email, req.body.nickname),
+        accessToken: token().access(req.body.nickname),
+        refeshToken: token().refresh(req.body.nickname),
       },
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
       code: 500,
       message: 'Internal Sever Error',

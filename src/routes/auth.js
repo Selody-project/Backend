@@ -1,16 +1,28 @@
 const express = require('express');
 
-const { getNaverUserInfo, createSocialUser } = require('../controllers/auth');
-const { createToken, verifyToken } = require('../controllers/token');
+const {
+  getNaverUserInfo, joinSocialUser, join, login,
+} = require('../controllers/auth');
+const { createToken, verifyToken } = require('../middleware/token');
 
 const router = express.Router();
 
-// GET /auth/login/naver
-// 네이버 최초 로그인
-router.post('/login/naver', getNaverUserInfo, createSocialUser, createToken);
+// GET api/auth/join
+router.post('/join', join, createToken);
 
-// GET /auth/token
-// 토큰 갱신
+// GET api/auth/login
+router.post('/login', login, createToken);
+
+// GET api/auth/logout
+// router.get('/logout', );
+
+// GET api/auth/naver
+router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
+
+// GET api/auth/google
+// router.post('/google', joinSocialUser, createToken);
+
+// GET api/auth/token
 router.get('/token', verifyToken, createToken);
 
 module.exports = router;

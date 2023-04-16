@@ -12,6 +12,7 @@
   "rules": {
     "global-require": "off",
     "import/no-dynamic-require" : 1,
+    "consistent-return" : 1,
     "eqeqeq": "off"
   },
   "overrides": [
