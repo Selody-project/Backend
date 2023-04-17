@@ -6,12 +6,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const cors = require('cors');
+const swaggerUi = require('swagger-ui-express');
 const { config } = require('./config/config');
 
 const appError = require('./middleware/appError');
 
 const indexRouter = require('./routes');
-const authRouter = require('./routes/auth');
 const { sequelize } = require('./models');
 
 const appUrl = config.APP_URL;
@@ -31,8 +31,13 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/auth', authRouter);
-app.use('/', indexRouter);
+// swagger setting
+const swaggerFile = require('./swagger/swagger-output.json');
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+// router
+app.use('/api', indexRouter);
 
 app.use(appError);
 

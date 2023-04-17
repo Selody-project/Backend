@@ -23,6 +23,7 @@ const token = () => ({
 });
 
 // jwt 발급
+// nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req.body에 nickname을 전달해줘야함.
 exports.createToken = (req, res) => {
   try {
     res.json({
