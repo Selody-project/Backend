@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 
@@ -18,6 +19,11 @@ const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 
 const app = express();
+
+app.use('/api/auth/', rateLimit({
+  windowMs: 1 * 60 * 1000,
+  max: 60,
+}));
 
 app.options('*', cors());
 app.use(cors());
