@@ -16,7 +16,7 @@ const appError = (error, req, res, next) => {
       message: error.message,
     });
   }
-
+  console.log(error.message);
   return res.status(500).send({ error: 'something went wrong' });
 };
 

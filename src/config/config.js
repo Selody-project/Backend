@@ -17,11 +17,12 @@ const config = {
 };
 
 const dbConfig = {
-  HOST: dbHost,
-  PORT: dbPort,
-  USERNAME: dbUsername,
-  PASSWORD: dbPassword,
-  NAME: dbName,
+  username: dbUsername,
+  password: dbPassword,
+  database: dbName,
+  host: dbHost,
+  dialect: 'mysql',
+  port: dbPort,
 };
 
 module.exports = {
