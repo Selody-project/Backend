@@ -3,6 +3,12 @@ const Sequelize = require('sequelize');
 class User extends Sequelize.Model {
   static initiate(sequelize) {
     User.init({
+      userId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true,
+      },
       email: {
         type: Sequelize.STRING(40),
         allowNull: true,
@@ -36,8 +42,13 @@ class User extends Sequelize.Model {
       collate: 'utf8_general_ci',
     });
   }
-
-//  static associate(db) {}
+  static associate(db) {
+    db.User.hasMany(db.PersonalSchedule, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+      allowNull: false,
+    });
+  }
 }
 
 module.exports = User;
