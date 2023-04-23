@@ -26,13 +26,13 @@ const token = () => ({
 // nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req.body에 nickname을 전달해줘야함.
 exports.createToken = (req, res) => {
   try {
-    res.json({
-      status: 200,
-      message: 'success',
-      jwt: {
-        accessToken: token().access(req.body.nickname),
-        refeshToken: token().refresh(req.body.nickname),
-      },
+    const accessToken = token().access(req.body.nickname);
+    const refreshToken = token().access(req.body.nickname);
+    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    return res.status(200).json({
+      message: 'JWT 발급에 성공하였습니다',
+      nickname: req.body.nickname,
     });
   } catch (error) {
     res.status(500).json({

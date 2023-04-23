@@ -25,4 +25,10 @@ router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
 // GET api/auth/token
 router.get('/token', verifyToken, createToken);
 
+// GET api/auth/token/verify
+router.get('/token/verify', verifyToken, (req, res) => res.status(200).json({
+  message: '유효한 토큰입니다',
+  nickname: req.body.nickname,
+}));
+
 module.exports = router;
