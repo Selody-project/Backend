@@ -29,7 +29,7 @@ class GroupSchedule extends Sequelize.Model {
             allowNull:false,
         },
         repeat:{
-            type:Sequelize.INTEGER,
+            type:Sequelize.TINYINT,
             allowNull:false,
         },
         repeatType:{
@@ -37,7 +37,7 @@ class GroupSchedule extends Sequelize.Model {
             allowNull:true,
         },
         confirmed:{
-            type:Sequelize.INTEGER,
+            type:Sequelize.TINYINT,
             allowNull: false,
         },
         possible:{
