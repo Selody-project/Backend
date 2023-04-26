@@ -13,4 +13,4 @@ EXPOSE 3000
 
 # ENTRYPOINT ["node"]
 
-CMD ["npm", "run", "server"]
+CMD ["npm", "run", "dev"]
