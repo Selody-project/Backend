@@ -1,9 +1,27 @@
 version: "3"
 
 services:
-  node-app-starter:
-    image: "node-app-starter"
-    container_name: "node-app"
+  xern-db:
+     image: mysql:8.0
+     container_name: xern-db
+     command: --default-authentication-plugin=mysql_native_password
+     restart: unless-stopped
+     environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: xern
+        MYSQL_TCP_PORT: 3308
+     hostname: mymysql
+     volumes:
+       - $HOME/database:/var/lib/mysql
+     expose:
+      - 3308
+     ports:
+       - 3308:3308
+     networks:
+       - internalnet
+  xern-bakcend:
+    image: "xern-bakcend"
+    container_name: "xern-backend"
     build:
       context: .
       dockerfile: Dockerfile.dev
@@ -11,4 +29,12 @@ services:
       - /app/node_modules
       - .:/app
     ports:
-      - "3000:3000"
+      - "8000:8000"
+    depends_on:
+      - xern-db
+    networks:
+      - internalnet
+
+networks:
+   internalnet:
+     driver: bridge
