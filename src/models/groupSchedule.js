@@ -51,7 +51,7 @@ class GroupSchedule extends Sequelize.Model {
       },
     }, {
       sequelize,
-      timestamps: true,
+      timestamps: false,
       modelName: 'GroupSchedule',
       tableName: 'groupSchedule',
       charset: 'utf8',
