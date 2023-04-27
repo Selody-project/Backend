@@ -8,23 +8,25 @@ const mockUser = {
   password: 'super_strong_password',
 };
 
+async function syncDB() {
+  await db.sequelize.sync({ force: true });
+}
+
 async function setUpUserDB() {
   const mockUserData = [
     'test-user@email.com',
     'test-user',
     await bcrypt.hash('super_strong_password', 12),
     'local',
-    'test-sns',
-    '2023-04-26',
     '2023-04-26',
     '2023-04-26',
   ];
 
   await db.sequelize.query(
     `INSERT INTO users
-      (email, nickname, password, provider, snsId, createdAt, updatedAt, deletedAt)
+      (email, nickname, password, provider, createdAt, updatedAt)
     VALUES
-      (?, ?, ?, ?, ?, ?, ?, ?);`,
+      (?, ?, ?, ?, ?, ?);`,
     {
       type: QueryTypes.INSERT,
       replacements: [...mockUserData],
@@ -41,4 +43,5 @@ module.exports = {
   mockUser,
   setUpUserDB,
   tearDownUserDB,
+  syncDB,
 };
