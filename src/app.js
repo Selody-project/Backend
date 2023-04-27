@@ -10,7 +10,7 @@ const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const { config } = require('./config/config');
 
-const appError = require('./middleware/appError');
+const apiError = require('./middleware/apiError');
 
 const indexRouter = require('./routes');
 const { sequelize } = require('./models');
@@ -45,7 +45,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 // router
 app.use('/api', indexRouter);
 
-app.use(appError);
+app.use(apiError);
 
 sequelize.sync({ force: false }).then(() => {
   console.log('DB Connection has been established successfully.');

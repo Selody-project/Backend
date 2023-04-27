@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const ApiError = require('../errors/apiError');
 
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
 const REFRESH_SECRET_KEY = process.env.JWT_SECRET;
@@ -24,7 +25,7 @@ const token = () => ({
 
 // jwt 발급
 // nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req.body에 nickname을 전달해줘야함.
-exports.createToken = (req, res) => {
+function createToken(req, res, next) {
   try {
     const accessToken = token().access(req.body.nickname);
     const refreshToken = token().access(req.body.nickname);
@@ -35,28 +36,30 @@ exports.createToken = (req, res) => {
       nickname: req.body.nickname,
     });
   } catch (error) {
-    res.status(500).json({
-      code: 500,
-      message: 'Internal Sever Error',
-    });
+    return next(new ApiError());
   }
-};
+}
 
 // jwt 검증
-exports.verifyToken = (req, res, next) => {
+function verifyToken(req, res, next) {
   try {
     req.body = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
-    next();
+    return next();
   } catch (error) {
     if (error.name === 'TokenExpireError') {
-      res.status(419).json({
+      return res.status(419).json({
         code: 419,
         message: '토큰이 만료되었습니다.',
       });
     }
-    res.status(401).json({
+    return res.status(401).json({
       code: 401,
       message: '유효하지 않은 토큰입니다.',
     });
   }
+}
+
+module.exports = {
+  createToken,
+  verifyToken,
 };

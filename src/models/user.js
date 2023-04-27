@@ -42,6 +42,7 @@ class User extends Sequelize.Model {
       collate: 'utf8_general_ci',
     });
   }
+
   static associate(db) {
     db.User.hasMany(db.PersonalSchedule, {
       foreignKey: 'userId',
