@@ -1,8 +1,6 @@
-class AppError extends Error {
-  constructor(message, statusCode) {
-    super(message);
-    this.statusCode = statusCode;
-  }
-}
+const APIError = require('./apiError');
 
-module.exports = AppError;
+module.exports = {
+  APIError,
+  ...require('./auth'),
+};

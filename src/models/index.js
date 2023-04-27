@@ -14,6 +14,13 @@ const sequelize = new Sequelize(
     options: {
       database: dbConfig.database,
     },
+    pool: {
+      max: 5,
+      min: 0,
+      idle: 10000,
+    },
+    // eslint-disable-next-line no-console
+    logging: process.env.NODE_ENV == 'test' ? false : console.log(),
   },
 );
 
@@ -24,10 +31,7 @@ fs
   .readdirSync(__dirname)
   .filter((file) => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
   .forEach((file) => {
-    console.log(__dirname);
-    console.log(file);
     const model = require(path.join(__dirname, file));
-    // console.log(file, model.name);
     db[model.name] = model;
     model.initiate(sequelize);
   });

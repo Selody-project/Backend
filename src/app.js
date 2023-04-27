@@ -10,7 +10,7 @@ const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
 const { config } = require('./config/config');
 
-const appError = require('./middleware/appError');
+const apiError = require('./middleware/apiError');
 
 const indexRouter = require('./routes');
 const { sequelize } = require('./models');
@@ -45,18 +45,17 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 // router
 app.use('/api', indexRouter);
 
-app.use(appError);
-
-sequelize.sync({ force: false }).then(() => {
-  console.log('DB Connection has been established successfully.');
-}).catch((error) => {
-  console.error('Unable to connect to the database: ', error);
-});
+app.use(apiError);
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, async () => {
     console.log(`Server is up on port ${appUrl}:${port}`);
     try {
+      await sequelize.sync({ force: false }).then(() => {
+        console.log('DB Connection has been established successfully.');
+      }).catch((error) => {
+        console.error('Unable to connect to the database: ', error);
+      });
       console.log(`${port} PORT Connection has been established successfully.`);
     } catch (error) {
       console.error('Unable to connect to the database:', error);
