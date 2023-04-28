@@ -7,6 +7,7 @@ class GroupSchedule extends Sequelize.Model {
         type: Sequelize.BIGINT,
         primaryKey: true,
         allowNull: false,
+        autoIncrement: true,
       },
       groupId: {
         type: Sequelize.BIGINT,
@@ -42,11 +43,11 @@ class GroupSchedule extends Sequelize.Model {
         allowNull: false,
       },
       possible: {
-        type: JSON,
+        type: Sequelize.JSON,
         allowNull: true,
       },
       impossible: {
-        type: JSON,
+        type: Sequelize.JSON,
         allowNull: true,
       },
     }, {

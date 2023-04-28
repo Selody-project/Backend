@@ -31,7 +31,7 @@ app.use(express.json());
 
 app.use(
   // eslint-disable-next-line no-unused-vars
-  morgan('combined', { skip: (req, res) => process.env.NODE_ENV === 'test' }),
+  morgan('dev', { skip: (req, res) => process.env.NODE_ENV === 'test' }),
 );
 
 app.use(express.json());

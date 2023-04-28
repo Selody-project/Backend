@@ -1,36 +1,39 @@
 const request = require('supertest');
 const app = require('../../src/app');
 const {
-  mockUser, setUpUserDB, tearDownUserDB, syncDB,
+  db, mockUser, setUpUserDB, tearDownUserDB, syncDB, dropDB,
 } = require('../dbSetup');
 
 describe('Test /auth endpoints', () => {
+  beforeAll(async () => {
+    await syncDB();
+  });
+
+  beforeEach(async () => {
+    await tearDownUserDB();
+    await setUpUserDB();
+  });
+
+  afterEach(async () => {
+    await tearDownUserDB();
+  });
+
+  afterAll(async () => {
+    await dropDB();
+    await db.sequelize.close();
+  });
+
   describe('Test POST /auth/join', () => {
-    beforeAll(async () => {
-      await syncDB();
-      await tearDownUserDB();
-      await setUpUserDB();
+    it('Successfully create a new user ', async () => {
+      const mockBody = {
+        email: 't23@email.com',
+        nickname: 't3',
+        password: 'sup3',
+      };
+
+      const response = await request(app).post('/api/auth/join').send(mockBody);
+      expect(response.status).toEqual(200);
     });
-
-    beforeEach(async () => {
-      await tearDownUserDB();
-      await setUpUserDB();
-    });
-
-    afterAll(async () => {
-      await tearDownUserDB();
-    });
-
-    // it('Successfully create a new user ', async () => {
-    //   const mockBody = {
-    //     email: 'test-user2@email.com',
-    //     nickname: 'test-user2',
-    //     password: 'super_strong_password',
-    //   };
-
-    //   const response = await request(app).post('/api/auth/join').send(mockBody);
-    //   expect(response.status).toEqual(200);
-    // });
 
     it('Failed to create a new user (already existing email) ', async () => {
       const response = await request(app).post('/api/auth/join').send(mockUser);
