@@ -25,7 +25,7 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: false,
         defaultValue: false,
       },
-      repaetType: {
+      repeatType: {
         type: Sequelize.ENUM('YEAR', 'MONTH', 'WEEK', 'DAY'),
         allowNull: true,
       },
@@ -34,7 +34,7 @@ class PersonalSchedule extends Sequelize.Model {
       timestamps: false,
       inderscpred: false,
       modelName: 'PersonalSchedule',
-      tableName: 'PersonalSchedule',
+      tableName: 'personalSchedule',
       paranoid: false,
       charset: 'utf8',
       collate: 'utf8_general_ci',

@@ -1,7 +1,7 @@
 {
-  "name": "xern-backend",
+  "name": "selody",
   "version": "1.1.0",
-  "description": "xern application",
+  "description": "selody - meeting planner",
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon src/app.js",

@@ -69,28 +69,28 @@ async function setUpGroupScheduleDB() {
 async function setUpPersonalScheduleDB() {
   await PersonalSchedule.bulkCreate([
     {
-      id: 1, title: 'test-title', content: 'test-content1', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 1, title: 'test-title', content: 'test-content1', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 2, title: 'test-title', content: 'test-content2', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 2, title: 'test-title', content: 'test-content1', startDate: '2023-04-16', endDate: '2023-04-30', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 3, title: 'test-title', content: 'test-content3', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 3, title: 'test-title', content: 'test-content1', startDate: '2023-04-01', endDate: '2023-04-15', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 4, title: 'test-title', content: 'test-content4', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 4, title: 'test-title', content: 'test-content1', startDate: '2023-02-03', endDate: '2023-03-15', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 5, title: 'test-title', content: 'test-content5', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 5, title: 'test-title', content: 'test-content1', startDate: '2023-03-01', endDate: '2023-04-15', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 6, title: 'test-title', content: 'test-content6', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 6, title: 'test-title', content: 'test-content1', startDate: '2023-08-01', endDate: '2023-08-30', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 7, title: 'test-title', content: 'test-content7', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 7, title: 'test-title', content: 'test-content1', startDate: '2023-04-01', endDate: '2023-04-30', repeat: 0, repeatType: '1', userId: 1,
     },
     {
-      id: 8, title: 'test-title', content: 'test-content8', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', userId: 1,
+      id: 8, title: 'test-title', content: 'test-content1', startDate: '2023-04-15', endDate: '2023-05-15', repeat: 0, repeatType: '1', userId: 1,
     },
   ]);
 }
