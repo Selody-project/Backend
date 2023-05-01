@@ -43,7 +43,8 @@ function createToken(req, res, next) {
 // jwt 검증
 function verifyToken(req, res, next) {
   try {
-    req.body = jwt.verify(req.headers.authorization, process.env.JWT_SECRET);
+    const authToken = req.headers.authorization.split(' ')[1];
+    req.body = jwt.verify(authToken, process.env.JWT_SECRET);
     return next();
   } catch (error) {
     if (error.name === 'TokenExpireError') {

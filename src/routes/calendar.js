@@ -1,8 +1,9 @@
-const express = require('express')
-const router = express.Router()
+const express = require('express');
 
-const {todo} = require('../controllers/todo')
+const router = express.Router();
 
-router.post('/todo',todo)
+const { todo } = require('../controllers/todo');
+
+router.post('/todo', todo);
 
 module.exports = router;
