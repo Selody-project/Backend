@@ -42,11 +42,11 @@ class GroupSchedule extends Sequelize.Model {
         allowNull: false,
       },
       possible: {
-        type: JSON,
+        type: Sequelize.JSON,
         allowNull: true,
       },
       impossible: {
-        type: JSON,
+        type: Sequelize.JSON,
         allowNull: true,
       },
     }, {
