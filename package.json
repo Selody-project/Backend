@@ -8,7 +8,8 @@
     "build": "echo \"Error: no build script specified\" && exit 1",
     "lint": "eslint --fix src/",
     "test": "cross-env NODE_ENV=test jest --setupFiles dotenv/config --coverage --detectOpenHandles --forceExit",
-    "prepare": "husky install ./.husky"
+    "prepare": "husky install ./.husky",
+    "swagger-autogen": "node src/swagger/swagger.js"
   },
   "repository": {
     "type": "git",
