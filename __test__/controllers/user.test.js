@@ -4,6 +4,7 @@ const app = require('../../src/app');
 const {
   db, tearDownUserDB, syncDB, tearDownPersonalScheduleDB, setUpPersonalScheduleDB, dropDB,
 } = require('../dbSetup');
+const PersonalSchedule = require('../../src/models/personalSchedule');
 
 describe('Test /api/user endpoints', () => {
   let token;
@@ -11,6 +12,7 @@ describe('Test /api/user endpoints', () => {
     await syncDB();
     await tearDownUserDB();
     const mockUser = {
+      userId: 1,
       email: 'testUser@email.com',
       nickname: 'test-user',
       password: await bcrypt.hash('test-group-password125', 12),
@@ -32,6 +34,21 @@ describe('Test /api/user endpoints', () => {
   afterAll(async () => {
     await dropDB();
     await db.sequelize.close();
+  });
+
+  describe('Test POST /api/user/calendar', () => {
+    it('Schedule creation successful ', async () => {
+      const res = (await request(app).post('/api/user/calendar').set('Authorization', `Bearer ${token}`).send({
+        userId: 1, 
+        title: 'test-title', 
+        content: 'test-content1', 
+        startDate: '6000-01-01 00:00:00.000000', 
+        endDate: '7000-01-01 00:00:00.000000', 
+        repeat: 0, 
+        repeatType: '1',
+      }));
+      expect(res.statusCode).toEqual(201);
+    });
   });
 
   describe('Test GET /api/user/:user_id/calendar', () => {
