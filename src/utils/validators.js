@@ -12,7 +12,12 @@ const groupScehma = Joi.object({
   group_id: Joi.number().min(0).required(),
 });
 
+const userIdSchema = Joi.object({
+  user_id: Joi.number().min(0).required(),
+});
+
 module.exports = {
   validateUserSchema: validator(userSchema),
   validateGroupSchema: validator(groupScehma),
+  validateUserIdSchema: validator(userIdSchema),
 };

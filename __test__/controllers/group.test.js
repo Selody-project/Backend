@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
-  tearDownUserDB, syncDB, tearDownGroupScheduleDB, setUpGroupScheduleDB, dropDB,
+  db, tearDownUserDB, syncDB, tearDownGroupScheduleDB, setUpGroupScheduleDB, dropDB,
 } = require('../dbSetup');
 
 describe('Test /api/group endpoints', () => {
@@ -33,6 +33,7 @@ describe('Test /api/group endpoints', () => {
 
   afterAll(async () => {
     await dropDB();
+    await db.sequelize.close();
   });
 
   describe('Test GET /api/group/:group_id/calendar', () => {
@@ -41,17 +42,17 @@ describe('Test /api/group endpoints', () => {
       const date = '2023-04';
       const expectedSchedule = {
         schedule: [{
-          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 1, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-02-03T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 1, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-02-03T00:00:00.000Z', title: 'test-title',
         }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 2, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-04-16T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 2, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-16T00:00:00.000Z', title: 'test-title',
         }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 3, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 3, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
         }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 5, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 5, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
         }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 6, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-03-01T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 6, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-03-01T00:00:00.000Z', title: 'test-title',
         }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 8, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'year', startDate: '2023-04-15T00:00:00.000Z', title: 'test-title',
+          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 8, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-15T00:00:00.000Z', title: 'test-title',
         }],
       };
       const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Authorization', `Bearer ${token}`).query({

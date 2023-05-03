@@ -35,7 +35,7 @@ class GroupSchedule extends Sequelize.Model {
         allowNull: false,
       },
       repeatType: {
-        type: Sequelize.ENUM('year', 'month', 'week'),
+        type: Sequelize.ENUM('YEAR', 'MONTH', 'WEEK', 'DAY'),
         allowNull: true,
       },
       confirmed: {

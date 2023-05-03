@@ -37,12 +37,6 @@
         "responses": {
           "200": {
             "description": "성공"
-          },
-          "409": {
-            "description": "충돌"
-          },
-          "500": {
-            "description": "내부 서버 오류"
           }
         }
       }
@@ -73,12 +67,6 @@
         "responses": {
           "200": {
             "description": "성공"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "500": {
-            "description": "내부 서버 오류"
           }
         }
       }
@@ -109,9 +97,6 @@
         "responses": {
           "200": {
             "description": "성공"
-          },
-          "500": {
-            "description": "내부 서버 오류"
           }
         }
       }
@@ -135,9 +120,97 @@
           },
           "419": {
             "description": ""
+          }
+        }
+      }
+    },
+    "/api/auth/token/verify": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
           },
-          "500": {
-            "description": "내부 서버 오류"
+          "401": {
+            "description": "권한 없음"
+          },
+          "419": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/calendar": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "419": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/api/user/{user_id}/calendar": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "419": {
+            "description": ""
           }
         }
       }
