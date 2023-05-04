@@ -5,8 +5,8 @@ class Group extends Sequelize.Model {
     Group.init({
       groupId: {
         type: Sequelize.BIGINT,
-        primaryKey: true,
         allowNull: false,
+        primaryKey: true,
         autoIncrement: true,
       },
       name: {
@@ -21,10 +21,19 @@ class Group extends Sequelize.Model {
       sequelize,
       timestamps: false,
       modelName: 'Group',
-      tableName: 'group',
+      tableName: 'groups',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });
+  }
+
+  static associate(db) {
+    db.Group.hasMany(db.GroupSchedule, {
+      foreignKey: 'groupId',
+      onDelete: 'cascade',
+      allowNull: false,
+    });
+    db.Group.belongsToMany(db.User, { through: 'UserGroup', foreignKey: 'groupId', timestamps: false });
   }
 }
 

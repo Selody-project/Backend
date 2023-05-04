@@ -1,5 +1,6 @@
 const bcrypt = require('bcrypt');
 const db = require('../src/models');
+const Group = require('../src/models/group');
 const GroupSchedule = require('../src/models/groupSchedule');
 const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
@@ -35,6 +36,14 @@ async function setUpUserDB() {
   };
 
   await User.create(mockUserData);
+}
+
+async function setUpGroupDB() {
+  await Group.create({
+    groupId: 1,
+    name: 'test-group',
+    member: 5,
+  });
 }
 
 async function setUpGroupScheduleDB() {
@@ -99,6 +108,10 @@ async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
 
+async function tearDownGroupDB() {
+  await db.sequelize.query('DELETE FROM `groups`');
+}
+
 async function tearDownGroupScheduleDB() {
   await db.sequelize.query('DELETE FROM groupSchedule');
 }
@@ -111,9 +124,11 @@ module.exports = {
   db,
   mockUser,
   setUpUserDB,
+  setUpGroupDB,
   setUpGroupScheduleDB,
   setUpPersonalScheduleDB,
   tearDownUserDB,
+  tearDownGroupDB,
   tearDownGroupScheduleDB,
   tearDownPersonalScheduleDB,
   syncDB,

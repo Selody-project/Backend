@@ -30,7 +30,6 @@ describe('Test /auth endpoints', () => {
         nickname: 't3',
         password: 'sup3',
       };
-
       const response = await request(app).post('/api/auth/join').send(mockBody);
       expect(response.status).toEqual(200);
     });

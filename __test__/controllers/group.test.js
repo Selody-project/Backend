@@ -2,11 +2,14 @@ const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
-  db, tearDownUserDB, syncDB, tearDownGroupScheduleDB, setUpGroupScheduleDB, dropDB,
+  db, syncDB, 
+  tearDownUserDB, tearDownGroupDB, tearDownGroupScheduleDB,
+  setUpGroupScheduleDB, setUpGroupDB,
+  dropDB, 
 } = require('../dbSetup');
 
 describe('Test /api/group endpoints', () => {
-  let token;
+  let cookie;
   beforeAll(async () => {
     await syncDB();
   });
@@ -20,15 +23,18 @@ describe('Test /api/group endpoints', () => {
 
     await tearDownGroupScheduleDB();
     await tearDownUserDB();
+    await tearDownGroupDB();
+    await setUpGroupDB();
     await setUpGroupScheduleDB();
     const res = await request(app).post('/api/auth/join').send(mockUser);
     // eslint-disable-next-line prefer-destructuring
-    token = res.headers['set-cookie'][0].split(';')[0].split('=')[1];
+    cookie = res.headers['set-cookie'][0];
   });
 
   afterEach(async () => {
-    await tearDownUserDB();
     await tearDownGroupScheduleDB();
+    await tearDownGroupDB();
+    await tearDownUserDB();
   });
 
   afterAll(async () => {
@@ -55,7 +61,7 @@ describe('Test /api/group endpoints', () => {
           confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 8, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-15T00:00:00.000Z', title: 'test-title',
         }],
       };
-      const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Authorization', `Bearer ${token}`).query({
+      const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
         date,
       });
       expect(res.status).toEqual(200);

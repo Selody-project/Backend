@@ -29,8 +29,8 @@ function createToken(req, res, next) {
   try {
     const accessToken = token().access(req.body.nickname);
     const refreshToken = token().access(req.body.nickname);
-    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
       nickname: req.body.nickname,
@@ -43,8 +43,8 @@ function createToken(req, res, next) {
 // jwt 검증
 function verifyToken(req, res, next) {
   try {
-    const authToken = req.headers.authorization.split(' ')[1];
-    req.body = jwt.verify(authToken, process.env.JWT_SECRET);
+    const authToken = req.cookies.accessToken;
+    req.body.nickname = jwt.verify(authToken, process.env.JWT_SECRET).nickname;
     return next();
   } catch (error) {
     if (error.name === 'TokenExpireError') {
