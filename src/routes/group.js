@@ -13,8 +13,8 @@ router.get('/', getGroupList);
 
 router.post('/', createGroup);
 
-router.get('/:group_id/calendar', getGroupSchedule);
-
 router.post('/calendar', postGroupSchedule);
+
+router.get('/:group_id/calendar', getGroupSchedule);
 
 module.exports = router;
