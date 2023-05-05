@@ -4,7 +4,7 @@ const {
   createGroup,
   getGroupList,
   getGroupSchedule,
-//  postGroupSchedule,
+  postGroupSchedule,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -15,6 +15,6 @@ router.post('/', createGroup);
 
 router.get('/:group_id/calendar', getGroupSchedule);
 
-// router.post('/calendar', postGroupSchedule);
+router.post('/calendar', postGroupSchedule);
 
 module.exports = router;
