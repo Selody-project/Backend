@@ -3,7 +3,17 @@ const Sequelize = require('sequelize');
 class PersonalSchedule extends Sequelize.Model {
   static initiate(sequelize) {
     PersonalSchedule.init({
-
+      id: {
+        type: Sequelize.BIGINT,
+        primaryKey: true,
+        allowNull: false,
+        autoIncrement: true,
+      },
+      userId: {
+        type: Sequelize.BIGINT,
+        primaryKey: true,
+        allowNull: false,
+      },
       title: {
         type: Sequelize.STRING(45),
         allowNull: false,

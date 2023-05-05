@@ -2,6 +2,7 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const { validateUserIdSchema } = require('../utils/validators');
 const PersonalSchedule = require('../models/personalSchedule');
+const User = require('../models/user');
 
 async function getUserSchedule(req, res, next) {
   try {
@@ -30,6 +31,16 @@ async function getUserSchedule(req, res, next) {
   }
 }
 
+async function getUserInfo(req, res) {
+  const exUser = await User.findOne({
+    where: {
+      nickname: req.body.nickname,
+    },
+  });
+  res.status(200).json({ exUser });
+}
+
 module.exports = {
   getUserSchedule,
+  getUserInfo,
 };

@@ -4,7 +4,7 @@ class User extends Sequelize.Model {
   static initiate(sequelize) {
     User.init({
       userId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.BIGINT,
         allowNull: false,
         primaryKey: true,
         autoIncrement: true,
@@ -49,6 +49,7 @@ class User extends Sequelize.Model {
       onDelete: 'cascade',
       allowNull: false,
     });
+    db.User.belongsToMany(db.Group, { through: 'UserGroup', foreignKey: 'userId', timestamps: false });
   }
 }
 

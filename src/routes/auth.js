@@ -4,6 +4,7 @@ const {
   getNaverUserInfo, joinSocialUser, join, login,
 } = require('../controllers/auth');
 const { createToken, verifyToken } = require('../middleware/token');
+const { getUserInfo } = require('../controllers/user');
 
 const router = express.Router();
 
@@ -26,9 +27,6 @@ router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
 router.get('/token', verifyToken, createToken);
 
 // GET api/auth/token/verify
-router.get('/token/verify', verifyToken, (req, res) => res.status(200).json({
-  message: '유효한 토큰입니다',
-  nickname: req.body.nickname,
-}));
+router.get('/token/verify', verifyToken, getUserInfo);
 
 module.exports = router;
