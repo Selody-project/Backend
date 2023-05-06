@@ -12,35 +12,33 @@ describe('Test /api/group endpoints', () => {
   let cookie;
   beforeAll(async () => {
     await syncDB();
-  });
 
-  beforeEach(async () => {
     const mockUser = {
       userId: 1,
       email: 'testGroup1@email.com',
       nickname: 'test-group1',
       password: await bcrypt.hash('test-group-password12345', 12),
     };
-
-    await tearDownGroupScheduleDB();
-    await tearDownUserDB();
-    await tearDownGroupDB();
-
     const res = await request(app).post('/api/auth/join').send(mockUser);
+    // eslint-disable-next-line prefer-destructuring
+    cookie = res.headers['set-cookie'][0];
+  });
+
+  beforeEach(async () => {
+    await tearDownGroupScheduleDB();
+    await tearDownGroupDB();
 
     await setUpGroupDB();
     await setUpGroupScheduleDB();
-    // eslint-disable-next-line prefer-destructuring
-    cookie = res.headers['set-cookie'][0];
   });
 
   afterEach(async () => {
     await tearDownGroupScheduleDB();
     await tearDownGroupDB();
-    await tearDownUserDB();
   });
 
   afterAll(async () => {
+    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
