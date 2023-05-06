@@ -83,7 +83,6 @@ async function postGroupSchedule(req, res, next) {
 async function putGroupSchedule(req, res, next) {
   try {
     const { id } = req.body;
-    console.log(req.body);
     await GroupSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
   } catch (err) {

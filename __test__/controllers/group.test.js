@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
+const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, 
   tearDownUserDB, tearDownGroupDB, tearDownGroupScheduleDB,
@@ -76,6 +77,21 @@ describe('Test /api/group endpoints', () => {
         repeat: 1,
         repeatType: 'MONTH'
       }));
+      expect(res.status).toEqual(201);
+    });
+  });
+
+  describe('Test PUT /api/group/calendar', () => {
+    it('Group Schedule Modification Successful ', async () => {
+      const res = (await request(app).put(`/api/group/calendar`).set('Cookie', cookie).send({
+        id: 1,
+        groupId: 1,
+        title: 'modified-title',
+      }));
+      const modifiedSchedule = await GroupSchedule.findOne({
+        where: { title: 'modified-title' },
+      });
+      expect(modifiedSchedule.id).toEqual(1);
       expect(res.status).toEqual(201);
     });
   });
