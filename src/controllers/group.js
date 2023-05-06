@@ -90,10 +90,22 @@ async function putGroupSchedule(req, res, next) {
   }
 }
 
+async function deleteGroupSchedule(req, res, next) {
+  try {
+    const { id } = req.body;
+    const schedule = await GroupSchedule.findOne({ where: { id } });
+    await schedule.destroy();
+    return res.status(200).json({ message: 'Group schedule deleted successfully.' });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupList,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,
+  deleteGroupSchedule,
 };
