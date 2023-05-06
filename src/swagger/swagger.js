@@ -5,7 +5,7 @@ const doc = {
     title: 'Restful api 명세서',
     description: 'RestFul API 클라이언트 UI',
   },
-  host: 'http://3.34.196.250',
+  host: 'http://127.0.0.1:8000',
   schemes: ['http'],
 };
 
