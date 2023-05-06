@@ -60,12 +60,12 @@ async function getGroupSchedule(req, res, next) {
 async function postGroupSchedule(req, res, next) {
   try {
     const {
-      groupId, title, startDate, endDate, contents,
+      groupId, title, startDate, endDate, content,
     } = req.body;
     await GroupSchedule.create({
       groupId,
       title,
-      contents,
+      content,
       startDate,
       endDate,
       confirmed: 0,
@@ -80,9 +80,20 @@ async function postGroupSchedule(req, res, next) {
   }
 }
 
+async function putGroupSchedule(req, res, next) {
+  try {
+    const { id } = req.body;
+    await GroupSchedule.update(req.body, { where: { id } });
+    return res.status(201).json({ message: 'Successfully Modified.' });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupList,
   getGroupSchedule,
   postGroupSchedule,
+  putGroupSchedule,
 };

@@ -251,6 +251,57 @@
             "description": "로그인 실패"
           }
         }
+      },
+      "put": {
+        "description": "",
+        "summary": "그룹 스케줄 수정",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                },
+                "groupId": {
+                  "example": "any"
+                },
+                "title": {
+                  "example": "any"
+                },
+                "contents": {
+                  "example": "any"
+                },
+                "startDate": {
+                  "example": "any"
+                },
+                "endDate": {
+                  "example": "any"
+                },
+                "confirmed": {
+                  "example": "any"
+                },
+                "repeat": {
+                  "example": "any"
+                },
+                "repeatType": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
       }
     },
     "/api/group/{group_id}/calendar": {
