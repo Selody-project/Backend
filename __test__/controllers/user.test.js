@@ -131,7 +131,7 @@ describe('Test /api/user endpoints', () => {
         ],
       };
 
-      const res = await request(app).post('/api/user/calendar').set('Authorization', `Bearer ${token}`).send(schedule);
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(201);
       const newSchedule = await PersonalSchedule.findOne({
         where: { title: 'test-title' },
