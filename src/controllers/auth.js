@@ -9,7 +9,7 @@ const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
 const { Op } = Sequelize;
 
 async function getNaverUserInfo(req, res, next) {
-  const accessToken = req.body.access_token;
+  const { accessToken } = req.body;
   const header = `Bearer ${accessToken}`;
   const apiUrl = 'https://openapi.naver.com/v1/nid/me';
   const options = {
@@ -43,7 +43,6 @@ async function join(req, res, next) {
   const { email, nickname, password } = req.body;
   let options;
 
-  // sequelize where undefined 관련하여
   if (email && !nickname) {
     options = { where: { [Op.or]: [{ email }] } };
   } else if (!email && nickname) {

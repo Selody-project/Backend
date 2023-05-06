@@ -7,7 +7,7 @@ const {
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
 describe('Test /api/user endpoints', () => {
-  let token;
+  let cookie;
   beforeAll(async () => {
     await syncDB();
     await tearDownUserDB();
@@ -18,7 +18,7 @@ describe('Test /api/user endpoints', () => {
     };
     const res = await request(app).post('/api/auth/join').send(mockUser);
     // eslint-disable-next-line prefer-destructuring
-    token = res.headers['set-cookie'][0].split(';')[0].split('=')[1];
+    cookie = res.headers['set-cookie'][0];
   });
 
   beforeEach(async () => {
@@ -103,7 +103,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/${userID}/calendar`).set('Authorization', `Bearer ${token}`).query({
+      const res = await request(app).get(`/api/user/${userID}/calendar`).set('Cookie', cookie).query({
         date,
       });
       expect(res.statusCode).toEqual(200);

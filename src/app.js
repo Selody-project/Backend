@@ -3,6 +3,7 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
 
 dotenv.config();
 
@@ -20,13 +21,14 @@ const port = config.PORT || 8000;
 
 const app = express();
 
-app.use('/api/auth/', rateLimit({
+app.use('/api/', rateLimit({
   windowMs: 1 * 60 * 1000,
-  max: 60,
+  max: 200,
 }));
 
 app.options('*', cors());
 app.use(cors());
+app.use(cookieParser());
 app.use(express.json());
 
 app.use(

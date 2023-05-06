@@ -29,8 +29,8 @@ function createToken(req, res, next) {
   try {
     const accessToken = token().access(req.body.nickname);
     const refreshToken = token().access(req.body.nickname);
-    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
-    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 });
+    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
+    res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
       nickname: req.body.nickname,
@@ -43,13 +43,38 @@ function createToken(req, res, next) {
 // jwt 검증
 function verifyToken(req, res, next) {
   try {
-    const authToken = req.headers.authorization.split(' ')[1];
-    req.body = jwt.verify(authToken, process.env.JWT_SECRET);
+    const authToken = req.cookies.accessToken;
+    req.body.nickname = jwt.verify(authToken, ACCESS_SECRET_KEY).nickname;
     return next();
-  } catch (error) {
-    if (error.name === 'TokenExpireError') {
-      return res.status(419).json({
-        code: 419,
+  } catch (err) {
+    if (err.name === 'TokenExpireError') {
+      return res.status(401).json({
+        code: 401,
+        message: '토큰이 만료되었습니다.',
+      });
+    }
+    return res.status(401).json({
+      code: 401,
+      message: '유효하지 않은 토큰입니다.',
+    });
+  }
+}
+
+// jwt 갱신
+function renewToken(req, res) {
+  try {
+    const authToken = req.cookies.refreshToken;
+    const { nickname } = jwt.verify(authToken, REFRESH_SECRET_KEY);
+    const accessToken = token().access(nickname);
+    res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
+    return res.status(200).json({
+      message: '토큰이 갱신되었습니다.',
+      nickname: req.body.nickname,
+    });
+  } catch (err) {
+    if (err.name === 'TokenExpireError') {
+      return res.status(401).json({
+        code: 401,
         message: '토큰이 만료되었습니다.',
       });
     }
@@ -63,4 +88,5 @@ function verifyToken(req, res, next) {
 module.exports = {
   createToken,
   verifyToken,
+  renewToken,
 };

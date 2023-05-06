@@ -19,7 +19,7 @@ class GroupSchedule extends Sequelize.Model {
         allowNull: false,
       },
       content: {
-        type: Sequelize.STRING(45),
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       startDate: {
@@ -57,6 +57,12 @@ class GroupSchedule extends Sequelize.Model {
       tableName: 'groupSchedule',
       charset: 'utf8',
       collate: 'utf8_general_ci',
+    });
+  }
+
+  static associate(db) {
+    db.GroupSchedule.belongsTo(db.Group, {
+      foreignKey: 'groupId',
     });
   }
 }
