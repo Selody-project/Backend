@@ -4,6 +4,7 @@ const app = require('../../src/app');
 const {
   db, tearDownUserDB, syncDB, tearDownPersonalScheduleDB, setUpPersonalScheduleDB, dropDB,
 } = require('../dbSetup');
+const PersonalSchedule = require('../../src/models/personalSchedule');
 
 describe('Test /api/user endpoints', () => {
   let cookie;
@@ -13,7 +14,7 @@ describe('Test /api/user endpoints', () => {
     const mockUser = {
       email: 'testUser@email.com',
       nickname: 'test-user',
-      password: await bcrypt.hash('test-group-password125', 12),
+      password: await bcrypt.hash('test-user-password125', 12),
     };
     const res = await request(app).post('/api/auth/join').send(mockUser);
     // eslint-disable-next-line prefer-destructuring
@@ -107,6 +108,20 @@ describe('Test /api/user endpoints', () => {
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
+  describe('Test PUT /api/user/calendar', () => {
+    it('Successfully modified user schedule ', async () => {
+      const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
+        id: 1,
+        title: 'modified-title',
+      });
+      const modifiedSchedule = await PersonalSchedule.findOne({
+        where: { title: 'modified-title' },
+      });
+      expect(res.status).toEqual(201);
+      expect(modifiedSchedule.id).toEqual(1);
     });
   });
 });

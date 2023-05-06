@@ -74,7 +74,7 @@ async function postGroupSchedule(req, res, next) {
       possible: null,
       impossible: null,
     });
-    res.status(201).json({ message: 'Group Schedule creation successful' });
+    return res.status(201).json({ message: 'Group Schedule creation successful' });
   } catch (err) {
     return next(err);
   }

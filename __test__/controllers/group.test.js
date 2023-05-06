@@ -3,10 +3,10 @@ const request = require('supertest');
 const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
 const {
-  db, syncDB, 
-  tearDownUserDB, tearDownGroupDB, tearDownGroupScheduleDB,
+  db, syncDB,
+  tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupScheduleDB, setUpGroupDB,
-  dropDB, 
+  dropDB,
 } = require('../dbSetup');
 
 describe('Test /api/group endpoints', () => {
@@ -39,20 +39,19 @@ describe('Test /api/group endpoints', () => {
   });
 
   afterAll(async () => {
-    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
 
   describe('Test GET /api/group', () => {
     it('Group list lookup successful ', async () => {
-      const res = (await request(app).get(`/api/group`).set('Cookie', cookie));
+      const res = (await request(app).get('/api/group').set('Cookie', cookie));
       const expectedGroups = {
         groupList: [{
-          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1}
+          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1 },
         }, {
-          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1}
-        }]
+          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1 },
+        }],
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);
@@ -61,21 +60,21 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group', () => {
     it('Group creation successful ', async () => {
-      const res = (await request(app).post(`/api/group`).set('Cookie', cookie).send({ name: 'test-group'}));
+      const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
       expect(res.status).toEqual(200);
     });
   });
 
   describe('Test POST /api/group/calendar', () => {
     it('Group schedule creation successful ', async () => {
-      const res = (await request(app).post(`/api/group/calendar`).set('Cookie', cookie).send({
+      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
         groupId: 1,
         title: 'test-title',
         contents: 'test-content',
         startDate: '2023-05-06',
         endDate: '2023-05-07',
         repeat: 1,
-        repeatType: 'MONTH'
+        repeatType: 'MONTH',
       }));
       expect(res.status).toEqual(201);
     });
@@ -83,7 +82,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test PUT /api/group/calendar', () => {
     it('Group Schedule Modification Successful ', async () => {
-      const res = (await request(app).put(`/api/group/calendar`).set('Cookie', cookie).send({
+      const res = (await request(app).put('/api/group/calendar').set('Cookie', cookie).send({
         id: 1,
         groupId: 1,
         title: 'modified-title',

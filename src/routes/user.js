@@ -1,12 +1,12 @@
 const express = require('express');
 
 const {
-  getUserSchedule,
+  getUserSchedule, putUserSchedule,
 } = require('../controllers/user');
-const { verifyToken } = require('../middleware/token');
 
 const router = express.Router();
 
-router.get('/:user_id/calendar', verifyToken, getUserSchedule);
+router.get('/:user_id/calendar', getUserSchedule);
+router.put('/calendar', putUserSchedule);
 
 module.exports = router;
