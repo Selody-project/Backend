@@ -16,17 +16,20 @@ describe('Test /api/group endpoints', () => {
 
   beforeEach(async () => {
     const mockUser = {
-      email: 'testGroup@email.com',
-      nickname: 'test-group',
+      userId: 1,
+      email: 'testGroup1@email.com',
+      nickname: 'test-group1',
       password: await bcrypt.hash('test-group-password12345', 12),
     };
 
     await tearDownGroupScheduleDB();
     await tearDownUserDB();
     await tearDownGroupDB();
+
+    const res = await request(app).post('/api/auth/join').send(mockUser);
+
     await setUpGroupDB();
     await setUpGroupScheduleDB();
-    const res = await request(app).post('/api/auth/join').send(mockUser);
     // eslint-disable-next-line prefer-destructuring
     cookie = res.headers['set-cookie'][0];
   });
@@ -40,6 +43,43 @@ describe('Test /api/group endpoints', () => {
   afterAll(async () => {
     await dropDB();
     await db.sequelize.close();
+  });
+
+  describe('Test GET /api/group', () => {
+    it('Group list lookup successful ', async () => {
+      const res = (await request(app).get(`/api/group`).set('Cookie', cookie));
+      const expectedGroups = {
+        groupList: [{
+          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1}
+        }, {
+          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1}
+        }]
+      };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+  });
+
+  describe('Test POST /api/group', () => {
+    it('Group creation successful ', async () => {
+      const res = (await request(app).post(`/api/group`).set('Cookie', cookie).send({ name: 'test-group'}));
+      expect(res.status).toEqual(200);
+    });
+  });
+
+  describe('Test POST /api/group/calendar', () => {
+    it('Group schedule creation successful ', async () => {
+      const res = (await request(app).post(`/api/group/calendar`).set('Cookie', cookie).send({
+        groupId: 1,
+        title: 'test-title',
+        contents: 'test-content',
+        startDate: '2023-05-06',
+        endDate: '2023-05-07',
+        repeat: 1,
+        repeatType: 'MONTH'
+      }));
+      expect(res.status).toEqual(201);
+    });
   });
 
   describe('Test GET /api/group/:group_id/calendar', () => {

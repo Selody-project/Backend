@@ -39,11 +39,19 @@ async function setUpUserDB() {
 }
 
 async function setUpGroupDB() {
-  await Group.create({
+  const group1 = await Group.create({
     groupId: 1,
     name: 'test-group',
     member: 5,
   });
+  const group2 = await Group.create({
+    groupId: 2,
+    name: 'test-group',
+    member: 6,
+  });
+  const user = await User.findAll()
+  await user[0].addGroup(group1);
+  await user[0].addGroup(group2);
 }
 
 async function setUpGroupScheduleDB() {

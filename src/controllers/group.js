@@ -56,24 +56,33 @@ async function getGroupSchedule(req, res, next) {
     return next(err);
   }
 }
-/*
+
 async function postGroupSchedule(req, res, next) {
-
   try {
-    const { nickname } = req.body.nickname;
-    const exUser =  await User.findOne({ where: { nickname: nickname } });
+    const {
+      groupId, title, startDate, endDate, contents,
+    } = req.body;
     await GroupSchedule.create({
-
-    })
+      groupId,
+      title,
+      contents,
+      startDate,
+      endDate,
+      confirmed: 0,
+      repeat: req.body.repeat || 0,
+      repeatType: req.body.repeatType || null,
+      possible: null,
+      impossible: null,
+    });
+    res.status(201).json({ message: 'Group Schedule creation successful' });
   } catch (err) {
     return next(err);
   }
- return next();
 }
-*/
+
 module.exports = {
   createGroup,
   getGroupList,
   getGroupSchedule,
-//  postGroupSchedule,
+  postGroupSchedule,
 };
