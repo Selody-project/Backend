@@ -302,6 +302,33 @@
             "description": "권한 없음"
           }
         }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 스케줄 삭제",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
       }
     },
     "/api/group/{group_id}/calendar": {
