@@ -5,6 +5,8 @@ const {
   db, tearDownUserDB, syncDB, tearDownPersonalScheduleDB, setUpPersonalScheduleDB, dropDB,
 } = require('../dbSetup');
 
+const PersonalSchedule = require('../../src/models/personalSchedule');
+
 describe('Test /api/user endpoints', () => {
   let cookie;
   beforeAll(async () => {
@@ -30,6 +32,7 @@ describe('Test /api/user endpoints', () => {
   });
 
   afterAll(async () => {
+    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
@@ -107,6 +110,36 @@ describe('Test /api/user endpoints', () => {
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
+  describe('Test POST /api/user/calendar', () => {
+    it('Successfully get an April Schedule ', async () => {
+      const schedule = {
+        userId: 1, title: 'test-title', content: 'test-content1', startDate: '6000-01-01 00:00:00.000000', endDate: '7000-01-01 00:00:00.000000', repeat: 0, repeatType: '1',
+      };
+      // const expectedSchedule = {
+      //   scheduleArr: [
+      //     {
+      //       id: 9,
+      //       userId: 1,
+      //       title: 'test-title',
+      //       content: 'test-content1',
+      //       startDate: '6000-01-01T00:00:00.000Z',
+      //       endDate: '7000-01-01T00:00:00.000Z',
+      //       repeat: false,
+      //       repeatType: 'YEAR',
+      //     },
+      //   ],
+      // };
+
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      expect(res.statusCode).toEqual(201);
+      const newSchedule = await PersonalSchedule.findOne({
+        where: { title: 'test-title' },
+      });
+      expect(newSchedule).toBeTruthy();
+      // expect(res.body).toEqual(expectedSchedule);
     });
   });
 });

@@ -49,7 +49,7 @@ async function setUpGroupDB() {
     name: 'test-group',
     member: 6,
   });
-  const user = await User.findAll()
+  const user = await User.findAll();
   await user[0].addGroup(group1);
   await user[0].addGroup(group2);
 }

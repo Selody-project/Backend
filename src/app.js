@@ -19,6 +19,8 @@ const { sequelize } = require('./models');
 const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 
+process.env.TZ = 'Asia/Seoul';
+
 const app = express();
 
 app.use('/api/', rateLimit({
