@@ -98,6 +98,10 @@ async function login(req, res, next) {
   }
 }
 
+async function logout(req, res) {
+  return res.clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+}
+
 /*
 exports.getGoogleUserInfo = async (req, res, next) => {
 };
@@ -107,5 +111,6 @@ module.exports = {
   getNaverUserInfo,
   join,
   login,
+  logout,
   joinSocialUser,
 };
