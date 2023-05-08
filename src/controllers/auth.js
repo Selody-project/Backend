@@ -90,7 +90,7 @@ async function login(req, res, next) {
   try {
     const result = await bcrypt.compare(password, exUser.password);
     if (result) {
-      req.body = { nickname: exUser.nickname };
+      req.body.nickname = { nickname: exUser.nickname };
       return next();
     }
   } catch (error) {
@@ -99,7 +99,7 @@ async function login(req, res, next) {
 }
 
 async function logout(req, res) {
-  return res.clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+  return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
 }
 
 /*
