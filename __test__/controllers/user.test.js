@@ -114,24 +114,24 @@ describe('Test /api/user endpoints', () => {
   });
 
   describe('Test POST /api/user/calendar', () => {
-    it('Successfully get an April Schedule ', async () => {
+    it('Insert a User schedule into the database', async () => {
       const schedule = {
         userId: 1, title: 'test-title', content: 'test-content1', startDate: '6000-01-01 00:00:00.000000', endDate: '7000-01-01 00:00:00.000000', repeat: 0, repeatType: '1',
       };
-      // const expectedSchedule = {
-      //   scheduleArr: [
-      //     {
-      //       id: 9,
-      //       userId: 1,
-      //       title: 'test-title',
-      //       content: 'test-content1',
-      //       startDate: '6000-01-01T00:00:00.000Z',
-      //       endDate: '7000-01-01T00:00:00.000Z',
-      //       repeat: false,
-      //       repeatType: 'YEAR',
-      //     },
-      //   ],
-      // };
+      const expectedSchedule = {
+        scheduleArr: [
+          {
+            id: 9,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '6000-01-01T00:00:00.000Z',
+            endDate: '7000-01-01T00:00:00.000Z',
+            repeat: false,
+            repeatType: 'YEAR',
+          },
+        ],
+      };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(201);
@@ -139,7 +139,14 @@ describe('Test /api/user endpoints', () => {
         where: { title: 'test-title' },
       });
       expect(newSchedule).toBeTruthy();
-      // expect(res.body).toEqual(expectedSchedule);
+      expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
+  describe('Test DELETE /api/user/calendar', () => {
+    it('Delete a User schedule from the database ', async () => {
+      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: 9 });
+      expect(res.statusCode).toEqual(204);
     });
   });
 });
