@@ -31,13 +31,23 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: false,
       },
       repeat: {
-        type: Sequelize.BOOLEAN,
+        type: Sequelize.TINYINT(1),
         allowNull: false,
-        defaultValue: false,
       },
-      repeatType: {
-        type: Sequelize.ENUM('YEAR', 'MONTH', 'WEEK', 'DAY'),
+      dayMonth: {
+        type: Sequelize.STRING(30),
         allowNull: true,
+        defaultValue: null,
+      },
+      month: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+        defaultValue: null,
+      },
+      dayWeek: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+        defaultValue: null,
       },
     }, {
       sequelize,
