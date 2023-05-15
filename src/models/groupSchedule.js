@@ -34,12 +34,23 @@ class GroupSchedule extends Sequelize.Model {
         type: Sequelize.TINYINT,
         allowNull: false,
       },
-      repeatType: {
-        type: Sequelize.ENUM('YEAR', 'MONTH', 'WEEK', 'DAY'),
+      dayMonth: {
+        type: Sequelize.STRING(30),
         allowNull: true,
+        defaultValue: null,
+      },
+      month: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+        defaultValue: null,
+      },
+      dayWeek: {
+        type: Sequelize.STRING(30),
+        allowNull: true,
+        defaultValue: null,
       },
       confirmed: {
-        type: Sequelize.TINYINT,
+        type: Sequelize.TINYINT(1),
         allowNull: false,
       },
       possible: {

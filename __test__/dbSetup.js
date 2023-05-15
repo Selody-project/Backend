@@ -57,28 +57,67 @@ async function setUpGroupDB() {
 async function setUpGroupScheduleDB() {
   await GroupSchedule.bulkCreate([
     {
-      id: 1, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 1, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-02-03', endDate: '2023-05-15', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 2, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-16', endDate: '2023-04-30', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 2, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-16', endDate: '2023-04-30', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 3, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-01', endDate: '2023-04-15', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 3, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-01', endDate: '2023-04-15', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 4, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-02-03', endDate: '2023-03-15', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 4, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-02-03', endDate: '2023-03-15', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 5, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-01', endDate: '2023-04-30', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 5, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-01', endDate: '2023-04-30', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 6, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-03-01', endDate: '2023-04-15', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 6, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-03-01', endDate: '2023-04-15', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 7, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-08-01', endDate: '2023-08-30', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 7, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-08-01', endDate: '2023-08-30', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
     {
-      id: 8, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-15', endDate: '2023-05-15', repeat: 1, repeatType: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+      id: 8, groupId: 1, title: 'test-title', content: 'test-content', startDate: '2023-04-15', endDate: '2023-05-15', repeat: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 9, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-02-03', endDate: '2021-02-03', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 10, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2023-04-15', endDate: '2023-04-20', repeat: 1, dayMonth: '*', month: '*', dayWeek: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 11, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2023-05-06', endDate: '2023-05-08', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 12, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-01-15', endDate: '2021-01-15', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 13, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-01-15', endDate: '2021-01-15', repeat: 1, dayMonth: '15', month: '1', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 14, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2025-05-15', endDate: '2025-05-16', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 15, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-02-15', endDate: '2021-02-15', repeat: 1, dayMonth: '2', month: '2', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 16, groupId: 2, title: 'test-title', content: 'test-content1', startDate: '2021-02-15', endDate: '2021-02-15', repeat: 1, dayMonth: '2', month: '2', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 17, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2023-03-15', endDate: '2023-05-15', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 18, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2023-03-15', endDate: '2023-05-15', repeat: 1, dayMonth: '*', month: '*', dayWeek: '1', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 19, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-03-15', endDate: '2021-05-15', repeat: 1, dayMonth: '15', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 20, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-03-15', endDate: '2021-05-15', repeat: 1, dayMonth: '15', month: '3', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 21, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2023-04-15', endDate: '2023-04-20', repeat: 1, dayMonth: '15', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
     },
   ]);
 }
@@ -112,6 +151,35 @@ async function setUpPersonalScheduleDB() {
   ]);
 }
 
+async function setUpGroupScheduleDB2() {
+  await GroupSchedule.bulkCreate([
+    {
+      id: 1, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-02-03', endDate: '2021-02-03', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 2, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-03-16', endDate: '2021-03-16', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 3, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-02-03', endDate: '2021-02-04', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 4, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-01-15', endDate: '2021-01-15', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 5, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-01-15', endDate: '2021-01-15', repeat: 1, dayMonth: '15', month: '1', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 6, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-05-15', endDate: '2021-05-16', repeat: 1, dayMonth: '*', month: '*', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 7, groupId: 1, title: 'test-title', content: 'test-content1', startDate: '2021-02-15', endDate: '2021-02-15', repeat: 1, dayMonth: '2', month: '2', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 8, groupId: 2, title: 'test-title', content: 'test-content1', startDate: '2021-02-15', endDate: '2021-02-15', repeat: 1, dayMonth: '2', month: '2', dayWeek: '*', confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+  ]);
+}
+
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
@@ -135,6 +203,7 @@ module.exports = {
   setUpGroupDB,
   setUpGroupScheduleDB,
   setUpPersonalScheduleDB,
+  setUpGroupScheduleDB2,
   tearDownUserDB,
   tearDownGroupDB,
   tearDownGroupScheduleDB,
