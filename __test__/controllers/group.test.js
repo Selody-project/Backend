@@ -3,10 +3,10 @@ const request = require('supertest');
 const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
 const {
-  db, syncDB, 
+  db, syncDB,
   tearDownUserDB, tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupScheduleDB, setUpGroupDB,
-  dropDB, 
+  dropDB,
 } = require('../dbSetup');
 
 describe('Test /api/group endpoints', () => {
@@ -46,13 +46,13 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group', () => {
     it('Group list lookup successful ', async () => {
-      const res = (await request(app).get(`/api/group`).set('Cookie', cookie));
+      const res = (await request(app).get('/api/group').set('Cookie', cookie));
       const expectedGroups = {
         groupList: [{
-          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1}
+          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1 },
         }, {
-          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1}
-        }]
+          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1 },
+        }],
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);
@@ -61,21 +61,21 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group', () => {
     it('Group creation successful ', async () => {
-      const res = (await request(app).post(`/api/group`).set('Cookie', cookie).send({ name: 'test-group'}));
+      const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
       expect(res.status).toEqual(200);
     });
   });
 
   describe('Test POST /api/group/calendar', () => {
     it('Group schedule creation successful ', async () => {
-      const res = (await request(app).post(`/api/group/calendar`).set('Cookie', cookie).send({
+      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
         groupId: 1,
         title: 'test-title',
         contents: 'test-content',
         startDate: '2023-05-06',
         endDate: '2023-05-07',
         repeat: 1,
-        repeatType: 'MONTH'
+        repeatType: 'MONTH',
       }));
       expect(res.status).toEqual(201);
     });
@@ -83,7 +83,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test PUT /api/group/calendar', () => {
     it('Group Schedule Modification Successful ', async () => {
-      const res = (await request(app).put(`/api/group/calendar`).set('Cookie', cookie).send({
+      const res = (await request(app).put('/api/group/calendar').set('Cookie', cookie).send({
         id: 1,
         groupId: 1,
         title: 'modified-title',
@@ -101,19 +101,219 @@ describe('Test /api/group endpoints', () => {
       const groupID = 1;
       const date = '2023-04';
       const expectedSchedule = {
-        schedule: [{
-          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 1, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-02-03T00:00:00.000Z', title: 'test-title',
-        }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 2, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-16T00:00:00.000Z', title: 'test-title',
-        }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 3, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
-        }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-30T00:00:00.000Z', groupId: 1, id: 5, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-01T00:00:00.000Z', title: 'test-title',
-        }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-04-15T00:00:00.000Z', groupId: 1, id: 6, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-03-01T00:00:00.000Z', title: 'test-title',
-        }, {
-          confirmed: 0, content: 'test-content', endDate: '2023-05-15T00:00:00.000Z', groupId: 1, id: 8, impossible: '["user3"]', possible: '["user1"]', repeat: 1, repeatType: 'YEAR', startDate: '2023-04-15T00:00:00.000Z', title: 'test-title',
-        }],
+
+        schedule: [
+          {
+            id: 1,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-02-03T00:00:00.000Z',
+            endDate: '2023-05-15T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 2,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-04-16T00:00:00.000Z',
+            endDate: '2023-04-30T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 3,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-04-01T00:00:00.000Z',
+            endDate: '2023-04-15T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 5,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-04-01T00:00:00.000Z',
+            endDate: '2023-04-30T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 6,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-03-01T00:00:00.000Z',
+            endDate: '2023-04-15T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 8,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDate: '2023-04-15T00:00:00.000Z',
+            endDate: '2023-05-15T00:00:00.000Z',
+            repeat: 0,
+            dayMonth: null,
+            month: null,
+            dayWeek: null,
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 9,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-02-03T00:00:00.000Z',
+            endDate: '2021-02-03T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '*',
+            month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 10,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2023-04-15T00:00:00.000Z',
+            endDate: '2023-04-20T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '*',
+            month: '*',
+            dayWeek: '1',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 12,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-01-15T00:00:00.000Z',
+            endDate: '2021-01-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '*',
+            month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 17,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2023-03-15T00:00:00.000Z',
+            endDate: '2023-05-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '*',
+            month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 18,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2023-03-15T00:00:00.000Z',
+            endDate: '2023-05-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '*',
+            month: '*',
+            dayWeek: '1',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 19,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-03-15T00:00:00.000Z',
+            endDate: '2021-05-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '15',
+            month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 20,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-03-15T00:00:00.000Z',
+            endDate: '2021-05-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '15',
+            month: '3',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 21,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2023-04-15T00:00:00.000Z',
+            endDate: '2023-04-20T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '15',
+            month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+        ],
       };
       const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
         date,
