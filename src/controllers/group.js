@@ -1,12 +1,12 @@
-const { Op } = require('sequelize');
+const Sequelize = require('sequelize');
+
+const { Op } = Sequelize;
 const moment = require('moment');
 const { validateGroupSchema } = require('../utils/validators');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 
-// 와이어프레임에 그룹 생성 과정이 있었나?
-// 없었으면 추가 필요할 듯
 async function createGroup(req, res, next) {
   try {
     const { nickname, name } = req.body;
@@ -39,15 +39,42 @@ async function getGroupSchedule(req, res, next) {
     const { date: dateString } = req.query;
     const start = moment(dateString, 'YYYY-MM').startOf('month').toDate();
     const end = moment(start).add(1, 'month').startOf('month').toDate();
-
+    // const nonRepeatedSchedule = await GroupSchedule.findAll({
+    //   where: {
+    //     groupid: groupID,
+    //     repeat: 0,
+    //     [Op.or]: [
+    //       { startDate: { [Op.between]: [start, end] } },
+    //       { endDate: { [Op.between]: [start, end] } },
+    //       { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
+    //     ],
+    //   },
+    // });
     const schedule = await GroupSchedule.findAll({
       where: {
         groupid: groupID,
-        [Op.or]: [
-          { startDate: { [Op.between]: [start, end] } },
-          { endDate: { [Op.between]: [start, end] } },
-          { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
-        ],
+        [Op.or]: [{
+          month: '*',
+          repeat: 1,
+          startDate: { [Op.lte]: end },
+          [Op.or]: [
+            { month: end.getMonth() },
+            { month: { [Op.lte]: start.getMonth() }, endDate: { [Op.gte]: end.getMonth() } },
+            {
+              [Op.and]: [
+                Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('startDate')), { [Op.lte]: start.getMonth() }),
+                Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('endDate')), { [Op.gte]: end.getMonth() })],
+            },
+          ],
+        },
+        {
+          repeat: 0,
+          [Op.or]: [
+            { startDate: { [Op.between]: [start, end] } },
+            { endDate: { [Op.between]: [start, end] } },
+            { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
+          ],
+        }],
       },
     });
 
@@ -74,7 +101,7 @@ async function postGroupSchedule(req, res, next) {
       possible: null,
       impossible: null,
     });
-    res.status(201).json({ message: 'Group Schedule creation successful' });
+    return res.status(201).json({ message: 'Group Schedule creation successful' });
   } catch (err) {
     return next(err);
   }
