@@ -1,12 +1,28 @@
-const { Op } = require('sequelize');
+const Sequelize = require('sequelize');
+
+const { Op } = Sequelize;
 const moment = require('moment');
 const { validateGroupSchema } = require('../utils/validators');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 
-// 와이어프레임에 그룹 생성 과정이 있었나?
-// 없었으면 추가 필요할 듯
+function leftPad(value) {
+  if (value >= 10) {
+      return value;
+  }
+
+  return `0${value}`;
+}
+
+function toStringByFormatting(source, delimiter = '-') {
+  const year = source.getFullYear();
+  const month = leftPad(source.getMonth() + 1);
+  const day = leftPad(source.getDate());
+
+  return [year, month, day].join(delimiter);
+}
+
 async function createGroup(req, res, next) {
   try {
     const { nickname, name } = req.body;
@@ -38,19 +54,38 @@ async function getGroupSchedule(req, res, next) {
 
     const { date: dateString } = req.query;
     const start = moment(dateString, 'YYYY-MM').startOf('month').toDate();
-    const end = moment(start).add(1, 'month').startOf('month').toDate();
+    const end = moment(start).endOf('month').toDate();
 
+    const tempDate = toStringByFormatting(new Date(start.getFullYear(), start.getMonth(), start.getDate()));
+    console.log(tempDate);
+    /*
     const schedule = await GroupSchedule.findAll({
       where: {
         groupid: groupID,
-        [Op.or]: [
-          { startDate: { [Op.between]: [start, end] } },
-          { endDate: { [Op.between]: [start, end] } },
-          { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
-        ],
+        [Op.or]: [{
+          repeat: 1,
+          startDate: { [Op.lte]: end },
+          [Op.or]: [
+            { month: '*' },        // day, week, month
+            Sequelize.where(Sequelize.fn('DATEDIFF', Sequelize.col('endDate'), Sequelize.col('startDate')), { 
+              [Op.gte]: 365 
+            }),
+            Sequelize.where(Sequelize.fn('DATEDIFF', Sequelize.col('endDate'), Sequelize.col('startDate')), { 
+              [Op.gte]: Sequelize.fn('DATEDIFF', tempDate, Sequelize.col('startDate'))
+            })
+        ]
+        },
+        {
+          repeat: 0,
+          [Op.or]: [
+            { startDate: { [Op.between]: [start, end] } },
+            { endDate: { [Op.between]: [start, end] } },
+            { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
+          ],
+        }],
       },
     });
-
+    */
     return res.status(200).json({ schedule });
   } catch (err) {
     return next(err);
@@ -74,7 +109,7 @@ async function postGroupSchedule(req, res, next) {
       possible: null,
       impossible: null,
     });
-    res.status(201).json({ message: 'Group Schedule creation successful' });
+    return res.status(201).json({ message: 'Group Schedule creation successful' });
   } catch (err) {
     return next(err);
   }
