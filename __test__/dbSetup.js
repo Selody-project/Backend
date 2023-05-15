@@ -180,8 +180,6 @@ async function setUpGroupScheduleDB2() {
   ]);
 }
 
-// 1, 3, 4, 7
-
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }

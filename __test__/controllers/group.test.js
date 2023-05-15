@@ -101,6 +101,7 @@ describe('Test /api/group endpoints', () => {
       const groupID = 1;
       const date = '2023-04';
       const expectedSchedule = {
+
         schedule: [
           {
             id: 1,
@@ -277,6 +278,21 @@ describe('Test /api/group endpoints', () => {
             repeat: 1,
             dayMonth: '15',
             month: '*',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
+            impossible: '["user3"]',
+          },
+          {
+            id: 20,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-03-15T00:00:00.000Z',
+            endDate: '2021-05-15T00:00:00.000Z',
+            repeat: 1,
+            dayMonth: '15',
+            month: '3',
             dayWeek: '*',
             confirmed: 0,
             possible: '["user1"]',

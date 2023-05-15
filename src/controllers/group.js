@@ -39,31 +39,19 @@ async function getGroupSchedule(req, res, next) {
     const { date: dateString } = req.query;
     const start = moment(dateString, 'YYYY-MM').startOf('month').toDate();
     const end = moment(start).add(1, 'month').startOf('month').toDate();
-    // const nonRepeatedSchedule = await GroupSchedule.findAll({
-    //   where: {
-    //     groupid: groupID,
-    //     repeat: 0,
-    //     [Op.or]: [
-    //       { startDate: { [Op.between]: [start, end] } },
-    //       { endDate: { [Op.between]: [start, end] } },
-    //       { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
-    //     ],
-    //   },
-    // });
+
     const schedule = await GroupSchedule.findAll({
       where: {
         groupid: groupID,
         [Op.or]: [{
-          month: '*',
           repeat: 1,
-          startDate: { [Op.lte]: end },
           [Op.or]: [
-            { month: end.getMonth() },
-            { month: { [Op.lte]: start.getMonth() }, endDate: { [Op.gte]: end.getMonth() } },
+            { month: '*', startDate: { [Op.lte]: end } },
             {
               [Op.and]: [
                 Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('startDate')), { [Op.lte]: start.getMonth() }),
-                Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('endDate')), { [Op.gte]: end.getMonth() })],
+                Sequelize.where(Sequelize.fn('MONTH', Sequelize.col('endDate')), { [Op.gte]: end.getMonth() }),
+              ],
             },
           ],
         },
@@ -77,7 +65,6 @@ async function getGroupSchedule(req, res, next) {
         }],
       },
     });
-
     return res.status(200).json({ schedule });
   } catch (err) {
     return next(err);
