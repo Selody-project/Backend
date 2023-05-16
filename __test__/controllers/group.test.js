@@ -95,6 +95,15 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test DELETE /api/group/calendar', () => {
+    it('Group schedule deleted successfully ', async () => {
+      const res = (await request(app).delete(`/api/group/calendar`).set('Cookie', cookie).send({
+        id: 4,
+      }));
+      expect(res.status).toEqual(200);
+    });
+  });
+
   describe('Test GET /api/group/:group_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const groupID = 1;

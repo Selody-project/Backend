@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const ApiError = require('../errors/apiError');
+const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
 
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
 const REFRESH_SECRET_KEY = process.env.JWT_SECRET;
@@ -64,6 +65,7 @@ function verifyToken(req, res, next) {
 function renewToken(req, res) {
   try {
     const authToken = req.cookies.refreshToken;
+    if (!authToken) throw new InvalidIdPasswordError();
     const { nickname } = jwt.verify(authToken, REFRESH_SECRET_KEY);
     const accessToken = token().access(nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
@@ -72,6 +74,7 @@ function renewToken(req, res) {
       nickname: req.body.nickname,
     });
   } catch (err) {
+    console.log(err);
     if (err.name === 'TokenExpireError') {
       return res.status(401).json({
         code: 401,

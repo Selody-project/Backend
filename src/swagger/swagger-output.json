@@ -101,6 +101,27 @@
         }
       }
     },
+    "/api/auth/logout": {
+      "delete": {
+        "description": "",
+        "summary": "로그아웃",
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
     "/api/auth/token/refresh": {
       "get": {
         "description": "",
@@ -240,6 +261,33 @@
         "responses": {
           "201": {
             "description": "작성됨"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 스케줄 삭제",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
           },
           "401": {
             "description": "권한 없음"
