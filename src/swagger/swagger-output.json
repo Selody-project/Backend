@@ -110,6 +110,27 @@
         }
       }
     },
+    "/api/auth/logout": {
+      "delete": {
+        "description": "",
+        "summary": "로그아웃",
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          }
+        }
+      }
+    },
     "/api/auth/token/refresh": {
       "get": {
         "description": "",
