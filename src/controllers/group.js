@@ -1,27 +1,11 @@
 const Sequelize = require('sequelize');
-
-const { Op } = Sequelize;
 const moment = require('moment');
+const db = require('../models');
+// const { Op } = Sequelize;
 const { validateGroupSchema } = require('../utils/validators');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
-
-function leftPad(value) {
-  if (value >= 10) {
-      return value;
-  }
-
-  return `0${value}`;
-}
-
-function toStringByFormatting(source, delimiter = '-') {
-  const year = source.getFullYear();
-  const month = leftPad(source.getMonth() + 1);
-  const day = leftPad(source.getDate());
-
-  return [year, month, day].join(delimiter);
-}
 
 async function createGroup(req, res, next) {
   try {
@@ -55,39 +39,38 @@ async function getGroupSchedule(req, res, next) {
     const { date: dateString } = req.query;
     const start = moment(dateString, 'YYYY-MM').startOf('month').toDate();
     const end = moment(start).endOf('month').toDate();
-
-    const tempDate = toStringByFormatting(new Date(start.getFullYear(), start.getMonth(), start.getDate()));
-    console.log(tempDate);
-    /*
-    const schedule = await GroupSchedule.findAll({
-      where: {
-        groupid: groupID,
-        [Op.or]: [{
-          repeat: 1,
-          startDate: { [Op.lte]: end },
-          [Op.or]: [
-            { month: '*' },        // day, week, month
-            Sequelize.where(Sequelize.fn('DATEDIFF', Sequelize.col('endDate'), Sequelize.col('startDate')), { 
-              [Op.gte]: 365 
-            }),
-            Sequelize.where(Sequelize.fn('DATEDIFF', Sequelize.col('endDate'), Sequelize.col('startDate')), { 
-              [Op.gte]: Sequelize.fn('DATEDIFF', tempDate, Sequelize.col('startDate'))
-            })
-        ]
-        },
-        {
-          repeat: 0,
-          [Op.or]: [
-            { startDate: { [Op.between]: [start, end] } },
-            { endDate: { [Op.between]: [start, end] } },
-            { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
-          ],
-        }],
-      },
+    const query = `
+    SELECT * FROM groupSchedule
+    WHERE groupId = :groupID AND (
+      ( 
+        repetition = 0 AND ( 
+          (startDate BETWEEN :start AND :end)
+          OR
+          (endDate BETWEEN :start AND :end)
+          OR
+          (startDate <= :start AND endDate >= :end)
+        )
+      ) 
+      OR 
+      ( 
+        repetition = 1 AND startDate <= :end AND
+        (
+          month = '*'
+          OR
+          (DATEDIFF(endDate, startDate) >= 365)
+          OR
+          DATEDIFF(endDate, startDate) >= MOD(DATEDIFF(:start, startDate), 365)
+        )
+      )
+    )
+    `;
+    const schedule = await db.sequelize.query(query, {
+      replacements: { groupID, start, end },
+      type: Sequelize.QueryTypes.SELECT,
     });
-    */
     return res.status(200).json({ schedule });
   } catch (err) {
+    console.log(err);
     return next(err);
   }
 }
@@ -104,8 +87,7 @@ async function postGroupSchedule(req, res, next) {
       startDate,
       endDate,
       confirmed: 0,
-      repeat: req.body.repeat || 0,
-      repeatType: req.body.repeatType || null,
+      repetition: req.body.repetition || 0,
       possible: null,
       impossible: null,
     });

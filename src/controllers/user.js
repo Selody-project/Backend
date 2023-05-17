@@ -45,18 +45,14 @@ async function getUserDaySchedule(req, res, next) {
       { startDate: { [Op.lte]: start }, endDate: { [Op.gte]: end } },
     ];
     /*
-    const repeatOpt = [
-      { repeatType: 'DAY',  },
-      { repeatType: 'WEEK',  },
-      { repeatType: 'MONTH',  },
-      { repeatType: 'YEAR',  },
+    const repetitionOpt = [
     ]
 */
     const userSchedules = await PersonalSchedule.findAll({
       where: {
         userId: req.params.user_id,
         [Op.or]: [{
-          repeat: 0,
+          repetition: 0,
           [Op.or]: dateOpt,
         },
         ],
