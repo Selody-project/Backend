@@ -30,7 +30,7 @@ class GroupSchedule extends Sequelize.Model {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      repeat: {
+      repetition: {
         type: Sequelize.TINYINT,
         allowNull: false,
       },
