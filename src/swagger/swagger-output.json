@@ -13,7 +13,9 @@
   "paths": {
     "/api/auth/join": {
       "post": {
-        "description": "",
+        "description": "아이디, 닉네임 중복확인 후 회원가입을 진행합니다.",
+        "summary": "로컬 유저 회원가입",
+        "tags": ["Auth"],
         "parameters": [
           {
             "name": "body",
@@ -37,6 +39,9 @@
         "responses": {
           "200": {
             "description": "성공"
+          },
+          "409": {
+            "description": "아이디/닉네임 중복"
           }
         }
       }
@@ -44,6 +49,8 @@
     "/api/auth/login": {
       "post": {
         "description": "",
+        "summary": "로컬 유저 로그인",
+        "tags": ["Auth"],
         "parameters": [
           {
             "name": "body",
@@ -56,9 +63,6 @@
                 },
                 "password": {
                   "example": "any"
-                },
-                "nickname": {
-                  "example": "any"
                 }
               }
             }
@@ -67,6 +71,9 @@
         "responses": {
           "200": {
             "description": "성공"
+          },
+          "401": {
+            "description": "로그인 실패"
           }
         }
       }
@@ -74,6 +81,8 @@
     "/api/auth/naver": {
       "post": {
         "description": "",
+        "summary": "네이버 로그인",
+        "tags": ["Auth"],
         "parameters": [
           {
             "name": "body",
@@ -81,7 +90,7 @@
             "schema": {
               "type": "object",
               "properties": {
-                "accessToken": {
+                "access_token": {
                   "example": "any"
                 },
                 "id": {
@@ -125,7 +134,15 @@
     "/api/auth/token/refresh": {
       "get": {
         "description": "",
-        "parameters": [],
+        "summary": "토큰 갱신",
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -139,7 +156,15 @@
     "/api/auth/token/verify": {
       "get": {
         "description": "",
-        "parameters": [],
+        "summary": "토큰 검증",
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -150,10 +175,18 @@
         }
       }
     },
-    "/api/group/": {
+    "/api/group": {
       "get": {
         "description": "",
-        "parameters": [],
+        "summary": "유저 그룹 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -165,6 +198,8 @@
       },
       "post": {
         "description": "",
+        "summary": "그룹 생성",
+        "tags": ["Group"],
         "parameters": [
           {
             "name": "body",
@@ -172,9 +207,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "nickname": {
-                  "example": "any"
-                },
                 "name": {
                   "example": "any"
                 }
@@ -195,6 +227,8 @@
     "/api/group/calendar": {
       "post": {
         "description": "",
+        "summary": "그룹 스케줄 생성",
+        "tags": ["Group"],
         "parameters": [
           {
             "name": "body",
@@ -202,19 +236,13 @@
             "schema": {
               "type": "object",
               "properties": {
-                "nickname": {
-                  "example": "any"
-                },
-                "repeat": {
-                  "example": "any"
-                },
-                "repeatType": {
-                  "example": "any"
-                },
                 "groupId": {
                   "example": "any"
                 },
                 "title": {
+                  "example": "any"
+                },
+                "contents": {
                   "example": "any"
                 },
                 "startDate": {
@@ -223,7 +251,13 @@
                 "endDate": {
                   "example": "any"
                 },
-                "content": {
+                "confirmed": {
+                  "example": "any"
+                },
+                "repeat": {
+                  "example": "any"
+                },
+                "repeatType": {
                   "example": "any"
                 }
               }
@@ -231,16 +265,18 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "작성됨"
+          "200": {
+            "description": "성공"
           },
           "401": {
-            "description": "권한 없음"
+            "description": "로그인 실패"
           }
         }
       },
       "put": {
         "description": "",
+        "summary": "그룹 스케줄 수정",
+        "tags": ["Group"],
         "parameters": [
           {
             "name": "body",
@@ -248,10 +284,31 @@
             "schema": {
               "type": "object",
               "properties": {
-                "nickname": {
+                "id": {
                   "example": "any"
                 },
-                "id": {
+                "groupId": {
+                  "example": "any"
+                },
+                "title": {
+                  "example": "any"
+                },
+                "contents": {
+                  "example": "any"
+                },
+                "startDate": {
+                  "example": "any"
+                },
+                "endDate": {
+                  "example": "any"
+                },
+                "confirmed": {
+                  "example": "any"
+                },
+                "repeat": {
+                  "example": "any"
+                },
+                "repeatType": {
                   "example": "any"
                 }
               }
@@ -260,7 +317,7 @@
         ],
         "responses": {
           "201": {
-            "description": "작성됨"
+            "description": "성공"
           },
           "401": {
             "description": "권한 없음"
@@ -298,11 +355,18 @@
     "/api/group/{group_id}/calendar": {
       "get": {
         "description": "",
+        "summary": "그룹 월간 일정 조회",
+        "tags": ["Group"],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           },
           {
@@ -324,11 +388,18 @@
     "/api/user/{user_id}/calendar": {
       "get": {
         "description": "",
+        "summary": "유저 월간 일정 조회",
+        "tags": ["User"],
         "parameters": [
           {
             "name": "user_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           },
           {
@@ -346,35 +417,173 @@
           }
         }
       }
-    },
-    "/api/user/calendar": {
-      "put": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "nickname": {
-                  "example": "any"
-                },
-                "id": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "작성됨"
-          },
-          "401": {
-            "description": "권한 없음"
-          }
+    }
+  },
+  "definitions": {
+    "Users": {
+      "type": "object",
+      "required": [
+        "email",
+        "nickname",
+        "password"
+      ],
+      "properties": {
+        "userId": {
+          "type": "BIGINT"
+        },
+        "email": {
+          "type": "VARCHAR(40)"
+        },
+        "nickname": {
+          "type": "VARCHAR(15)"
+        },
+        "password": {
+          "type": "VARCHAR(100)"
+        },
+        "provider": {
+          "type": "ENUM('local', 'naver', 'google')"
+        },
+        "snsId": {
+          "type": "VARCHAR(100)"
+        },
+        "createdAt": {
+          "type": "DATETIME"
+        },
+        "updatedAt": {
+          "type": "DATETIME"
+        },
+        "deletedAt": {
+          "type": "DATETIME"
         }
+      },
+      "xml": {
+        "name": "users"
+      }
+    },
+    "Groups": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "groupId": {
+          "type": "BIGINT"
+        },
+        "name": {
+          "type": "VARCHAR(45)"
+        },
+        "member": {
+          "type": "INT"
+        }
+      },
+      "xml": {
+        "name": "Groups"
+      }
+    },
+    "PersonalSchedule": {
+      "type": "object",
+      "required": [
+        "userId",
+        "title",
+        "startDate",
+        "endDate",
+        "repeat"
+      ],
+      "properties": {
+        "id": {
+          "type": "BIGINT"
+        },
+        "userId": {
+          "type": "BIGINT"
+        },
+        "title": {
+          "type": "VARCHAR(45)"
+        },
+        "content": {
+          "type": "TEXT"
+        },
+        "startDate": {
+          "type": "DATETIME"
+        },
+        "endDate": {
+          "type": "DATETIME"
+        },
+        "repeat": {
+          "type": "TINYINT(1)"
+        },
+        "repeatType": {
+          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        }
+      },
+      "xml": {
+        "name": "PersonalSchedule"
+      }
+    },
+    "GroupSchedule": {
+      "type": "object",
+      "required": [
+        "groupId",
+        "title",
+        "startDate",
+        "endDate",
+        "repeat",
+        "confirmed"
+      ],
+      "properties": {
+        "id": {
+          "type": "BIGINT"
+        },
+        "groupId": {
+          "type": "BIGINT"
+        },
+        "title": {
+          "type": "VARCHAR(45)"
+        },
+        "content": {
+          "type": "TEXT"
+        },
+        "startDate": {
+          "type": "DATETIME"
+        },
+        "endDate": {
+          "type": "DATETIME"
+        },
+        "repeat": {
+          "type": "TINYINT(1)"
+        },
+        "repeatType": {
+          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        },
+        "confirmed": {
+          "type": "TINYINT(1)"
+        },
+        "possible": {
+          "type": "JSON"
+        },
+        "impossible": {
+          "type": "JSON"
+        }
+      },
+      "xml": {
+        "name": "GroupSchedule"
+      }
+    },
+    "UserGroup": {
+      "type": "object",
+      "required": [
+        "userId",
+        "groupId"
+      ],
+      "properties": {
+        "groupId": {
+          "type": "BIGINT"
+        },
+        "userId": {
+          "type": "BIGINT"
+        }
+      },
+      "xml": {
+        "name": "UserGroup"
       }
     }
   }

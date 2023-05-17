@@ -41,17 +41,17 @@ describe('Test /api/user endpoints', () => {
       const date = '2023-04';
       const expectedSchedule = {
         schedule: [{
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-05-15T00:00:00.000Z', id: 1, month: null, repeat: 0, startDate: '2023-02-03T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-05-15T00:00:00.000Z', id: 1, month: null, repetition: 0, startDate: '2023-02-03T00:00:00.000Z', title: 'test-title', userId: 1,
         }, {
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-30T00:00:00.000Z', id: 2, month: null, repeat: 0, startDate: '2023-04-16T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-30T00:00:00.000Z', id: 2, month: null, repetition: 0, startDate: '2023-04-16T00:00:00.000Z', title: 'test-title', userId: 1,
         }, {
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-15T00:00:00.000Z', id: 3, month: null, repeat: 0, startDate: '2023-04-01T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-15T00:00:00.000Z', id: 3, month: null, repetition: 0, startDate: '2023-04-01T00:00:00.000Z', title: 'test-title', userId: 1,
         }, {
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-15T00:00:00.000Z', id: 5, month: null, repeat: 0, startDate: '2023-03-01T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-15T00:00:00.000Z', id: 5, month: null, repetition: 0, startDate: '2023-03-01T00:00:00.000Z', title: 'test-title', userId: 1,
         }, {
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-30T00:00:00.000Z', id: 7, month: null, repeat: 0, startDate: '2023-04-01T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-04-30T00:00:00.000Z', id: 7, month: null, repetition: 0, startDate: '2023-04-01T00:00:00.000Z', title: 'test-title', userId: 1,
         }, {
-          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-05-15T00:00:00.000Z', id: 8, month: null, repeat: 0, startDate: '2023-04-15T00:00:00.000Z', title: 'test-title', userId: 1,
+          content: 'test-content1', dayMonth: null, dayWeek: null, endDate: '2023-05-15T00:00:00.000Z', id: 8, month: null, repetition: 0, startDate: '2023-04-15T00:00:00.000Z', title: 'test-title', userId: 1,
         }],
       };
       const res = await request(app).get(`/api/user/${userID}/calendar`).set('Cookie', cookie).query({

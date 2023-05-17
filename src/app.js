@@ -16,6 +16,7 @@ const apiError = require('./middleware/apiError');
 const indexRouter = require('./routes');
 const { sequelize } = require('./models');
 
+process.env.TZ = 'Etc/Universal';
 const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 

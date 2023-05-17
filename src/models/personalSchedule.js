@@ -30,7 +30,7 @@ class PersonalSchedule extends Sequelize.Model {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      repeat: {
+      repetition: {
         type: Sequelize.TINYINT(1),
         allowNull: false,
       },
