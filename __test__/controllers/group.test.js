@@ -4,7 +4,7 @@ const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB,
-  tearDownUserDB, tearDownGroupDB, tearDownGroupScheduleDB,
+  tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupScheduleDB, setUpGroupDB,
   dropDB,
 } = require('../dbSetup');
@@ -40,7 +40,6 @@ describe('Test /api/group endpoints', () => {
   });
 
   afterAll(async () => {
-    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });

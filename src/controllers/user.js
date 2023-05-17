@@ -84,8 +84,19 @@ async function getUserInfo(req, res, next) {
   }
 }
 
+async function putUserSchedule(req, res, next) {
+  try {
+    const { id } = req.body;
+    await PersonalSchedule.update(req.body, { where: { id } });
+    return res.status(201).json({ message: 'Successfully Modified.' });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 module.exports = {
   getUserSchedule,
   getUserDaySchedule,
   getUserInfo,
+  putUserSchedule,
 };
