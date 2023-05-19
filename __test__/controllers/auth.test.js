@@ -13,7 +13,7 @@ describe('Test /auth endpoints', () => {
   beforeEach(async () => {
     await tearDownUserDB();
     await setUpUserDB();
-    
+
     const res = await request(app).post('/api/auth/login').send({
       email: 'test-user@email.com',
       password: 'super_strong_password'
