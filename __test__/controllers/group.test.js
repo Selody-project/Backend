@@ -97,7 +97,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test DELETE /api/group/calendar', () => {
     it('Group schedule deleted successfully ', async () => {
-      const res = (await request(app).delete(`/api/group/calendar`).set('Cookie', cookie).send({
+      const res = (await request(app).delete('/api/group/calendar').set('Cookie', cookie).send({
         id: 4,
       }));
       expect(res.status).toEqual(200);
@@ -322,18 +322,18 @@ describe('Test /api/group endpoints', () => {
             impossible: '["user3"]',
           },
           {
-            id: 22, 
-            groupId: 1, 
-            title: 'test-title', 
-            content: 'test-content1', 
-            startDate: '2021-12-15T00:00:00.000Z', 
-            endDate: '2022-05-20T00:00:00.000Z', 
-            repetition: 1, 
-            dayMonth: '15', 
-            month: '12', 
-            dayWeek: '*', 
-            confirmed: 0, 
-            possible: '["user1"]', 
+            id: 22,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDate: '2021-12-15T00:00:00.000Z',
+            endDate: '2022-05-20T00:00:00.000Z',
+            repetition: 1,
+            dayMonth: '15',
+            month: '12',
+            dayWeek: '*',
+            confirmed: 0,
+            possible: '["user1"]',
             impossible: '["user3"]',
           },
         ],

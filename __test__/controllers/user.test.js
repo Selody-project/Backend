@@ -31,6 +31,7 @@ describe('Test /api/user endpoints', () => {
   });
 
   afterAll(async () => {
+    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
@@ -73,6 +74,40 @@ describe('Test /api/user endpoints', () => {
       });
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
+    });
+  });
+
+  describe('Test POST /api/user/calendar', () => {
+    it('Insert a User schedule into the database', async () => {
+      const schedule = {
+        userId: 1, title: 'test-title', content: 'test-content1', startDate: '6000-01-01 00:00:00.000000', endDate: '7000-01-01 00:00:00.000000', repetition: 1,
+      };
+      // const expectedSchedule = {
+      //   scheduleArr: [
+      //     {
+      //       id: 9,
+      //       userId: 1,
+      //       title: 'test-title',
+      //       content: 'test-content1',
+      //       startDate: '6000-01-01T00:00:00.000Z',
+      //       endDate: '7000-01-01T00:00:00.000Z',
+      //       repetition: 1,
+      //     },
+      //   ],
+      // };
+
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      // const newSchedule = await PersonalSchedule.findOne({
+      //   where: { title: 'test-title' },
+      // });
+      expect(res.statusCode).toEqual(201);
+    });
+  });
+
+  describe('Test DELETE /api/user/calendar', () => {
+    it('Delete a User schedule from the database ', async () => {
+      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: 9 });
+      expect(res.statusCode).toEqual(204);
     });
   });
 });

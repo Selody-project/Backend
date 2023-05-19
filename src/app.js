@@ -20,6 +20,9 @@ process.env.TZ = 'Etc/Universal';
 const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 
+process.env.TZ = 'Etc/Universal';
+console.log(new Date().toString());
+console.log(new Date());
 const app = express();
 
 app.use('/api/', rateLimit({
