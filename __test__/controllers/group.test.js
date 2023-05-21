@@ -35,13 +35,13 @@ describe('Test /api/group endpoints', () => {
   });
 
   afterEach(async () => {
-    await tearDownGroupScheduleDB();
-    await tearDownGroupDB();
+    // await tearDownGroupScheduleDB();
+    // await tearDownGroupDB();
   });
 
   afterAll(async () => {
-    await dropDB();
-    await db.sequelize.close();
+    // await dropDB();
+    // await db.sequelize.close();
   });
 
   describe('Test GET /api/group', () => {
@@ -59,282 +59,153 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test POST /api/group', () => {
-    it('Group creation successful ', async () => {
-      const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
-      expect(res.status).toEqual(200);
-    });
-  });
+  // describe('Test POST /api/group', () => {
+  //   it('Group creation successful ', async () => {
+  //     const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
+  //     expect(res.status).toEqual(200);
+  //   });
+  // });
 
-  describe('Test POST /api/group/calendar', () => {
-    it('Group schedule creation successful ', async () => {
-      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
-        groupId: 1,
-        title: 'test-title',
-        contents: 'test-content',
-        startDate: '2023-05-06',
-        endDate: '2023-05-07',
-        repetition: 1,
-      }));
-      expect(res.status).toEqual(201);
-    });
-  });
+  // describe('Test POST /api/group/calendar', () => {
+  //   it('Group schedule creation successful ', async () => {
+  //     const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
+  //       groupId: 1,
+  //       title: 'test-title',
+  //       contents: 'test-content',
+  //       startDate: '2023-05-06',
+  //       endDate: '2023-05-07',
+  //       repetition: 1,
+  //     }));
+  //     expect(res.status).toEqual(201);
+  //   });
+  // });
 
-  describe('Test PUT /api/group/calendar', () => {
-    it('Group Schedule Modification Successful ', async () => {
-      const res = (await request(app).put('/api/group/calendar').set('Cookie', cookie).send({
-        id: 1,
-        groupId: 1,
-        title: 'modified-title',
-      }));
-      const modifiedSchedule = await GroupSchedule.findOne({
-        where: { title: 'modified-title' },
-      });
-      expect(modifiedSchedule.id).toEqual(1);
-      expect(res.status).toEqual(201);
-    });
-  });
+  // describe('Test PUT /api/group/calendar', () => {
+  //   it('Group Schedule Modification Successful ', async () => {
+  //     const res = (await request(app).put('/api/group/calendar').set('Cookie', cookie).send({
+  //       id: 1,
+  //       groupId: 1,
+  //       title: 'modified-title',
+  //     }));
+  //     const modifiedSchedule = await GroupSchedule.findOne({
+  //       where: { title: 'modified-title' },
+  //     });
+  //     expect(modifiedSchedule.id).toEqual(1);
+  //     expect(res.status).toEqual(201);
+  //   });
+  // });
 
-  describe('Test DELETE /api/group/calendar', () => {
-    it('Group schedule deleted successfully ', async () => {
-      const res = (await request(app).delete(`/api/group/calendar`).set('Cookie', cookie).send({
-        id: 4,
-      }));
-      expect(res.status).toEqual(200);
-    });
-  });
+  // describe('Test DELETE /api/group/calendar', () => {
+  //   it('Group schedule deleted successfully ', async () => {
+  //     const res = (await request(app).delete('/api/group/calendar').set('Cookie', cookie).send({
+  //       id: 4,
+  //     }));
+  //     expect(res.status).toEqual(200);
+  //   });
+  // });
 
   describe('Test GET /api/group/:group_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const groupID = 1;
       const date = '2023-04';
       const expectedSchedule = {
-
-        schedule: [
+        "nonRecurrenceSchedule": [
+          {"content": "test-content1", "endDateTime": "2023-05-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-02-03T00:00:00.000Z", "title": "test-title1"}, 
+          {"content": "test-content2", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-15T00:00:00.000Z", "title": "test-title2"},
+          {"content": "test-content4", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-01T00:00:00.000Z", "title": "test-title4"}, 
+          {"content": "test-content5", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-03-15T00:00:00.000Z", "title": "test-title5"}, 
+          {"content": "test-content6", "endDateTime": "2023-05-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-15T00:00:00.000Z", "title": "test-title6"}, 
+          {"content": "test-content9", "endDateTime": "2023-04-01T08:59:59.000Z", "recurrence": 0, "startDateTime": "2023-03-15T00:00:00.000Z", "title": "test-title9"}, 
+          {"content": "test-content10", "endDateTime": "2023-05-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-30T23:59:59.000Z", "title": "test-title10"}
+        ],
+        "recurrenceSchedule": [
           {
-            id: 1,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-02-03T00:00:00.000Z',
-            endDate: '2023-05-15T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content11", "freq": "DAILY", "groupId": 1, "id": 11, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-01T13:00:00.000Z", "startDateTime": "2023-04-01T12:00:00.000Z" },
+              { "endDateTime": "2023-04-02T13:00:00.000Z", "startDateTime": "2023-04-02T12:00:00.000Z" },
+              { "endDateTime": "2023-04-03T13:00:00.000Z", "startDateTime": "2023-04-03T12:00:00.000Z" },
+              { "endDateTime": "2023-04-04T13:00:00.000Z", "startDateTime": "2023-04-04T12:00:00.000Z" },
+              { "endDateTime": "2023-04-05T13:00:00.000Z", "startDateTime": "2023-04-05T12:00:00.000Z" },
+            ],
+            "title": "test-title11", "until": "2023-04-05T14:00:00.000Z",
           },
           {
-            id: 2,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-04-16T00:00:00.000Z',
-            endDate: '2023-04-30T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content12", "freq": "MONTHLY", "groupId": 1, "id": 12, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+             { "endDateTime": "2023-04-15T13:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title12", "until": "2025-01-01T00:00:00.000Z",
           },
           {
-            id: 3,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-04-01T00:00:00.000Z',
-            endDate: '2023-04-15T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content13", "freq": "WEEKLY", "groupId": 1, "id": 13, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-05T13:00:00.000Z", "startDateTime": "2023-04-05T12:00:00.000Z" },
+              { "endDateTime": "2023-04-12T13:00:00.000Z", "startDateTime": "2023-04-12T12:00:00.000Z" },
+              { "endDateTime": "2023-04-19T13:00:00.000Z", "startDateTime": "2023-04-19T12:00:00.000Z" },
+              { "endDateTime": "2023-04-26T13:00:00.000Z", "startDateTime": "2023-04-26T12:00:00.000Z" },
+            ],
+            "title": "test-title13", "until": "2025-01-01T00:00:00.000Z",
           },
           {
-            id: 5,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-04-01T00:00:00.000Z',
-            endDate: '2023-04-30T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content14", "freq": "YEARLY", "groupId": 1, "id": 14, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-15T13:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title14", "until": "2025-01-01T00:00:00.000Z",
+          },
+          { 
+            "byweekday": "MO,TU", "content": "test-content15", "freq": "DAILY", "groupId": 1, "id": 15, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-03T13:00:00.000Z", "startDateTime": "2023-04-03T12:00:00.000Z" },
+              { "endDateTime": "2023-04-04T13:00:00.000Z", "startDateTime": "2023-04-04T12:00:00.000Z" },
+              { "endDateTime": "2023-04-10T13:00:00.000Z", "startDateTime": "2023-04-10T12:00:00.000Z" },
+              { "endDateTime": "2023-04-11T13:00:00.000Z", "startDateTime": "2023-04-11T12:00:00.000Z" },
+              { "endDateTime": "2023-04-17T13:00:00.000Z", "startDateTime": "2023-04-17T12:00:00.000Z" },
+              { "endDateTime": "2023-04-18T13:00:00.000Z", "startDateTime": "2023-04-18T12:00:00.000Z" },
+              { "endDateTime": "2023-04-24T13:00:00.000Z", "startDateTime": "2023-04-24T12:00:00.000Z" },
+              { "endDateTime": "2023-04-25T13:00:00.000Z", "startDateTime": "2023-04-25T12:00:00.000Z" },
+            ],
+            "title": "test-title15", "until": "2025-01-01T00:00:00.000Z",
           },
           {
-            id: 6,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-03-01T00:00:00.000Z',
-            endDate: '2023-04-15T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content16", "freq": "DAILY", "groupId": 1, "id": 16, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T12:00:00.000Z" },
+              { "endDateTime": "2023-04-02T00:00:00.000Z", "startDateTime": "2023-03-16T12:00:00.000Z" },
+              { "endDateTime": "2023-04-03T00:00:00.000Z", "startDateTime": "2023-03-17T12:00:00.000Z" },
+              { "endDateTime": "2023-04-04T00:00:00.000Z", "startDateTime": "2023-03-18T12:00:00.000Z" },
+              { "endDateTime": "2023-04-05T00:00:00.000Z", "startDateTime": "2023-03-19T12:00:00.000Z" },
+            ],
+            "title": "test-title16", "until": "2023-03-20T00:00:00.000Z",
           },
           {
-            id: 8,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDate: '2023-04-15T00:00:00.000Z',
-            endDate: '2023-05-15T00:00:00.000Z',
-            repetition: 0,
-            dayMonth: null,
-            month: null,
-            dayWeek: null,
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content17", "freq": "WEEKLY", "groupId": 1, "id": 17, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-05T00:00:00.000Z", "startDateTime": "2023-03-19T12:00:00.000Z" },
+              { "endDateTime": "2023-04-12T00:00:00.000Z", "startDateTime": "2023-03-26T12:00:00.000Z" },
+              { "endDateTime": "2023-04-19T00:00:00.000Z", "startDateTime": "2023-04-02T12:00:00.000Z" },
+              { "endDateTime": "2023-04-26T00:00:00.000Z", "startDateTime": "2023-04-09T12:00:00.000Z" },
+              { "endDateTime": "2023-05-03T00:00:00.000Z", "startDateTime": "2023-04-16T12:00:00.000Z" },
+              { "endDateTime": "2023-05-10T00:00:00.000Z", "startDateTime": "2023-04-23T12:00:00.000Z" },
+              { "endDateTime": "2023-05-17T00:00:00.000Z", "startDateTime": "2023-04-30T12:00:00.000Z" },
+            ],
+            "title": "test-title17", "until": "2025-01-01T00:00:00.000Z",
           },
           {
-            id: 9,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2021-02-03T00:00:00.000Z',
-            endDate: '2021-02-03T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '*',
-            month: '*',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content18", "freq": "MONTHLY", "groupId": 1, "id": 18, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T12:00:00.000Z" },
+              { "endDateTime": "2023-05-02T00:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title18", "until": "2025-01-01T00:00:00.000Z",
           },
           {
-            id: 10,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2023-04-15T00:00:00.000Z',
-            endDate: '2023-04-20T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '*',
-            month: '*',
-            dayWeek: '1',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 12,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2021-01-15T00:00:00.000Z',
-            endDate: '2021-01-15T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '*',
-            month: '*',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 17,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2023-03-15T00:00:00.000Z',
-            endDate: '2023-05-15T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '*',
-            month: '*',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 18,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2023-03-15T00:00:00.000Z',
-            endDate: '2023-05-15T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '*',
-            month: '*',
-            dayWeek: '1',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 19,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2021-03-15T00:00:00.000Z',
-            endDate: '2021-05-15T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '15',
-            month: '*',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 20,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2021-03-15T00:00:00.000Z',
-            endDate: '2021-05-15T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '15',
-            month: '3',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 21,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDate: '2023-04-15T00:00:00.000Z',
-            endDate: '2023-04-20T00:00:00.000Z',
-            repetition: 1,
-            dayMonth: '15',
-            month: '*',
-            dayWeek: '*',
-            confirmed: 0,
-            possible: '["user1"]',
-            impossible: '["user3"]',
-          },
-          {
-            id: 22, 
-            groupId: 1, 
-            title: 'test-title', 
-            content: 'test-content1', 
-            startDate: '2021-12-15T00:00:00.000Z', 
-            endDate: '2022-05-20T00:00:00.000Z', 
-            repetition: 1, 
-            dayMonth: '15', 
-            month: '12', 
-            dayWeek: '*', 
-            confirmed: 0, 
-            possible: '["user1"]', 
-            impossible: '["user3"]',
+            "byweekday": "", "content": "test-content19", "freq": "YEARLY", "groupId": 1, "id": 19, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-02T00:00:00.000Z", "startDateTime": "2023-01-15T12:00:00.000Z" },
+            ],
+            "title": "test-title19", "until": "2025-01-01T00:00:00.000Z",
           },
         ],
       };

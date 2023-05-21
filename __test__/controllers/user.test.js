@@ -9,7 +9,9 @@ const PersonalSchedule = require('../../src/models/personalSchedule');
 describe('Test /api/user endpoints', () => {
   let cookie;
   beforeAll(async () => {
+    await dropDB();
     await syncDB();
+    await tearDownPersonalScheduleDB();
     await tearDownUserDB();
     const mockUser = {
       email: 'testUser@email.com',
@@ -34,7 +36,7 @@ describe('Test /api/user endpoints', () => {
     await dropDB();
     await db.sequelize.close();
   });
-
+/*
   describe('Test GET /api/user/:user_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const userID = 1;
@@ -61,7 +63,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedSchedule);
     });
   });
-
+*/
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({

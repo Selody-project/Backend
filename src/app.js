@@ -50,15 +50,20 @@ app.use('/api', indexRouter);
 
 app.use(apiError);
 
+const dbTimezoneSetUp = `
+SET GLOBAL time_zone='+00:00';
+SET time_zone='+00:00';
+`;
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, async () => {
     console.log(`Server is up on port ${appUrl}:${port}`);
     try {
-      await sequelize.sync({ force: false }).then(() => {
+      const db = await sequelize.sync({ force: false }).then(() => {
         console.log('DB Connection has been established successfully.');
       }).catch((error) => {
         console.error('Unable to connect to the database: ', error);
       });
+      await db.sequelize.query(dbTimezoneSetUp, { type: sequelize.QueryTypes.SET });
       console.log(`${port} PORT Connection has been established successfully.`);
     } catch (error) {
       console.error('Unable to connect to the database:', error);

@@ -22,32 +22,33 @@ class GroupSchedule extends Sequelize.Model {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      startDate: {
+      startDateTime: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      endDate: {
+      endDateTime: {
         type: Sequelize.DATE,
         allowNull: false,
       },
-      repetition: {
-        type: Sequelize.TINYINT,
+      recurrence: {
+        type: Sequelize.TINYINT(1),
         allowNull: false,
       },
-      dayMonth: {
-        type: Sequelize.STRING(30),
+      freq: {
+        type: Sequelize.STRING(10),
         allowNull: true,
-        defaultValue: null,
       },
-      month: {
-        type: Sequelize.STRING(30),
+      interval: {
+        type: Sequelize.INTEGER,
         allowNull: true,
-        defaultValue: null,
       },
-      dayWeek: {
-        type: Sequelize.STRING(30),
+      byweekday: {
+        type: Sequelize.TEXT,
         allowNull: true,
-        defaultValue: null,
+      },
+      until: {
+        type: Sequelize.DATE,
+        allowNull: true,
       },
       confirmed: {
         type: Sequelize.TINYINT(1),
