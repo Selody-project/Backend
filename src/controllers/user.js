@@ -30,20 +30,8 @@ async function putUserSchedule(req, res, next) {
   }
 }
 
-async function getUserPersonalMonthSchedule(req, res, next) {
+async function getSchedule(userID, start, end, startUTC, endUTC) {
   try {
-    const { error } = validateUserIdSchema(req.params);
-    if (error) return next(new DataFormatError());
-
-    const { user_id: userID } = req.params;
-    const { date: dateString } = req.query;
-
-    // moment 라이브러리를 사용하여 생성된 Date 객체는
-    // 로컬 타임존에 따라 자동으로 변환될 수 있음. 따라서 startUTC, endUTC로 다시 변환해줌.
-    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
-    const end = moment.utc(start).endOf('month').toDate();
-    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
-    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
     const nonRecurrenceStatement = `
       SELECT title, content, startDateTime, endDateTime, recurrence FROM personalSchedule
       WHERE userId = :userID AND (
@@ -60,8 +48,7 @@ async function getUserPersonalMonthSchedule(req, res, next) {
       WHERE userId = :userID AND (
         recurrence = 1 AND 
         startDateTime <= :end
-      )
-      `;
+      )`;
     const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
       replacements: { userID, start: startUTC, end: endUTC },
       type: Sequelize.QueryTypes.SELECT,
@@ -114,7 +101,28 @@ async function getUserPersonalMonthSchedule(req, res, next) {
         });
       }
     });
-    return res.status(200).json({ nonRecurrenceSchedule, recurrenceSchedule });
+  } catch (err) {
+    return next(err); 
+  }
+  return { nonRecurrenceSchedule, recurrenceSchedule };
+}
+
+async function getUserPersonalMonthSchedule(req, res, next) {
+  try {
+    const { error } = validateUserIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { user_id: userID } = req.params;
+    const { date: dateString } = req.query;
+
+    // moment 라이브러리를 사용하여 생성된 Date 객체는
+    // 로컬 타임존에 따라 자동으로 변환될 수 있음. 따라서 startUTC, endUTC로 다시 변환해줌.
+    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
+    const end = moment.utc(start).endOf('month').toDate();
+    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
+    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
+    const schedule = getSchedule(start, end, startUTC, endUTC);
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(err);
   }
@@ -122,6 +130,16 @@ async function getUserPersonalMonthSchedule(req, res, next) {
 
 async function getUserPersonalDaySchedule(req, res, next) {
   try {
+    const { user_id: userID } = req.params;
+    const { date: dateString } = req.query;
+
+    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
+    const end = moment.utc(start).endOf('month').toDate();
+    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
+    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
+    const schedule = getSchedule(start, end, startUTC, endUTC);
+    if (schedule) 
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(err);
   }
