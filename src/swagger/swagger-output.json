@@ -254,11 +254,20 @@
                 "confirmed": {
                   "example": "any"
                 },
-                "repeat": {
+                "recurrence": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "freq": {
                   "example": "any"
                 },
-                "repeatType": {
+                "interval": {
                   "example": "any"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 }
               }
             }
@@ -305,11 +314,20 @@
                 "confirmed": {
                   "example": "any"
                 },
-                "repeat": {
+                "recurrence": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "freq": {
                   "example": "any"
                 },
-                "repeatType": {
+                "interval": {
                   "example": "any"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 }
               }
             }
@@ -508,11 +526,20 @@
         "endDate": {
           "type": "DATETIME"
         },
-        "repeat": {
+        "recurrence": {
           "type": "TINYINT(1)"
         },
-        "repeatType": {
-          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        "freq": {
+          "type": "STRING(10)"
+        },
+        "interval": {
+          "type": "INTEGER"
+        },
+        "byweekday": {
+          "type": "TEXT"
+        },
+        "until": {
+          "type": "DATETIME"
         }
       },
       "xml": {
@@ -548,11 +575,20 @@
         "endDate": {
           "type": "DATETIME"
         },
-        "repeat": {
+        "recurrence": {
           "type": "TINYINT(1)"
         },
-        "repeatType": {
-          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        "freq": {
+          "type": "STRING(10)"
+        },
+        "interval": {
+          "type": "INTEGER"
+        },
+        "byweekday": {
+          "type": "TEXT"
+        },
+        "until": {
+          "type": "DATETIME"
         },
         "confirmed": {
           "type": "TINYINT(1)"

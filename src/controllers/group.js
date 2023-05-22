@@ -1,17 +1,15 @@
 const Sequelize = require('sequelize');
 const moment = require('moment');
-// const {
-//   datetime, RRule, RRuleSet, rrulestr,
-// } = require('rrule');
-
-const {
-  RRule,
-} = require('rrule');
+const { RRule } = require('rrule');
 const db = require('../models');
-const { validateGroupSchema } = require('../utils/validators');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
+const DataFormatError = require('../errors/DataFormatError');
+const { 
+  validateGroupSchema, validateGroupIdSchema,
+  validateScheduleSchema, validateScheduleIdSchema 
+} = require('../utils/validators');
 
 function getRRuleFreq(freq) {
   const RRuleFreq = {
@@ -20,7 +18,6 @@ function getRRuleFreq(freq) {
     MONTHLY: RRule.MONTHLY,
     YEARLY: RRule.YEARLY,
   };
-
   return RRuleFreq[freq];
 }
 
@@ -35,16 +32,17 @@ function getRRuleByWeekDay(byweekday) {
     SA: RRule.SA,
     SU: RRule.SU,
   };
-
   if (arr[0] === '') {
     return [];
   }
-
   return arr.map((str) => RRuleWeekDay[str]);
 }
 
 async function createGroup(req, res, next) {
   try {
+    const { error } = validateGroupSchema(req.body);
+    if (error) return next(new DataFormatError());
+
     const { nickname, name } = req.body;
     const exUser = await User.findOne({ where: { nickname } });
     const group = await Group.create({ name, member: 1 });
@@ -57,7 +55,8 @@ async function createGroup(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const exUser = await User.findOne({ where: { nickname: req.body.nickname } });
+    const { nickname } = req.body;
+    const exUser = await User.findOne({ where: { nickname } });
     const groupList = await exUser.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
@@ -67,8 +66,8 @@ async function getGroupList(req, res, next) {
 
 async function getGroupSchedule(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.params);
-    if (error) throw error;
+    const { error } = validateGroupIdSchema(req.params);
+    if (error) return next(new DataFormatError());
 
     const { group_id: groupID } = req.params;
     const { date: dateString } = req.query;
@@ -79,7 +78,6 @@ async function getGroupSchedule(req, res, next) {
     const end = moment.utc(start).endOf('month').toDate();
     const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
     const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
-    // + start.getTimezoneOffset() * 60000
     const nonRecurrenceStatement = `
       SELECT title, content, startDateTime, endDateTime, recurrence FROM groupSchedule
       WHERE groupId = :groupID AND (
@@ -88,7 +86,7 @@ async function getGroupSchedule(req, res, next) {
           OR
           (endDateTime BETWEEN :start AND :end)
           OR
-          (startDateTime <= :start AND endDateTime >= :end)
+          (startDateTime < :start AND endDateTime > :end)
         )
       )`;
     const recurrenceStatement = `
@@ -127,7 +125,7 @@ async function getGroupSchedule(req, res, next) {
         });
       }
       const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
-      const scheduleDateList = rrule.between(new Date(startUTC - scheduleLength - 1), endUTC);
+      const scheduleDateList = rrule.between(new Date(startUTC.getTime() - scheduleLength - 1), new Date(end.getTime() + 1));
       const possibleDateList = [];
       scheduleDateList.forEach((scheduleDate) => {
         const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
@@ -159,6 +157,9 @@ async function getGroupSchedule(req, res, next) {
 
 async function postGroupSchedule(req, res, next) {
   try {
+    const { error } = validateScheduleSchema(req.body);
+    if (error) return next(new DataFormatError());
+
     const {
       groupId, title, startDate, endDate, content,
     } = req.body;
@@ -170,6 +171,9 @@ async function postGroupSchedule(req, res, next) {
       endDate,
       confirmed: 0,
       repetition: req.body.repetition || 0,
+      dayMonth: req.body.dayMonth || null,
+      month: req.body.month || null,
+      dayWeek: req.body.dayWeek || null,
       possible: null,
       impossible: null,
     });
@@ -181,6 +185,9 @@ async function postGroupSchedule(req, res, next) {
 
 async function putGroupSchedule(req, res, next) {
   try {
+    const { error } = validateScheduleSchema(req.body);
+    if (error) return next(new DataFormatError());
+
     const { id } = req.body;
     await GroupSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
@@ -191,6 +198,9 @@ async function putGroupSchedule(req, res, next) {
 
 async function deleteGroupSchedule(req, res, next) {
   try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+    
     const { id } = req.body;
     const schedule = await GroupSchedule.findOne({ where: { id } });
     await schedule.destroy();
