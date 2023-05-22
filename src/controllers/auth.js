@@ -1,12 +1,15 @@
 const request = require('request');
 const bcrypt = require('bcrypt');
 const { Sequelize } = require('sequelize');
+const { Op } = Sequelize;
 const User = require('../models/user');
 const ApiError = require('../errors/apiError');
 const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
+const DataFormatError = require('../errors/DataFormatError');
+const { validateLoginSchema, validateJoinSchema } = require('../utils/validators');
 
-const { Op } = Sequelize;
+
 
 async function getNaverUserInfo(req, res, next) {
   const { accessToken } = req.body;
@@ -40,13 +43,16 @@ async function joinSocialUser(req, res, next) {
 }
 
 async function join(req, res, next) {
+  const { error } = validateJoinSchema(req.body);
+  if (error) return next(new DataFormatError());
+
   const { email, nickname, password } = req.body;
   let options;
 
   if (email && !nickname) {
-    options = { where: { [Op.or]: [{ email }] } };
+    options = { where: { email } };
   } else if (!email && nickname) {
-    options = { where: { [Op.or]: [{ nickname }] } };
+    options = { where: { nickname } };
   } else {
     options = { where: { [Op.or]: [{ email }, { nickname }] } };
   }
@@ -65,7 +71,7 @@ async function join(req, res, next) {
         provider: 'local',
       });
       return next();
-    } catch (error) {
+    } catch (err) {
       return next(new ApiError());
     }
   } else {
@@ -74,26 +80,28 @@ async function join(req, res, next) {
 }
 
 async function login(req, res, next) {
-  const { email, password } = req.body;
+  const { error } = validateLoginSchema(req.body);
+  if (error) return next(new DataFormatError());
 
+  const { email, password } = req.body;
   let exUser;
   try {
     exUser = await User.findOne({ where: { email } });
-  } catch (error) {
+  } catch (err) {
     return new ApiError();
   }
 
   if (!exUser) {
     return next(new InvalidIdPasswordError());
   }
-
   try {
     const result = await bcrypt.compare(password, exUser.password);
     if (result) {
-      req.body.nickname = { nickname: exUser.nickname };
+      req.body.nickname = exUser.nickname;
       return next();
     }
-  } catch (error) {
+    return next(new InvalidIdPasswordError());
+  } catch (err) {
     return next(new ApiError());
   }
 }

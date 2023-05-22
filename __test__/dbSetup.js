@@ -116,7 +116,16 @@ async function setUpGroupScheduleDB() {
       id: 19, groupId: 1, title: 'test-title19', content: 'test-content19', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
     },
     {
-      id: 20, groupId: 1, title: 'test-title20', content: 'test-content21', startDateTime: '2020-01-15T00:00:00.000Z', endDateTime: '2020-01-31T23:59:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 2, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
+      id: 20, groupId: 1, title: 'test-title20', content: 'test-content20', startDateTime: '2020-01-15T00:00:00.000Z', endDateTime: '2020-01-31T23:59:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 2, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
+    },
+    {
+      id: 21, groupId: 1, title: 'test-title21', content: 'test-content21', startDateTime: '2020-04-30T23:59:59.999Z', endDateTime: '2020-05-01T23:59:59.999Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
+    },
+    {
+      id: 22, groupId: 1, title: 'test-title22', content: 'test-content22', startDateTime: '2020-03-15T00:00:00.000Z', endDateTime: '2020-03-31T23:59:59.999Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
+    },
+    {
+      id: 23, groupId: 1, title: 'test-title23', content: 'test-content23', startDateTime: '2020-03-15T00:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01', confirmed: 0, possible: 'user1', impossible: 'user3',
     },
   ]);
 }

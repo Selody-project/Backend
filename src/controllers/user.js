@@ -1,14 +1,18 @@
 const { Op } = require('sequelize');
 const moment = require('moment');
-const { validateUserIdSchema } = require('../utils/validators');
 const PersonalSchedule = require('../models/personalSchedule');
 const GroupSchedule = require('../models/groupSchedule');
 const User = require('../models/user');
+const { 
+  validateUserIdSchema,
+  validateScheduleSchema, validateScheduleIdSchema 
+} = require('../utils/validators');
 
-async function getUserSchedule(req, res, next) {
+async function getUserPersonalSchedule(req, res, next) {
   try {
     const { error } = validateUserIdSchema(req.params);
-    if (error) throw error;
+    if (error) return next(new DataFormatError());
+
     const { user_id: userID } = req.params;
 
     const { date: dateString } = req.query;
@@ -32,8 +36,11 @@ async function getUserSchedule(req, res, next) {
   }
 }
 
-async function getUserDaySchedule(req, res, next) {
+async function getUserPersonalDaySchedule(req, res, next) {
   try {
+    const { error } = validateUserIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
     const curr = new Date();
     //    const weekday = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
     const start = moment(curr).startOf('day').add(9, 'hours').toDate();
@@ -77,7 +84,8 @@ async function getUserDaySchedule(req, res, next) {
 
 async function getUserInfo(req, res, next) {
   try {
-    const exUser = await User.findOne({ where: { nickname: req.body.nickname } });
+    const { nickname } = req.body;
+    const exUser = await User.findOne({ where: { nickname } });
     return res.status(200).json({ exUser });
   } catch (err) {
     return next(err);
@@ -86,6 +94,8 @@ async function getUserInfo(req, res, next) {
 
 async function putUserSchedule(req, res, next) {
   try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
     const { id } = req.body;
     await PersonalSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
@@ -95,8 +105,8 @@ async function putUserSchedule(req, res, next) {
 }
 
 module.exports = {
-  getUserSchedule,
-  getUserDaySchedule,
+  getUserPersonalSchedule,
+  getUserPersonalDaySchedule,
   getUserInfo,
   putUserSchedule,
 };
