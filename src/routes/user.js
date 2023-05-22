@@ -6,8 +6,8 @@ const {
 
 const router = express.Router();
 
-router.get('/:user_id/calendar', getUserPersonalMonthSchedule);
 router.put('/calendar', putUserSchedule);
+router.get('/:user_id/calendar', getUserPersonalMonthSchedule);
 router.get('/:user_id/calendar/todo', getUserPersonalDaySchedule);
 
 module.exports = router;

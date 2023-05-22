@@ -31,7 +31,7 @@ const groupIdSchema = Joi.object({
 
 const scheduleSchema = Joi.object({
   id: Joi.number().min(0),
-
+  
 });
 
 const scheduleIdSchema = Joi.object({
