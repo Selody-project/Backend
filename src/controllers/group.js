@@ -6,9 +6,9 @@ const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const DataFormatError = require('../errors/DataFormatError');
-const { 
+const {
   validateGroupSchema, validateGroupIdSchema,
-  validateScheduleSchema, validateScheduleIdSchema 
+  validateScheduleSchema, validateScheduleIdSchema,
 } = require('../utils/validators');
 
 function getRRuleFreq(freq) {
@@ -125,7 +125,10 @@ async function getGroupSchedule(req, res, next) {
         });
       }
       const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
-      const scheduleDateList = rrule.between(new Date(startUTC.getTime() - scheduleLength - 1), new Date(end.getTime() + 1));
+      const scheduleDateList = rrule.between(
+        new Date(startUTC.getTime() - scheduleLength - 1),
+        new Date(end.getTime() + 1),
+      );
       const possibleDateList = [];
       scheduleDateList.forEach((scheduleDate) => {
         const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
@@ -200,7 +203,7 @@ async function deleteGroupSchedule(req, res, next) {
   try {
     const { error } = validateScheduleIdSchema(req.params);
     if (error) return next(new DataFormatError());
-    
+
     const { id } = req.body;
     const schedule = await GroupSchedule.findOne({ where: { id } });
     await schedule.destroy();
