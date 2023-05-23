@@ -166,6 +166,59 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
+  describe('Test GET /api/user/:user_id/calendar/todo', () => {
+    it('Successfully get an April Schedule ', async () => {
+      const userID = 1;
+      const date = '2023-04-15';
+      const expectedSchedule = {
+        "nonRecurrenceSchedule": [
+          { "content": "test-content1", "endDateTime": "2023-05-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-02-03T00:00:00.000Z", "title": "test-title1" },
+          { "content": "test-content2", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-15T00:00:00.000Z", "title": "test-title2" },
+          { "content": "test-content3", "endDateTime": "2023-04-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-10T00:00:00.000Z", "title": "test-title3" },
+          { "content": "test-content4", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-01T00:00:00.000Z", "title": "test-title4" },
+          { "content": "test-content5", "endDateTime": "2023-04-30T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-03-15T00:00:00.000Z", "title": "test-title5" },
+          { "content": "test-content6", "endDateTime": "2023-05-15T23:59:59.000Z", "recurrence": 0, "startDateTime": "2023-04-15T00:00:00.000Z", "title": "test-title6" },
+        ],
+        "recurrenceSchedule": [
+          {
+            "byweekday": "", "content": "test-content12", "freq": "MONTHLY", "id": 12, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-15T13:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title12", "until": "2025-01-01T00:00:00.000Z",
+          },
+          {
+            "byweekday": "", "content": "test-content14", "freq": "YEARLY", "id": 14, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-15T13:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title14", "until": "2025-01-01T00:00:00.000Z",
+          },
+          {
+            "byweekday": "", "content": "test-content17", "freq": "WEEKLY", "id": 17, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-19T00:00:00.000Z", "startDateTime": "2023-04-02T12:00:00.000Z" },
+              { "endDateTime": "2023-04-26T00:00:00.000Z", "startDateTime": "2023-04-09T12:00:00.000Z" },
+            ],
+            "title": "test-title17", "until": "2025-01-01T00:00:00.000Z",
+          },
+          {
+            "byweekday": "", "content": "test-content18", "freq": "MONTHLY", "id": 18, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-05-02T00:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
+            ],
+            "title": "test-title18", "until": "2025-01-01T00:00:00.000Z",
+          },
+        ],
+      };
+      const res = await request(app).get(`/api/user/${userID}/calendar/todo`).set('Cookie', cookie).query({
+        date,
+      });
+      expect(res.statusCode).toEqual(200);
+      expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
