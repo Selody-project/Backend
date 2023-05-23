@@ -31,11 +31,6 @@ const groupIdSchema = Joi.object({
 
 const scheduleSchema = Joi.object({
   id: Joi.number().min(0),
-  
-});
-
-const scheduleIdSchema = Joi.object({
-  id: Joi.number().min(0).required(),
   title: Joi.string().max(45),
   content: Joi.string(),
   startDateTime: Joi.date(),
@@ -48,6 +43,10 @@ const scheduleIdSchema = Joi.object({
   confirmed: Joi.number(),
   possible: Joi.object(),
   impossible: Joi.object(),
+});
+
+const scheduleIdSchema = Joi.object({
+  id: Joi.number().min(0).required(),
 })
 
 module.exports = {

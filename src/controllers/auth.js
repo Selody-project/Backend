@@ -1,6 +1,7 @@
 const request = require('request');
 const bcrypt = require('bcrypt');
 const { Sequelize } = require('sequelize');
+
 const { Op } = Sequelize;
 const User = require('../models/user');
 const ApiError = require('../errors/apiError');
@@ -8,8 +9,6 @@ const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
 const DataFormatError = require('../errors/DataFormatError');
 const { validateLoginSchema, validateJoinSchema } = require('../utils/validators');
-
-
 
 async function getNaverUserInfo(req, res, next) {
   const { accessToken } = req.body;
@@ -45,7 +44,7 @@ async function joinSocialUser(req, res, next) {
 async function join(req, res, next) {
   const { error } = validateJoinSchema(req.body);
   if (error) return next(new DataFormatError());
-  
+
   const { email, nickname, password } = req.body;
   let options;
 
@@ -70,6 +69,7 @@ async function join(req, res, next) {
         password: hash,
         provider: 'local',
       });
+      req.nickname = nickname;
       return next();
     } catch (err) {
       return next(new ApiError());
@@ -97,7 +97,7 @@ async function login(req, res, next) {
   try {
     const result = await bcrypt.compare(password, exUser.password);
     if (result) {
-      req.body.nickname = exUser.nickname;
+      req.nickname = exUser.nickname;
       return next();
     }
     return next(new InvalidIdPasswordError());

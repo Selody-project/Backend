@@ -43,7 +43,8 @@ async function createGroup(req, res, next) {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
 
-    const { nickname, name } = req.body;
+    const { nickname } = req;
+    const { name } = req.body;
     const exUser = await User.findOne({ where: { nickname } });
     const group = await Group.create({ name, member: 1 });
     await exUser.addGroup(group);
@@ -55,7 +56,7 @@ async function createGroup(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { nickname } = req.body;
+    const { nickname } = req;
     const exUser = await User.findOne({ where: { nickname } });
     const groupList = await exUser.getGroups();
     return res.status(200).json({ groupList });

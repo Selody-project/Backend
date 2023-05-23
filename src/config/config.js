@@ -23,7 +23,6 @@ const dbConfig = {
   host: dbHost,
   dialect: 'mysql',
   port: dbPort,
-  timezone: '+00:00',
 };
 
 module.exports = {

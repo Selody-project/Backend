@@ -1,7 +1,4 @@
-const Sequelize = require('sequelize');
 const moment = require('moment');
-const { RRule } = require('rrule');
-const db = require('../models');
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
@@ -10,119 +7,11 @@ const { validateUserIdSchema, validateScheduleSchema } = require('../utils/valid
 
 async function getUserInfo(req, res, next) {
   try {
-    const { nickname } = req.body;
+    const { nickname } = req;
     const exUser = await User.findOne({ where: { nickname } });
     return res.status(200).json({ exUser });
   } catch (err) {
     return next(err);
-  }
-}
-
-function getRRuleFreq(freq) {
-  const RRuleFreq = {
-    DAILY: RRule.DAILY,
-    WEEKLY: RRule.WEEKLY,
-    MONTHLY: RRule.MONTHLY,
-    YEARLY: RRule.YEARLY,
-  };
-  return RRuleFreq[freq];
-}
-
-function getRRuleByWeekDay(byweekday) {
-  const arr = byweekday.split(',');
-  const RRuleWeekDay = {
-    MO: RRule.MO,
-    TU: RRule.TU,
-    WE: RRule.WE,
-    TH: RRule.TH,
-    FR: RRule.FR,
-    SA: RRule.SA,
-    SU: RRule.SU,
-  };
-  if (arr[0] === '') {
-    return [];
-  }
-  return arr.map((str) => RRuleWeekDay[str]);
-}
-
-async function getSchedule(userID, start, end, startUTC, endUTC) {
-  try {
-    const nonRecurrenceStatement = `
-      SELECT title, content, startDateTime, endDateTime, recurrence FROM personalSchedule
-      WHERE userId = :userID AND (
-        recurrence = 0 AND ( 
-          (startDateTime BETWEEN :start AND :end)
-          OR
-          (endDateTime BETWEEN :start AND :end)
-          OR
-          (startDateTime < :start AND endDateTime > :end)
-        )
-      )`;
-    const recurrenceStatement = `
-      SELECT * FROM personalSchedule
-      WHERE userId = :userID AND (
-        recurrence = 1 AND 
-        startDateTime <= :end
-      )`;
-    const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-      replacements: { userID, start: startUTC, end: endUTC },
-      type: Sequelize.QueryTypes.SELECT,
-    });
-    const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-      replacements: { userID, start: startUTC, end: endUTC },
-      type: Sequelize.QueryTypes.SELECT,
-    });
-    const recurrenceSchedule = [];
-    recurrenceScheduleList.forEach((schedule) => {
-      const byweekday = getRRuleByWeekDay(schedule.byweekday);
-      let rrule;
-      if (byweekday.length === 0) {
-        rrule = new RRule({
-          freq: getRRuleFreq(schedule.freq),
-          interval: schedule.interval,
-          dtstart: schedule.startDateTime,
-          until: schedule.until,
-        });
-      } else {
-        rrule = new RRule({
-          freq: getRRuleFreq(schedule.freq),
-          interval: schedule.interval,
-          byweekday: getRRuleByWeekDay(schedule.byweekday),
-          dtstart: schedule.startDateTime,
-          until: schedule.until,
-        });
-      }
-      const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
-      const scheduleDateList = rrule.between(
-        new Date(startUTC.getTime() - scheduleLength - 1),
-        new Date(end.getTime() + 1),
-      );
-      const possibleDateList = [];
-      scheduleDateList.forEach((scheduleDate) => {
-        const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
-        if (endDateTime >= start) {
-          possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
-        }
-      });
-      if (possibleDateList.length !== 0) {
-        recurrenceSchedule.push({
-          id: schedule.id,
-          groupId: schedule.groupId,
-          title: schedule.title,
-          content: schedule.content,
-          recurrence: schedule.recurrence,
-          freq: schedule.freq,
-          interval: schedule.interval,
-          byweekday: schedule.byweekday,
-          until: schedule.until,
-          recurrenceDateList: possibleDateList,
-        });
-      }
-    });
-    return { nonRecurrenceSchedule, recurrenceSchedule };
-  } catch (err) {
-    console.log(err);
-    return null;
   }
 }
 
@@ -140,7 +29,7 @@ async function getUserPersonalMonthSchedule(req, res, next) {
     const end = moment.utc(start).endOf('month').toDate();
     const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
     const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
-    const schedule = await getSchedule(userID, start, end, startUTC, endUTC);
+    const schedule = await PersonalSchedule.getSchedule(userID, start, end, startUTC, endUTC);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
@@ -160,7 +49,7 @@ async function getUserPersonalDaySchedule(req, res, next) {
     const end = moment.utc(start).endOf('day').toDate();
     const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
     const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
-    const schedule = await getSchedule(userID, start, end, startUTC, endUTC);
+    const schedule = await PersonalSchedule.getSchedule(userID, start, end, startUTC, endUTC);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {

@@ -13,7 +13,6 @@ const sequelize = new Sequelize(
     port: dbConfig.port,
     options: {
       database: dbConfig.database,
-      timezone: dbConfig.timezone,
     },
     pool: {
       max: 5,
