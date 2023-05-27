@@ -254,11 +254,20 @@
                 "confirmed": {
                   "example": "any"
                 },
-                "repeat": {
+                "recurrence": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "freq": {
                   "example": "any"
                 },
-                "repeatType": {
+                "interval": {
                   "example": "any"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 }
               }
             }
@@ -305,11 +314,20 @@
                 "confirmed": {
                   "example": "any"
                 },
-                "repeat": {
+                "recurrence": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "freq": {
                   "example": "any"
                 },
-                "repeatType": {
+                "interval": {
                   "example": "any"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 }
               }
             }
@@ -389,6 +407,39 @@
       "get": {
         "description": "",
         "summary": "유저 월간 일정 조회",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
+      }
+    },
+    "/api/user/{user_id}/calendar/todo": {
+      "get": {
+        "description": "",
+        "summary": "유저 일간 일정 조회",
         "tags": ["User"],
         "parameters": [
           {
@@ -508,11 +559,20 @@
         "endDate": {
           "type": "DATETIME"
         },
-        "repeat": {
+        "recurrence": {
           "type": "TINYINT(1)"
         },
-        "repeatType": {
-          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        "freq": {
+          "type": "STRING(10)"
+        },
+        "interval": {
+          "type": "INTEGER"
+        },
+        "byweekday": {
+          "type": "TEXT"
+        },
+        "until": {
+          "type": "DATETIME"
         }
       },
       "xml": {
@@ -548,11 +608,20 @@
         "endDate": {
           "type": "DATETIME"
         },
-        "repeat": {
+        "recurrence": {
           "type": "TINYINT(1)"
         },
-        "repeatType": {
-          "type": "ENUM('YEAR', 'MONTH', 'WEEK', 'DAY')"
+        "freq": {
+          "type": "STRING(10)"
+        },
+        "interval": {
+          "type": "INTEGER"
+        },
+        "byweekday": {
+          "type": "TEXT"
+        },
+        "until": {
+          "type": "DATETIME"
         },
         "confirmed": {
           "type": "TINYINT(1)"
