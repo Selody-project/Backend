@@ -1,17 +1,40 @@
 const moment = require('moment');
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
-const { validateUserIdSchema, validateScheduleSchema } = require('../utils/validators');
+const {
+  validateJoinSchema,
+  validateUserIdSchema,
+  validateScheduleSchema,
+} = require('../utils/validators');
 
-async function getUserInfo(req, res, next) {
+async function getUserProfile(req, res, next) {
   try {
     const { nickname } = req;
     const exUser = await User.findOne({ where: { nickname } });
     return res.status(200).json({ exUser });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
+  }
+}
+
+async function putUserProfile(req, res, next) {
+  try {
+    const { error } = validateJoinSchema(req.body);
+    if (error) return next(new DataFormatError());
+
+    const exUser = await User.findOne({ where: { nickname: req.nickname } });
+    const { nickname, password } = req.body;
+    await exUser.update({
+      nickname,
+      password: await bcrypt.hash(password, 12),
+    });
+    req.nickname = nickname;
+    next();
+  } catch (err) {
+    return next(new ApiError());
   }
 }
 
@@ -33,7 +56,7 @@ async function getUserPersonalMonthSchedule(req, res, next) {
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -53,7 +76,7 @@ async function getUserPersonalDaySchedule(req, res, next) {
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -65,12 +88,13 @@ async function putUserSchedule(req, res, next) {
     await PersonalSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
 module.exports = {
-  getUserInfo,
+  getUserProfile,
+  putUserProfile,
   getUserPersonalMonthSchedule,
   getUserPersonalDaySchedule,
   putUserSchedule,
