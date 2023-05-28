@@ -33,7 +33,6 @@ describe('Test /api/user endpoints', () => {
   });
 
   afterAll(async () => {
-    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
