@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
@@ -123,7 +124,7 @@ describe('Test /api/group endpoints', () => {
     it('Group schedule deleted successfully ', async () => {
       const id = 4;
       const res = await request(app).delete(`/api/group/calendar/${id}`).set('Cookie', cookie);
-      expect(res.status).toEqual(200);
+      expect(res.status).toEqual(204);
     });
 
     it('Successfully fail to delete group (DataFormat Error)', async () => {

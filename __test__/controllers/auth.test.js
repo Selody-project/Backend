@@ -18,6 +18,7 @@ describe('Test /auth endpoints', () => {
       email: 'test-user@email.com',
       password: 'super_strong_password',
     });
+    // eslint-disable-next-line prefer-destructuring
     cookie = res.headers['set-cookie'][0];
   });
 

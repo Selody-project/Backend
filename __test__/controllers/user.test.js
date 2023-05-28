@@ -1,3 +1,4 @@
+const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
@@ -45,11 +46,11 @@ describe('Test /api/user endpoints', () => {
 
   describe('Test PUT /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
-      const newNickname = "newNickname";
-      const newPassword = "newPassword";
+      const newNickname = 'newNickname';
+      const newPassword = 'newPassword';
       const res1 = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
-        password: newPassword
+        password: newPassword,
       });
       cookie = res1.headers['set-cookie'][0];
       expect(res1.status).toEqual(200);
@@ -61,12 +62,12 @@ describe('Test /api/user endpoints', () => {
       delete res2.body.exUser.updatedAt;
       delete res2.body.exUser.password;
       const expectedProfile = {
-        "exUser": {
-          "email": "test-user@email.com",
-          "nickname": newNickname,
-          "provider": "local",
-          "snsId": null,
-          "userId": 1,
+        exUser: {
+          email: 'test-user@email.com',
+          nickname: newNickname,
+          provider: 'local',
+          snsId: null,
+          userId: 1,
         },
       };
       expect(comparePassword).toEqual(true);
