@@ -100,7 +100,7 @@ describe('Test /api/group endpoints', () => {
   //     const res = (await request(app).delete('/api/group/calendar').set('Cookie', cookie).send({
   //       id: 4,
   //     }));
-  //     expect(res.status).toEqual(200);
+  //     expect(res.status).toEqual(204);
   //   });
   // });
 
