@@ -28,7 +28,7 @@ const token = () => ({
 // nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req에 nickname을 전달해줘야함.
 function createToken(req, res, next) {
   try {
-    const nickname = req.nickname;
+    const { nickname } = req;
     const accessToken = token().access(nickname);
     const refreshToken = token().access(nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
@@ -57,7 +57,6 @@ function verifyToken(req, res, next) {
   }
 }
 
-// jwt 갱신
 function renewToken(req, res, next) {
   try {
     const authToken = req.cookies.refreshToken;

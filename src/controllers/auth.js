@@ -47,7 +47,6 @@ async function join(req, res, next) {
 
   const { email, nickname, password } = req.body;
   let options;
-
   if (email && !nickname) {
     options = { where: { email } };
   } else if (!email && nickname) {
@@ -55,7 +54,6 @@ async function join(req, res, next) {
   } else {
     options = { where: { [Op.or]: [{ email }, { nickname }] } };
   }
-
   const exUser = await User.findOne(options);
   if (exUser) {
     return next(new DuplicateUserError());
