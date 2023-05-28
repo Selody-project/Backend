@@ -1,5 +1,6 @@
 const Sequelize = require('sequelize');
 const { RRule } = require('rrule');
+const moment = require('moment');
 
 class PersonalSchedule extends Sequelize.Model {
   static initiate(sequelize) {
@@ -96,7 +97,7 @@ class PersonalSchedule extends Sequelize.Model {
     return arr.map((str) => RRuleWeekDay[str]);
   }
 
-  static async getSchedule(userID, start, end, startUTC, endUTC) {
+  static async getSchedule(userID, start, end) {
     try {
       const db = require('.');
       const nonRecurrenceStatement = `
@@ -117,11 +118,19 @@ class PersonalSchedule extends Sequelize.Model {
           startDateTime <= :end
         )`;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-        replacements: { userID, start: startUTC, end: endUTC },
+        replacements: {
+          userID,
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
         type: Sequelize.QueryTypes.SELECT,
       });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-        replacements: { userID, start: startUTC, end: endUTC },
+        replacements: {
+          userID,
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
         type: Sequelize.QueryTypes.SELECT,
       });
       const recurrenceSchedule = [];
@@ -146,7 +155,7 @@ class PersonalSchedule extends Sequelize.Model {
         }
         const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
         const scheduleDateList = rrule.between(
-          new Date(startUTC.getTime() - scheduleLength - 1),
+          new Date(start.getTime() - scheduleLength),
           new Date(end.getTime() + 1),
         );
         const possibleDateList = [];

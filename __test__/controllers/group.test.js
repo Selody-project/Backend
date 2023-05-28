@@ -171,7 +171,6 @@ describe('Test /api/group endpoints', () => {
           {
             "byweekday": "", "content": "test-content16", "freq": "DAILY", "groupId": 1, "id": 16, "interval": 1, "recurrence": 1,
             "recurrenceDateList": [
-              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T12:00:00.000Z" },
               { "endDateTime": "2023-04-02T00:00:00.000Z", "startDateTime": "2023-03-16T12:00:00.000Z" },
               { "endDateTime": "2023-04-03T00:00:00.000Z", "startDateTime": "2023-03-17T12:00:00.000Z" },
               { "endDateTime": "2023-04-04T00:00:00.000Z", "startDateTime": "2023-03-18T12:00:00.000Z" },
@@ -195,7 +194,6 @@ describe('Test /api/group endpoints', () => {
           {
             "byweekday": "", "content": "test-content18", "freq": "MONTHLY", "groupId": 1, "id": 18, "interval": 1, "recurrence": 1,
             "recurrenceDateList": [
-              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T12:00:00.000Z" },
               { "endDateTime": "2023-05-02T00:00:00.000Z", "startDateTime": "2023-04-15T12:00:00.000Z" },
             ],
             "title": "test-title18", "until": "2025-01-01T00:00:00.000Z",
@@ -213,13 +211,6 @@ describe('Test /api/group endpoints', () => {
               { "endDateTime": "2023-05-01T23:59:59.000Z", "startDateTime": "2023-04-30T23:59:59.000Z" },
             ],
             "title": "test-title21", "until": "2025-01-01T00:00:00.000Z",
-          },
-          {
-            "byweekday": "", "content": "test-content23", "freq": "YEARLY", "groupId": 1, "id": 23, "interval": 1, "recurrence": 1,
-            "recurrenceDateList": [
-              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T00:00:00.000Z" },
-            ],
-            "title": "test-title23", "until": "2025-01-01T00:00:00.000Z",
           },
         ],
       };

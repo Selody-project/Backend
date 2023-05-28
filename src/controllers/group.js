@@ -73,12 +73,9 @@ async function getGroupSchedule(req, res, next) {
     const { group_id: groupID } = req.params;
     const { date: dateString } = req.query;
 
-    // moment 라이브러리를 사용하여 생성된 Date 객체는
-    // 로컬 타임존에 따라 자동으로 변환될 수 있음. 따라서 startUTC, endUTC로 다시 변환해줌.
     const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
     const end = moment.utc(start).endOf('month').toDate();
-    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
-    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
+
     const nonRecurrenceStatement = `
       SELECT title, content, startDateTime, endDateTime, recurrence FROM groupSchedule
       WHERE groupId = :groupID AND (
@@ -98,11 +95,19 @@ async function getGroupSchedule(req, res, next) {
       )
       `;
     const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-      replacements: { groupID, start: startUTC, end: endUTC },
+      replacements: {
+        groupID,
+        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+      },
       type: Sequelize.QueryTypes.SELECT,
     });
     const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-      replacements: { groupID, start: startUTC, end: endUTC },
+      replacements: {
+        groupID,
+        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+      },
       type: Sequelize.QueryTypes.SELECT,
     });
     const recurrenceSchedule = [];
@@ -127,7 +132,7 @@ async function getGroupSchedule(req, res, next) {
       }
       const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
       const scheduleDateList = rrule.between(
-        new Date(startUTC.getTime() - scheduleLength - 1),
+        new Date(start.getTime() - scheduleLength),
         new Date(end.getTime() + 1),
       );
       const possibleDateList = [];
