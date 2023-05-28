@@ -106,8 +106,12 @@ async function login(req, res, next) {
   }
 }
 
-async function logout(req, res) {
-  return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+async function logout(req, res, next) {
+  try {
+    return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+  } catch (err) {
+    return next(new ApiError());
+  }
 }
 
 /*

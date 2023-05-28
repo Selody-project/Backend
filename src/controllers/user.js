@@ -1,8 +1,10 @@
 const moment = require('moment');
+const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
+const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const DataFormatError = require('../errors/DataFormatError');
 const {
   validateJoinSchema,
@@ -27,6 +29,17 @@ async function putUserProfile(req, res, next) {
 
     const exUser = await User.findOne({ where: { nickname: req.nickname } });
     const { nickname, password } = req.body;
+    const duplicate = await User.findAll({
+      where: {
+        [Op.and]: [
+          { nickname },
+          { userId: { [Op.not]: exUser.userId } },
+        ],
+      },
+    });
+    if (duplicate.length > 0) {
+      return next(new DuplicateUserError());
+    }
     await exUser.update({
       nickname,
       password: await bcrypt.hash(password, 12),
