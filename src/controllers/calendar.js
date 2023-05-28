@@ -2,33 +2,30 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const personalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
-const NotNullValidationError = require('../errors/calendar/NotNullValidationError');
 const NotFoundError = require('../errors/calendar/NotFound');
 
 async function postPersonalSchedule(req, res, next) {
   const {
-    userId, title, content, startDate, endDate,
+    userId, title, content, startDateTime, endDateTime,
+    recurrence, freq, interval, byweekday, until,
   } = req.body;
-  // let { repeatType } = req.body;
-  // if (repeatType == 1) repeatType = 'YEAR';
-  // else if (repeatType == 2) repeatType = 'MONTH';
-  // else if (repeatType == 3) repeatType = 'WEEK';
-  // else repeatType = 'DAY';
   try {
-    if (title && startDate && endDate) {
-      const newSchedule = await personalSchedule.create({
-        userId,
-        title,
-        content,
-        startDate: moment(startDate).format('YYYY-MM-DD'),
-        endDate: moment(endDate).format('YYYY-MM-DD'),
-        repetition: req.body.repetition || 0,
-      });
+    const newSchedule = await personalSchedule.create({
+      userId,
+      title,
+      content,
+      startDateTime: moment(startDateTime).format('YYYY-MM-DD'),
+      endDateTime: moment(endDateTime).format('YYYY-MM-DD'),
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
 
-      const scheduleArr = [{ ...newSchedule.toJSON() }];
-      return res.status(201).json({ scheduleArr });
-    }
-    return next(new NotNullValidationError());
+    });
+
+    const scheduleArr = [{ ...newSchedule.toJSON() }];
+    return res.status(201).json({ scheduleArr });
   } catch (error) {
     return next(new ApiError());
   }

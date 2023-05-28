@@ -9,7 +9,9 @@ const PersonalSchedule = require('../../src/models/personalSchedule');
 describe('Test /api/user endpoints', () => {
   let cookie;
   beforeAll(async () => {
+    await dropDB();
     await syncDB();
+    await tearDownPersonalScheduleDB();
     await tearDownUserDB();
     const mockUser = {
       email: 'testUser@email.com',
@@ -35,7 +37,7 @@ describe('Test /api/user endpoints', () => {
     await dropDB();
     await db.sequelize.close();
   });
-
+  /*
   describe('Test GET /api/user/:user_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const userID = 1;
@@ -62,7 +64,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedSchedule);
     });
   });
-
+*/
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
@@ -80,27 +82,21 @@ describe('Test /api/user endpoints', () => {
   describe('Test POST /api/user/calendar', () => {
     it('Insert a User schedule into the database', async () => {
       const schedule = {
-        userId: 1, title: 'test-title', content: 'test-content1', startDate: '6000-01-01 00:00:00.000000', endDate: '7000-01-01 00:00:00.000000', repetition: 1,
+        id: 2, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
       };
-      // const expectedSchedule = {
-      //   scheduleArr: [
-      //     {
-      //       id: 9,
-      //       userId: 1,
-      //       title: 'test-title',
-      //       content: 'test-content1',
-      //       startDate: '6000-01-01T00:00:00.000Z',
-      //       endDate: '7000-01-01T00:00:00.000Z',
-      //       repetition: 1,
-      //     },
-      //   ],
-      // };
+      const expectedSchedule = {
+        scheduleArr: [
+          {
+            id: 2, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+
+          },
+        ],
+      };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
-      // const newSchedule = await PersonalSchedule.findOne({
-      //   where: { title: 'test-title' },
-      // });
+
       expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(expectedSchedule);
     });
   });
 

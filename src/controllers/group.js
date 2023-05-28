@@ -1,11 +1,47 @@
 const Sequelize = require('sequelize');
 const moment = require('moment');
+// const {
+//   datetime, RRule, RRuleSet, rrulestr,
+// } = require('rrule');
+
+const {
+  RRule,
+} = require('rrule');
 const db = require('../models');
-// const { Op } = Sequelize;
 const { validateGroupSchema } = require('../utils/validators');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
+
+function getRRuleFreq(freq) {
+  const RRuleFreq = {
+    DAILY: RRule.DAILY,
+    WEEKLY: RRule.WEEKLY,
+    MONTHLY: RRule.MONTHLY,
+    YEARLY: RRule.YEARLY,
+  };
+
+  return RRuleFreq[freq];
+}
+
+function getRRuleByWeekDay(byweekday) {
+  const arr = byweekday.split(',');
+  const RRuleWeekDay = {
+    MO: RRule.MO,
+    TU: RRule.TU,
+    WE: RRule.WE,
+    TH: RRule.TH,
+    FR: RRule.FR,
+    SA: RRule.SA,
+    SU: RRule.SU,
+  };
+
+  if (arr[0] === '') {
+    return [];
+  }
+
+  return arr.map((str) => RRuleWeekDay[str]);
+}
 
 async function createGroup(req, res, next) {
   try {
@@ -35,42 +71,88 @@ async function getGroupSchedule(req, res, next) {
     if (error) throw error;
 
     const { group_id: groupID } = req.params;
-
     const { date: dateString } = req.query;
-    const start = moment(dateString, 'YYYY-MM').startOf('month').toDate();
-    const end = moment(start).endOf('month').toDate();
-    const query = `
-    SELECT * FROM groupSchedule
-    WHERE groupId = :groupID AND (
-      ( 
-        repetition = 0 AND ( 
-          (startDate BETWEEN :start AND :end)
+
+    // moment 라이브러리를 사용하여 생성된 Date 객체는
+    // 로컬 타임존에 따라 자동으로 변환될 수 있음. 따라서 startUTC, endUTC로 다시 변환해줌.
+    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
+    const end = moment.utc(start).endOf('month').toDate();
+    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
+    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
+    // + start.getTimezoneOffset() * 60000
+    const nonRecurrenceStatement = `
+      SELECT title, content, startDateTime, endDateTime, recurrence FROM groupSchedule
+      WHERE groupId = :groupID AND (
+        recurrence = 0 AND ( 
+          (startDateTime BETWEEN :start AND :end)
           OR
-          (endDate BETWEEN :start AND :end)
+          (endDateTime BETWEEN :start AND :end)
           OR
-          (startDate <= :start AND endDate >= :end)
+          (startDateTime <= :start AND endDateTime >= :end)
         )
-      ) 
-      OR 
-      ( 
-        repetition = 1 AND startDate <= :end AND
-        (
-          month = '*'
-          OR
-          (DATEDIFF(endDate, startDate) >= 365)
-          OR
-          DATEDIFF(endDate, startDate) >= MOD(DATEDIFF(:start, startDate), 365)
-        )
+      )`;
+    const recurrenceStatement = `
+      SELECT * FROM groupSchedule
+      WHERE groupId = :groupID AND (
+        recurrence = 1 AND 
+        startDateTime <= :end
       )
-    )
-    `;
-    const schedule = await db.sequelize.query(query, {
-      replacements: { groupID, start, end },
+      `;
+    const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
+      replacements: { groupID, start: startUTC, end: endUTC },
       type: Sequelize.QueryTypes.SELECT,
     });
-    return res.status(200).json({ schedule });
+    const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
+      replacements: { groupID, start: startUTC, end: endUTC },
+      type: Sequelize.QueryTypes.SELECT,
+    });
+    const recurrenceSchedule = [];
+    recurrenceScheduleList.forEach((schedule) => {
+      const byweekday = getRRuleByWeekDay(schedule.byweekday);
+      let rrule;
+      if (byweekday.length === 0) {
+        rrule = new RRule({
+          freq: getRRuleFreq(schedule.freq),
+          interval: schedule.interval,
+          dtstart: schedule.startDateTime,
+          until: schedule.until,
+        });
+      } else {
+        rrule = new RRule({
+          freq: getRRuleFreq(schedule.freq),
+          interval: schedule.interval,
+          byweekday: getRRuleByWeekDay(schedule.byweekday),
+          dtstart: schedule.startDateTime,
+          until: schedule.until,
+        });
+      }
+      const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
+      const scheduleDateList = rrule.between(new Date(startUTC - scheduleLength - 1), endUTC);
+      const possibleDateList = [];
+      scheduleDateList.forEach((scheduleDate) => {
+        const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+        if (endDateTime >= start) {
+          possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
+        }
+      });
+      if (possibleDateList.length !== 0) {
+        recurrenceSchedule.push({
+          id: schedule.id,
+          groupId: schedule.groupId,
+          title: schedule.title,
+          content: schedule.content,
+          recurrence: schedule.recurrence,
+          freq: schedule.freq,
+          interval: schedule.interval,
+          byweekday: schedule.byweekday,
+          until: schedule.until,
+          recurrenceDateList: possibleDateList,
+        });
+      }
+      // console.log(JSON.stringify(recurrenceSchedule, null, 2));
+    });
+    return res.status(200).json({ nonRecurrenceSchedule, recurrenceSchedule });
   } catch (err) {
-    console.log(err);
     return next(err);
   }
 }
