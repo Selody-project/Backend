@@ -1,7 +1,7 @@
 const express = require('express');
 
 const {
-  getUserPersonalMonthSchedule, putUserSchedule,getUserPersonalDaySchedule,
+  getUserPersonalMonthSchedule, putUserSchedule, getUserPersonalDaySchedule,
 } = require('../controllers/user');
 
 const router = express.Router();

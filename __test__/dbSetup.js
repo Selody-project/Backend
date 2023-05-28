@@ -15,8 +15,6 @@ async function syncDB() {
   await db.sequelize.authenticate();
   await db.sequelize.sync({ force: false }).then(() => {
     console.log('DB Connection has been established successfully.');
-  }).catch((error) => {
-    console.error('Unable to connect to the database: ', error);
   });
 }
 
@@ -54,8 +52,6 @@ async function setUpGroupDB() {
   await user[0].addGroup(group2);
 }
 
-// 1 ~ 10 non-recurrence schedule
-// 11 ~ 20 recurrence schedule
 async function setUpGroupScheduleDB() {
   await GroupSchedule.bulkCreate([
     {
@@ -184,13 +180,13 @@ async function setUpPersonalScheduleDB() {
       id: 17, userId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
     {
-      id: 18, userId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: '', until: '2025-01-01', 
+      id: 18, userId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
     {
-      id: 19, userId: 1, title: 'test-title19', content: 'test-content19', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01', 
+      id: 19, userId: 1, title: 'test-title19', content: 'test-content19', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
     {
-      id: 20, userId: 1, title: 'test-title20', content: 'test-content20', startDateTime: '2020-01-15T00:00:00.000Z', endDateTime: '2020-01-31T23:59:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 2, byweekday: '', until: '2025-01-01', 
+      id: 20, userId: 1, title: 'test-title20', content: 'test-content20', startDateTime: '2020-01-15T00:00:00.000Z', endDateTime: '2020-01-31T23:59:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 2, byweekday: '', until: '2025-01-01',
     },
     {
       id: 21, userId: 1, title: 'test-title21', content: 'test-content21', startDateTime: '2020-04-30T23:59:59.999Z', endDateTime: '2020-05-01T23:59:59.999Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: '', until: '2025-01-01',

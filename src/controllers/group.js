@@ -4,39 +4,14 @@ const { RRule } = require('rrule');
 const db = require('../models');
 const User = require('../models/user');
 const Group = require('../models/group');
+const ApiError = require('../errors/apiError');
 const GroupSchedule = require('../models/groupSchedule');
 const DataFormatError = require('../errors/DataFormatError');
 const {
   validateGroupSchema, validateGroupIdSchema,
-  validateScheduleSchema, validateScheduleIdSchema,
+  validateScheduleIdSchema, validateGroupScheduleSchema,
 } = require('../utils/validators');
-
-function getRRuleFreq(freq) {
-  const RRuleFreq = {
-    DAILY: RRule.DAILY,
-    WEEKLY: RRule.WEEKLY,
-    MONTHLY: RRule.MONTHLY,
-    YEARLY: RRule.YEARLY,
-  };
-  return RRuleFreq[freq];
-}
-
-function getRRuleByWeekDay(byweekday) {
-  const arr = byweekday.split(',');
-  const RRuleWeekDay = {
-    MO: RRule.MO,
-    TU: RRule.TU,
-    WE: RRule.WE,
-    TH: RRule.TH,
-    FR: RRule.FR,
-    SA: RRule.SA,
-    SU: RRule.SU,
-  };
-  if (arr[0] === '') {
-    return [];
-  }
-  return arr.map((str) => RRuleWeekDay[str]);
-}
+const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
 
 async function createGroup(req, res, next) {
   try {
@@ -50,7 +25,7 @@ async function createGroup(req, res, next) {
     await exUser.addGroup(group);
     return res.status(200).json({ message: 'Group creation successful' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -61,7 +36,7 @@ async function getGroupList(req, res, next) {
     const groupList = await exUser.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -73,15 +48,20 @@ async function getGroupSchedule(req, res, next) {
     const { group_id: groupID } = req.params;
     const { date: dateString } = req.query;
 
-    // moment 라이브러리를 사용하여 생성된 Date 객체는
-    // 로컬 타임존에 따라 자동으로 변환될 수 있음. 따라서 startUTC, endUTC로 다시 변환해줌.
     const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
     const end = moment.utc(start).endOf('month').toDate();
-    const startUTC = new Date(start.getTime() + start.getTimezoneOffset() * 60000);
-    const endUTC = new Date(end.getTime() + start.getTimezoneOffset() * 60000);
+
     const nonRecurrenceStatement = `
-      SELECT title, content, startDateTime, endDateTime, recurrence FROM groupSchedule
-      WHERE groupId = :groupID AND (
+      SELECT 
+        title, 
+        content, 
+        startDateTime, 
+        endDateTime, 
+        recurrence 
+      FROM 
+        groupSchedule
+      WHERE 
+        groupId = :groupID AND (
         recurrence = 0 AND ( 
           (startDateTime BETWEEN :start AND :end)
           OR
@@ -91,18 +71,30 @@ async function getGroupSchedule(req, res, next) {
         )
       )`;
     const recurrenceStatement = `
-      SELECT * FROM groupSchedule
-      WHERE groupId = :groupID AND (
+      SELECT 
+        * 
+      FROM 
+        groupSchedule
+      WHERE 
+        groupId = :groupID AND (
         recurrence = 1 AND 
         startDateTime <= :end
       )
       `;
     const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-      replacements: { groupID, start: startUTC, end: endUTC },
+      replacements: {
+        groupID,
+        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+      },
       type: Sequelize.QueryTypes.SELECT,
     });
     const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-      replacements: { groupID, start: startUTC, end: endUTC },
+      replacements: {
+        groupID,
+        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+      },
       type: Sequelize.QueryTypes.SELECT,
     });
     const recurrenceSchedule = [];
@@ -127,7 +119,7 @@ async function getGroupSchedule(req, res, next) {
       }
       const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
       const scheduleDateList = rrule.between(
-        new Date(startUTC.getTime() - scheduleLength - 1),
+        new Date(start.getTime() - scheduleLength),
         new Date(end.getTime() + 1),
       );
       const possibleDateList = [];
@@ -151,52 +143,64 @@ async function getGroupSchedule(req, res, next) {
           recurrenceDateList: possibleDateList,
         });
       }
-      // console.log(JSON.stringify(recurrenceSchedule, null, 2));
     });
     return res.status(200).json({ nonRecurrenceSchedule, recurrenceSchedule });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
 async function postGroupSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.body);
+    const { error } = validateGroupScheduleSchema(req.body);
     if (error) return next(new DataFormatError());
 
     const {
-      groupId, title, startDate, endDate, content,
+      groupId,
+      title,
+      content,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
     } = req.body;
+
     await GroupSchedule.create({
       groupId,
       title,
       content,
-      startDate,
-      endDate,
-      confirmed: 0,
-      repetition: req.body.repetition || 0,
-      dayMonth: req.body.dayMonth || null,
-      month: req.body.month || null,
-      dayWeek: req.body.dayWeek || null,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
       possible: null,
       impossible: null,
     });
-    return res.status(201).json({ message: 'Group Schedule creation successful' });
+    return res.status(201).json({ message: 'Successfully create group schedule' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
 async function putGroupSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
 
-    const { id } = req.body;
+    const { error: bodyError } = validateGroupScheduleSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { id } = req.params;
     await GroupSchedule.update(req.body, { where: { id } });
-    return res.status(201).json({ message: 'Successfully Modified.' });
+    return res.status(201).json({ message: 'Successfully modify group schedule' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -205,12 +209,12 @@ async function deleteGroupSchedule(req, res, next) {
     const { error } = validateScheduleIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.body;
+    const { id } = req.params;
     const schedule = await GroupSchedule.findOne({ where: { id } });
     await schedule.destroy();
-    return res.status(200).json({ message: 'Group schedule deleted successfully.' });
+    return res.status(200).json({ message: 'Successfully delete group schedule' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
