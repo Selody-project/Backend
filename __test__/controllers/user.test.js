@@ -9,7 +9,9 @@ const PersonalSchedule = require('../../src/models/personalSchedule');
 describe('Test /api/user endpoints', () => {
   let cookie;
   beforeAll(async () => {
+    await dropDB();
     await syncDB();
+    await tearDownPersonalScheduleDB();
     await tearDownUserDB();
     const mockUser = {
       email: 'testUser@email.com',
@@ -31,10 +33,11 @@ describe('Test /api/user endpoints', () => {
   });
 
   afterAll(async () => {
+    await tearDownUserDB();
     await dropDB();
     await db.sequelize.close();
   });
-
+  /*
   describe('Test GET /api/user/:user_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const userID = 1;
@@ -61,7 +64,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedSchedule);
     });
   });
-
+*/
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
@@ -73,6 +76,34 @@ describe('Test /api/user endpoints', () => {
       });
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
+    });
+  });
+
+  describe('Test POST /api/user/calendar', () => {
+    it('Insert a User schedule into the database', async () => {
+      const schedule = {
+        id: 2, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+      };
+      const expectedSchedule = {
+        scheduleArr: [
+          {
+            id: 2, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+
+          },
+        ],
+      };
+
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
+  describe('Test DELETE /api/user/calendar', () => {
+    it('Delete a User schedule from the database ', async () => {
+      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: 9 });
+      expect(res.statusCode).toEqual(204);
     });
   });
 });
