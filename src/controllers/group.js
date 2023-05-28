@@ -4,6 +4,7 @@ const { RRule } = require('rrule');
 const db = require('../models');
 const User = require('../models/user');
 const Group = require('../models/group');
+const ApiError = require('../errors/apiError');
 const GroupSchedule = require('../models/groupSchedule');
 const DataFormatError = require('../errors/DataFormatError');
 const {
@@ -50,7 +51,7 @@ async function createGroup(req, res, next) {
     await exUser.addGroup(group);
     return res.status(200).json({ message: 'Group creation successful' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -61,7 +62,7 @@ async function getGroupList(req, res, next) {
     const groupList = await exUser.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -155,7 +156,7 @@ async function getGroupSchedule(req, res, next) {
     });
     return res.status(200).json({ nonRecurrenceSchedule, recurrenceSchedule });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -183,7 +184,7 @@ async function postGroupSchedule(req, res, next) {
     });
     return res.status(201).json({ message: 'Group Schedule creation successful' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -196,7 +197,7 @@ async function putGroupSchedule(req, res, next) {
     await GroupSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
@@ -208,9 +209,9 @@ async function deleteGroupSchedule(req, res, next) {
     const { id } = req.body;
     const schedule = await GroupSchedule.findOne({ where: { id } });
     await schedule.destroy();
-    return res.status(200).json({ message: 'Group schedule deleted successfully.' });
+    return res.status(204).json({ message: 'Group schedule deleted successfully.' });
   } catch (err) {
-    return next(err);
+    return next(new ApiError());
   }
 }
 
