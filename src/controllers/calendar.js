@@ -32,7 +32,7 @@ async function postPersonalSchedule(req, res, next) {
 }
 
 async function deletePersonalSchedule(req, res, next) {
-  const { id } = req.params;
+  const { id } = req.body;
   try {
     const data = await personalSchedule.destroy({
       where: {

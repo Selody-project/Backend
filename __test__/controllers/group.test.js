@@ -19,7 +19,7 @@ describe('Test /api/group endpoints', () => {
       userId: 1,
       email: 'testGroup1@email.com',
       nickname: 'test-group1',
-      password: await bcrypt.hash('test-group-password12345', 12),
+      password: 'test-group-password12345',
     };
     const res = await request(app).post('/api/auth/join').send(mockUser);
     // eslint-disable-next-line prefer-destructuring
@@ -283,6 +283,20 @@ describe('Test /api/group endpoints', () => {
             ],
             title: 'test-title19',
             until: '2025-01-01T00:00:00.000Z',
+          },
+          {
+            "byweekday": "", "content": "test-content21", "freq": "MONTHLY", "groupId": 1, "id": 21, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-05-01T23:59:59.000Z", "startDateTime": "2023-04-30T23:59:59.000Z" },
+            ],
+            "title": "test-title21", "until": "2025-01-01T00:00:00.000Z",
+          },
+          {
+            "byweekday": "", "content": "test-content23", "freq": "YEARLY", "groupId": 1, "id": 23, "interval": 1, "recurrence": 1,
+            "recurrenceDateList": [
+              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T00:00:00.000Z" },
+            ],
+            "title": "test-title23", "until": "2025-01-01T00:00:00.000Z",
           },
         ],
       };

@@ -35,7 +35,7 @@ describe('Test /auth endpoints', () => {
       const mockBody = {
         email: 't23@email.com',
         nickname: 't3',
-        password: 'sup3',
+        password: 'super_strong_password',
       };
       const response = await request(app).post('/api/auth/join').send(mockBody);
       expect(response.status).toEqual(200);
