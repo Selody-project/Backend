@@ -43,6 +43,38 @@ describe('Test /api/user endpoints', () => {
     await db.sequelize.close();
   });
 
+  describe('Test PUT /api/user/profile', () => {
+    it('Successfully modified user profile ', async () => {
+      const newNickname = "newNickname";
+      const newPassword = "newPassword";
+      const res1 = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
+        nickname: newNickname,
+        password: newPassword
+      });
+      cookie = res1.headers['set-cookie'][0];
+      expect(res1.status).toEqual(200);
+
+      const res2 = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      const comparePassword = await bcrypt.compare(newPassword, res2.body.exUser.password);
+      delete res2.body.exUser.createdAt;
+      delete res2.body.exUser.deletedAt;
+      delete res2.body.exUser.updatedAt;
+      delete res2.body.exUser.password;
+      const expectedProfile = {
+        "exUser": {
+          "email": "test-user@email.com",
+          "nickname": newNickname,
+          "provider": "local",
+          "snsId": null,
+          "userId": 1,
+        },
+      };
+      expect(comparePassword).toEqual(true);
+      expect(res2.status).toEqual(200);
+      expect(res2.body).toEqual(expectedProfile);
+    });
+  });
+
   describe('Test GET /api/user/:user_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const userID = 1;
