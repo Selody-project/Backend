@@ -1,5 +1,4 @@
-name: Auto Author Assign
-
+name: PR automation
 on:
   pull_request:
     types: [labeled, reopened, synchronize, ready_for_review]
@@ -11,4 +10,11 @@ jobs:
   assign-author:
     runs-on: ubuntu-latest
     steps:
-      - uses: toshimaru/auto-author-assign@v1.6.2
+      - name: assign assignee
+        uses: toshimaru/auto-author-assign@v1.6.2
+
+      - name: link issue
+        uses: tkt-actions/add-issue-links@v1.8.1
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          branch-prefix: 'ISSUE'
