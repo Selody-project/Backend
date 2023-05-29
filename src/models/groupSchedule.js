@@ -33,6 +33,7 @@ class GroupSchedule extends Sequelize.Model {
       recurrence: {
         type: Sequelize.TINYINT(1),
         allowNull: false,
+        defaultValue: 0,
       },
       freq: {
         type: Sequelize.STRING(10),
@@ -53,6 +54,7 @@ class GroupSchedule extends Sequelize.Model {
       confirmed: {
         type: Sequelize.TINYINT(1),
         allowNull: false,
+        defaultValue: 0,
       },
       possible: {
         type: Sequelize.JSON,

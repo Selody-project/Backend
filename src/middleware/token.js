@@ -58,7 +58,6 @@ function verifyToken(req, res, next) {
   }
 }
 
-// jwt 갱신
 function renewToken(req, res, next) {
   try {
     const authToken = req.cookies.refreshToken;

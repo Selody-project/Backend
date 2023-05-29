@@ -4,7 +4,7 @@ const {
   getNaverUserInfo, joinSocialUser, join, login, logout,
 } = require('../controllers/auth');
 const { createToken, verifyToken, renewToken } = require('../middleware/token');
-const { getUserInfo } = require('../controllers/user');
+const { getUserProfile } = require('../controllers/user');
 
 const router = express.Router();
 
@@ -21,6 +21,6 @@ router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
 
 router.get('/token/refresh', renewToken);
 
-router.get('/token/verify', verifyToken, getUserInfo);
+router.get('/token/verify', verifyToken, getUserProfile);
 
 module.exports = router;

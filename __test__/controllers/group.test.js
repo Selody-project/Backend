@@ -7,6 +7,8 @@ const {
   tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupScheduleDB, setUpGroupDB,
   dropDB,
+  tearDownUserDB,
+  setUpUserDB,
 } = require('../dbSetup');
 
 describe('Test /api/group endpoints', () => {
@@ -14,14 +16,13 @@ describe('Test /api/group endpoints', () => {
   beforeAll(async () => {
     await dropDB();
     await syncDB();
+    await tearDownUserDB();
+    await setUpUserDB();
 
-    const mockUser = {
-      userId: 1,
-      email: 'testGroup1@email.com',
-      nickname: 'test-group1',
-      password: 'test-group-password12345',
-    };
-    const res = await request(app).post('/api/auth/join').send(mockUser);
+    const res = await request(app).post('/api/auth/login').send({
+      email: 'test-user@email.com',
+      password: 'super_strong_password',
+    });
     // eslint-disable-next-line prefer-destructuring
     cookie = res.headers['set-cookie'][0];
   });
@@ -35,13 +36,13 @@ describe('Test /api/group endpoints', () => {
   });
 
   afterEach(async () => {
-    // await tearDownGroupScheduleDB();
-    // await tearDownGroupDB();
+    await tearDownGroupScheduleDB();
+    await tearDownGroupDB();
   });
 
   afterAll(async () => {
-    // await dropDB();
-    // await db.sequelize.close();
+    await dropDB();
+    await db.sequelize.close();
   });
 
   describe('Test GET /api/group', () => {
@@ -54,55 +55,84 @@ describe('Test /api/group endpoints', () => {
           groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1 },
         }],
       };
+
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);
     });
   });
 
-  // describe('Test POST /api/group', () => {
-  //   it('Group creation successful ', async () => {
-  //     const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
-  //     expect(res.status).toEqual(200);
-  //   });
-  // });
+  describe('Test POST /api/group', () => {
+    it('Group creation successful ', async () => {
+      const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
+      expect(res.status).toEqual(200);
+    });
+  });
 
-  // describe('Test POST /api/group/calendar', () => {
-  //   it('Group schedule creation successful ', async () => {
-  //     const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
-  //       groupId: 1,
-  //       title: 'test-title',
-  //       contents: 'test-content',
-  //       startDate: '2023-05-06',
-  //       endDate: '2023-05-07',
-  //       repetition: 1,
-  //     }));
-  //     expect(res.status).toEqual(201);
-  //   });
-  // });
+  describe('Test POST /api/group/calendar', () => {
+    it('Group schedule creation successful ', async () => {
+      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
+        groupId: 1,
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06',
+        endDateTime: '2023-05-07',
+        recurrence: 1,
+        freq: 'WEEKLY',
+        interval: 1,
+        byweekday: 'MO',
+        until: '2026-01-05',
+      }));
 
-  // describe('Test PUT /api/group/calendar', () => {
-  //   it('Group Schedule Modification Successful ', async () => {
-  //     const res = (await request(app).put('/api/group/calendar').set('Cookie', cookie).send({
-  //       id: 1,
-  //       groupId: 1,
-  //       title: 'modified-title',
-  //     }));
-  //     const modifiedSchedule = await GroupSchedule.findOne({
-  //       where: { title: 'modified-title' },
-  //     });
-  //     expect(modifiedSchedule.id).toEqual(1);
-  //     expect(res.status).toEqual(201);
-  //   });
-  // });
+      expect(res.status).toEqual(201);
+    });
 
-  // describe('Test DELETE /api/group/calendar', () => {
-  //   it('Group schedule deleted successfully ', async () => {
-  //     const res = (await request(app).delete('/api/group/calendar').set('Cookie', cookie).send({
-  //       id: 4,
-  //     }));
-  //     expect(res.status).toEqual(204);
-  //   });
-  // });
+    it('Succssfully failed to create group schedule (missing groupid) ', async () => {
+      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06',
+        endDateTime: '2023-05-07',
+        recurrence: 1,
+        freq: 'WEEKLY',
+        interval: 1,
+        byweekday: 'MO',
+        until: '2026-01-05',
+      }));
+
+      expect(res.status).toEqual(400);
+    });
+  });
+
+  describe('Test PUT /api/group/calendar', () => {
+    it('Group Schedule Modification Successful ', async () => {
+      const id = 1;
+      const res = (await request(app).put(`/api/group/calendar/${id}`).set('Cookie', cookie).send({
+        groupId: 1,
+        title: 'modified-title',
+        content: 'modified-contnent',
+      }));
+      const modifiedSchedule = await GroupSchedule.findOne({
+        where: { title: 'modified-title' },
+      });
+
+      expect(modifiedSchedule.id).toEqual(1);
+      expect(res.status).toEqual(201);
+    });
+  });
+
+  describe('Test DELETE /api/group/calendar', () => {
+    it('Group schedule deleted successfully ', async () => {
+      const id = 4;
+      const res = await request(app).delete(`/api/group/calendar/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully fail to delete group (DataFormat Error)', async () => {
+      const id = 'abc';
+      const res = await request(app).delete(`/api/group/calendar/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+  });
 
   describe('Test GET /api/group/:group_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
@@ -226,7 +256,6 @@ describe('Test /api/group endpoints', () => {
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
-              { endDateTime: '2023-04-01T00:00:00.000Z', startDateTime: '2023-03-15T12:00:00.000Z' },
               { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-03-16T12:00:00.000Z' },
               { endDateTime: '2023-04-03T00:00:00.000Z', startDateTime: '2023-03-17T12:00:00.000Z' },
               { endDateTime: '2023-04-04T00:00:00.000Z', startDateTime: '2023-03-18T12:00:00.000Z' },
@@ -264,7 +293,6 @@ describe('Test /api/group endpoints', () => {
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
-              { endDateTime: '2023-04-01T00:00:00.000Z', startDateTime: '2023-03-15T12:00:00.000Z' },
               { endDateTime: '2023-05-02T00:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
             ],
             title: 'test-title18',
@@ -285,24 +313,25 @@ describe('Test /api/group endpoints', () => {
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            "byweekday": "", "content": "test-content21", "freq": "MONTHLY", "groupId": 1, "id": 21, "interval": 1, "recurrence": 1,
-            "recurrenceDateList": [
-              { "endDateTime": "2023-05-01T23:59:59.000Z", "startDateTime": "2023-04-30T23:59:59.000Z" },
+            byweekday: '',
+            content: 'test-content21',
+            freq: 'MONTHLY',
+            groupId: 1,
+            id: 21,
+            interval: 1,
+            recurrence: 1,
+            recurrenceDateList: [
+              { endDateTime: '2023-05-01T23:59:59.000Z', startDateTime: '2023-04-30T23:59:59.000Z' },
             ],
-            "title": "test-title21", "until": "2025-01-01T00:00:00.000Z",
-          },
-          {
-            "byweekday": "", "content": "test-content23", "freq": "YEARLY", "groupId": 1, "id": 23, "interval": 1, "recurrence": 1,
-            "recurrenceDateList": [
-              { "endDateTime": "2023-04-01T00:00:00.000Z", "startDateTime": "2023-03-15T00:00:00.000Z" },
-            ],
-            "title": "test-title23", "until": "2025-01-01T00:00:00.000Z",
+            title: 'test-title21',
+            until: '2025-01-01T00:00:00.000Z',
           },
         ],
       };
       const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
         date,
       });
+
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
     });

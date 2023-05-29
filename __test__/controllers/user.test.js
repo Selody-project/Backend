@@ -2,8 +2,13 @@ const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
-  db, mockUser, tearDownUserDB, setUpUserDB, syncDB, tearDownPersonalScheduleDB,
-  setUpPersonalScheduleDB, dropDB,
+  db,
+  tearDownUserDB,
+  setUpUserDB,
+  syncDB,
+  tearDownPersonalScheduleDB,
+  setUpPersonalScheduleDB,
+  dropDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -37,6 +42,38 @@ describe('Test /api/user endpoints', () => {
   afterAll(async () => {
     await dropDB();
     await db.sequelize.close();
+  });
+
+  describe('Test PUT /api/user/profile', () => {
+    it('Successfully modified user profile ', async () => {
+      const newNickname = 'newNickname';
+      const newPassword = 'newPassword';
+      const res1 = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
+        nickname: newNickname,
+        password: newPassword,
+      });
+      cookie = res1.headers['set-cookie'][0];
+      expect(res1.status).toEqual(200);
+
+      const res2 = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      const comparePassword = await bcrypt.compare(newPassword, res2.body.exUser.password);
+      delete res2.body.exUser.createdAt;
+      delete res2.body.exUser.deletedAt;
+      delete res2.body.exUser.updatedAt;
+      delete res2.body.exUser.password;
+      const expectedProfile = {
+        exUser: {
+          email: 'test-user@email.com',
+          nickname: newNickname,
+          provider: 'local',
+          snsId: null,
+          userId: 1,
+        },
+      };
+      expect(comparePassword).toEqual(true);
+      expect(res2.status).toEqual(200);
+      expect(res2.body).toEqual(expectedProfile);
+    });
   });
 
   describe('Test GET /api/user/:user_id/calendar', () => {
@@ -158,7 +195,6 @@ describe('Test /api/user endpoints', () => {
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
-              { endDateTime: '2023-04-01T00:00:00.000Z', startDateTime: '2023-03-15T12:00:00.000Z' },
               { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-03-16T12:00:00.000Z' },
               { endDateTime: '2023-04-03T00:00:00.000Z', startDateTime: '2023-03-17T12:00:00.000Z' },
               { endDateTime: '2023-04-04T00:00:00.000Z', startDateTime: '2023-03-18T12:00:00.000Z' },
@@ -194,7 +230,6 @@ describe('Test /api/user endpoints', () => {
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
-              { endDateTime: '2023-04-01T00:00:00.000Z', startDateTime: '2023-03-15T12:00:00.000Z' },
               { endDateTime: '2023-05-02T00:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
             ],
             title: 'test-title18',
@@ -224,19 +259,6 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-05-01T23:59:59.000Z', startDateTime: '2023-04-30T23:59:59.000Z' },
             ],
             title: 'test-title21',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content23',
-            freq: 'YEARLY',
-            id: 23,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-01T00:00:00.000Z', startDateTime: '2023-03-15T00:00:00.000Z' },
-            ],
-            title: 'test-title23',
             until: '2025-01-01T00:00:00.000Z',
           },
         ],

@@ -47,7 +47,6 @@ async function join(req, res, next) {
 
   const { email, nickname, password } = req.body;
   let options;
-
   if (email && !nickname) {
     options = { where: { email } };
   } else if (!email && nickname) {
@@ -55,7 +54,6 @@ async function join(req, res, next) {
   } else {
     options = { where: { [Op.or]: [{ email }, { nickname }] } };
   }
-
   const exUser = await User.findOne(options);
   if (exUser) {
     return next(new DuplicateUserError());
@@ -106,8 +104,12 @@ async function login(req, res, next) {
   }
 }
 
-async function logout(req, res) {
-  return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+async function logout(req, res, next) {
+  try {
+    return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+  } catch (err) {
+    return next(new ApiError());
+  }
 }
 
 /*
