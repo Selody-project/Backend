@@ -9,6 +9,7 @@ const ApiError = require('../errors/apiError');
 const NotFoundError = require('../errors/calendar/NotFound');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/ExpiredCodeError');
+const InvalidGroupJoinError = require('../errors/InvalidGroupJoinError');
 const {
   validateGroupSchema, validateGroupIdSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema,
@@ -265,7 +266,7 @@ async function getInvitation(req, res, next) {
 
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if (group.inviteExp < new Date()) return next(new ExpiredCodeError());
+    if (!group || group.inviteExp < new Date()) return next(new ExpiredCodeError());
 
     return res.status(200).json({ group });
   } catch (err) {
@@ -280,10 +281,11 @@ async function postGroupJoin(req, res, next) {
 
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if (group.inviteExp < new Date()) return next(new ExpiredCodeError());
+    if (!group || group.inviteExp < new Date()) return next(new ExpiredCodeError());
 
     const { nickname } = req;
     const user = await User.findOne({ where: { nickname } });
+    if (await user.hasGroup(group)) return next(new InvalidGroupJoinError());
 
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
