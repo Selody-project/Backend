@@ -373,4 +373,32 @@ describe('Test /api/user endpoints', () => {
       expect(modifiedSchedule.id).toEqual(1);
     });
   });
+
+  describe('Test POST /api/user/calendar', () => {
+    it('Insert a User schedule into the database', async () => {
+      const schedule = {
+        id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+      };
+      const expectedSchedule = {
+        scheduleArr: [
+          {
+            id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+
+          },
+        ],
+      };
+
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(expectedSchedule);
+    });
+  });
+
+  describe('Test DELETE /api/user/calendar', () => {
+    it('Delete a User schedule from the database ', async () => {
+      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [9] });
+      expect(res.statusCode).toEqual(204);
+    });
+  });
 });
