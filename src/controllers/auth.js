@@ -30,8 +30,8 @@ async function getNaverUserInfo(req, res, next) {
 }
 
 async function joinSocialUser(req, res, next) {
-  const exUser = await User.findOne({ where: { snsId: req.body.id } });
-  if (!exUser) {
+  const user = await User.findOne({ where: { snsId: req.body.id } });
+  if (!user) {
     await User.create({
       nickname: req.body.nickname,
       provider: 'NAVER',
@@ -54,8 +54,8 @@ async function join(req, res, next) {
   } else {
     options = { where: { [Op.or]: [{ email }, { nickname }] } };
   }
-  const exUser = await User.findOne(options);
-  if (exUser) {
+  const user = await User.findOne(options);
+  if (user) {
     return next(new DuplicateUserError());
   }
   if (email && nickname && password) {
@@ -82,20 +82,20 @@ async function login(req, res, next) {
   if (error) return next(new DataFormatError());
 
   const { email, password } = req.body;
-  let exUser;
+  let user;
   try {
-    exUser = await User.findOne({ where: { email } });
+    user = await User.findOne({ where: { email } });
   } catch (err) {
     return new ApiError();
   }
 
-  if (!exUser) {
+  if (!user) {
     return next(new InvalidIdPasswordError());
   }
   try {
-    const result = await bcrypt.compare(password, exUser.password);
+    const result = await bcrypt.compare(password, user.password);
     if (result) {
-      req.nickname = exUser.nickname;
+      req.nickname = user.nickname;
       return next();
     }
     return next(new InvalidIdPasswordError());
