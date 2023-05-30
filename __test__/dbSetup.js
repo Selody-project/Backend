@@ -13,9 +13,7 @@ const mockUser = {
 
 async function syncDB() {
   await db.sequelize.authenticate();
-  await db.sequelize.sync({ force: false }).then(() => {
-    console.log('DB Connection has been established successfully.');
-  });
+  await db.sequelize.sync({ force: false });
 }
 
 async function dropDB() {
@@ -39,13 +37,15 @@ async function setUpUserDB() {
 async function setUpGroupDB() {
   const group1 = await Group.create({
     groupId: 1,
-    name: 'test-group',
+    name: 'test-group1',
     member: 5,
+    leader: 1,
   });
   const group2 = await Group.create({
     groupId: 2,
-    name: 'test-group',
+    name: 'test-group2',
     member: 6,
+    leader: 2,
   });
   const user = await User.findAll();
   await user[0].addGroup(group1);

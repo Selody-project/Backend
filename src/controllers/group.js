@@ -12,6 +12,9 @@ const {
   validateScheduleIdSchema, validateGroupScheduleSchema,
 } = require('../utils/validators');
 const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
+const {
+  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
+} = require('../errors');
 
 async function createGroup(req, res, next) {
   try {
@@ -21,9 +24,9 @@ async function createGroup(req, res, next) {
     const { nickname } = req;
     const { name } = req.body;
     const exUser = await User.findOne({ where: { nickname } });
-    const group = await Group.create({ name, member: 1 });
+    const group = await Group.create({ name, member: 1, leader: exUser.userId });
     await exUser.addGroup(group);
-    return res.status(200).json({ message: 'Group creation successful' });
+    return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -35,6 +38,55 @@ async function getGroupList(req, res, next) {
     const exUser = await User.findOne({ where: { nickname } });
     const groupList = await exUser.getGroups();
     return res.status(200).json({ groupList });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deleteGroup(req, res, next) {
+  try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { id } = req.params;
+    const group = await Group.findByPk(id);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new UnathroizedError());
+    }
+
+    await group.destroy();
+    return res.status(204).json({ message: 'Successfully delete group' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function patchGroup(req, res, next) {
+  try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { id } = req.params;
+    const { newLeaderId } = req.body;
+    const group = await Group.findByPk(id);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    group.leader = newLeaderId;
+    await group.save();
+
+    return res.status(200).json({ message: 'Successfully update group leader' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -195,8 +247,13 @@ async function putGroupSchedule(req, res, next) {
 
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
     if (bodyError) return next(new DataFormatError());
-
     const { id } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id } });
+
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+
     await GroupSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully modify group schedule' });
   } catch (err) {
@@ -211,6 +268,11 @@ async function deleteGroupSchedule(req, res, next) {
 
     const { id } = req.params;
     const schedule = await GroupSchedule.findOne({ where: { id } });
+
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+
     await schedule.destroy();
     
     return res.status(204).json({ message: 'Successfully delete group schedule' });
@@ -222,6 +284,8 @@ async function deleteGroupSchedule(req, res, next) {
 module.exports = {
   createGroup,
   getGroupList,
+  deleteGroup,
+  patchGroup,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,
