@@ -224,6 +224,108 @@
         }
       }
     },
+    "/api/group/{group_id}/invite-link": {
+      "post": {
+        "description": "",
+        "summary": "그룹 공유 코드 생성",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          }
+        }
+      }
+    },
+    "/api/group/invite-link/{inviteCode}": {
+      "get": {
+        "description": "",
+        "summary": "그룹 초대장 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "inviteCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "410": {
+            "description": "만료된 초대장"
+          }
+        }
+      }
+    },
+    "/api/group/join/{inviteCode}": {
+      "post": {
+        "description": "",
+        "summary": "그룹 초대 수락 및 가입",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "inviteCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "이미 가입된 유저"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "410": {
+            "description": "만료된 초대장"
+          }
+        }
+      }
+    },
     "/api/group/calendar": {
       "post": {
         "description": "",

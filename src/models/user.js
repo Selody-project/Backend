@@ -51,6 +51,7 @@ class User extends Sequelize.Model {
     });
     db.User.belongsToMany(db.Group, { through: 'UserGroup', foreignKey: 'userId', timestamps: false });
   }
+
 }
 
 module.exports = User;

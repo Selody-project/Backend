@@ -21,8 +21,10 @@ const userIdSchema = Joi.object({
 
 const groupSchema = Joi.object({
   groupId: Joi.number().min(0),
-  name: Joi.string().max(45).required(),
+  name: Joi.string().max(45),
   memeber: Joi.number().min(1),
+  inviteCode: Joi.string(),
+  inviteExp: Joi.date(),
 });
 
 const groupIdSchema = Joi.object({

@@ -15,7 +15,7 @@ describe('Test /auth endpoints', () => {
     await setUpUserDB();
 
     const res = await request(app).post('/api/auth/login').send({
-      email: 'test-user@email.com',
+      email: 'test-user1@email.com',
       password: 'super_strong_password',
     });
     // eslint-disable-next-line prefer-destructuring

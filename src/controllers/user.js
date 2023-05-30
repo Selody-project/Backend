@@ -6,6 +6,7 @@ const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
 const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const DataFormatError = require('../errors/DataFormatError');
+const NotFoundError = require('../errors/calendar/NotFound');
 const {
   validateJoinSchema,
   validateUserIdSchema,
@@ -15,8 +16,8 @@ const {
 async function getUserProfile(req, res, next) {
   try {
     const { nickname } = req;
-    const exUser = await User.findOne({ where: { nickname } });
-    return res.status(200).json({ exUser });
+    const user = await User.findOne({ where: { nickname } });
+    return res.status(200).json({ user });
   } catch (err) {
     return next(new ApiError());
   }
@@ -27,20 +28,20 @@ async function putUserProfile(req, res, next) {
     const { error } = validateJoinSchema(req.body);
     if (error) return next(new DataFormatError());
 
-    const exUser = await User.findOne({ where: { nickname: req.nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     const { nickname, password } = req.body;
     const duplicate = await User.findAll({
       where: {
         [Op.and]: [
           { nickname },
-          { userId: { [Op.not]: exUser.userId } },
+          { userId: { [Op.not]: user.userId } },
         ],
       },
     });
     if (duplicate.length > 0) {
       return next(new DuplicateUserError());
     }
-    await exUser.update({
+    await user.update({
       nickname,
       password: await bcrypt.hash(password, 12),
     });

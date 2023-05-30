@@ -23,7 +23,7 @@ describe('Test /api/user endpoints', () => {
     await setUpPersonalScheduleDB();
 
     const res = await request(app).post('/api/auth/login').send({
-      email: 'test-user@email.com',
+      email: 'test-user1@email.com',
       password: 'super_strong_password',
     });
     // eslint-disable-next-line prefer-destructuring
@@ -57,14 +57,15 @@ describe('Test /api/user endpoints', () => {
       expect(res.status).toEqual(200);
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res.body.exUser.password);
-      delete res.body.exUser.createdAt;
-      delete res.body.exUser.deletedAt;
-      delete res.body.exUser.updatedAt;
-      delete res.body.exUser.password;
+      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
+      delete res.body.user.createdAt;
+      delete res.body.user.deletedAt;
+      delete res.body.user.updatedAt;
+      delete res.body.user.password;
+
       const expectedProfile = {
-        exUser: {
-          email: 'test-user@email.com',
+        user: {
+          email: 'test-user1@email.com',
           nickname: newNickname,
           provider: 'local',
           snsId: null,

@@ -21,6 +21,14 @@ class Group extends Sequelize.Model {
         type: Sequelize.BIGINT,
         allowNull: false,
       },
+      inviteCode: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      inviteExp: {
+        type: Sequelize.DATE,
+        allowNull: true,
+      }
     }, {
       sequelize,
       timestamps: false,
