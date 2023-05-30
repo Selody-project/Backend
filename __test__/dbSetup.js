@@ -6,16 +6,14 @@ const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
 
 const mockUser = {
-  email: 'test-user@email.com',
+  email: 'test-user1@email.com',
   nickname: 'test-user',
   password: 'super_strong_password',
 };
 
 async function syncDB() {
   await db.sequelize.authenticate();
-  await db.sequelize.sync({ force: false }).then(() => {
-    console.log('DB Connection has been established successfully.');
-  });
+  await db.sequelize.sync({ force: false });
 }
 
 async function dropDB() {
@@ -23,34 +21,55 @@ async function dropDB() {
 }
 
 async function setUpUserDB() {
-  const mockUserData = {
-    userId: 1,
-    email: 'test-user@email.com',
-    nickname: 'test-user',
-    password: await bcrypt.hash('super_strong_password', 12),
-    provider: 'local',
-    createdAt: '2023-04-26',
-    updatedAt: '2023-04-26',
-  };
-
-  await User.create(mockUserData);
+  const mockUserData = [
+    {
+      userId: 1,
+      email: 'test-user1@email.com',
+      nickname: 'test-user1',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    },
+    {
+      userId: 2,
+      email: 'test-user2@email.com',
+      nickname: 'test-user2',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    }
+  ];
+  await User.create(mockUserData[0]);
+  await User.create(mockUserData[1]);
 }
 
 async function setUpGroupDB() {
   const group1 = await Group.create({
     groupId: 1,
-    name: 'test-group',
+    name: 'test-group1',
     member: 5,
-    InviteCode: 'InviteCode01',
+    leader: 1,
+    inviteCode: 'inviteCode01',
     inviteExp: '2099-01-01T00:00:00.000Z',
   });
   const group2 = await Group.create({
     groupId: 2,
-    name: 'test-group',
+    name: 'test-group2',
     member: 6,
-    InviteCode: 'InviteCode02',
-    inviteExp: '2099-01-01T00:00:00.000Z',
+    leader: 2,
+    inviteCode: 'expiredCode02',
+    inviteExp: '2000-01-01T00:00:00.000Z',
   });
+  await Group.create({
+    groupId: 3,
+    name: 'test-group3',
+    member: 2,
+    leader: 2,
+    inviteCode: 'inviteCode03',
+    inviteExp: '2099-01-01T00:00:00.000Z',
+  })
   const user = await User.findAll();
   await user[0].addGroup(group1);
   await user[0].addGroup(group2);

@@ -23,7 +23,7 @@ describe('Test /api/user endpoints', () => {
     await setUpPersonalScheduleDB();
 
     const res = await request(app).post('/api/auth/login').send({
-      email: 'test-user@email.com',
+      email: 'test-user1@email.com',
       password: 'super_strong_password',
     });
     // eslint-disable-next-line prefer-destructuring
@@ -48,22 +48,24 @@ describe('Test /api/user endpoints', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
       const newPassword = 'newPassword';
-      const res1 = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
+      let res = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
         password: newPassword,
       });
-      cookie = res1.headers['set-cookie'][0];
-      expect(res1.status).toEqual(200);
+      // eslint-disable-next-line prefer-destructuring
+      cookie = res.headers['set-cookie'][0];
+      expect(res.status).toEqual(200);
 
-      const res2 = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res2.body.user.password);
-      delete res2.body.user.createdAt;
-      delete res2.body.user.deletedAt;
-      delete res2.body.user.updatedAt;
-      delete res2.body.user.password;
+      res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
+      delete res.body.user.createdAt;
+      delete res.body.user.deletedAt;
+      delete res.body.user.updatedAt;
+      delete res.body.user.password;
+
       const expectedProfile = {
         user: {
-          email: 'test-user@email.com',
+          email: 'test-user1@email.com',
           nickname: newNickname,
           provider: 'local',
           snsId: null,
@@ -71,8 +73,8 @@ describe('Test /api/user endpoints', () => {
         },
       };
       expect(comparePassword).toEqual(true);
-      expect(res2.status).toEqual(200);
-      expect(res2.body).toEqual(expectedProfile);
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedProfile);
     });
   });
 

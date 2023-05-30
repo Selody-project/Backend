@@ -70,11 +70,9 @@ function renewToken(req, res, next) {
       nickname: req.nickname,
     });
   } catch (err) {
-    console.log(err.name);
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
-
     return next(new InvalidTokenError());
   }
 }
