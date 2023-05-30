@@ -56,13 +56,13 @@ describe('Test /api/user endpoints', () => {
       expect(res1.status).toEqual(200);
 
       const res2 = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res2.body.exUser.password);
-      delete res2.body.exUser.createdAt;
-      delete res2.body.exUser.deletedAt;
-      delete res2.body.exUser.updatedAt;
-      delete res2.body.exUser.password;
+      const comparePassword = await bcrypt.compare(newPassword, res2.body.user.password);
+      delete res2.body.user.createdAt;
+      delete res2.body.user.deletedAt;
+      delete res2.body.user.updatedAt;
+      delete res2.body.user.password;
       const expectedProfile = {
-        exUser: {
+        user: {
           email: 'test-user@email.com',
           nickname: newNickname,
           provider: 'local',
