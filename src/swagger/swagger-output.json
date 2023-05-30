@@ -437,6 +437,89 @@
           }
         }
       }
+    },         
+    "/api/user/calendar": {
+      "post": {
+        "description": "",
+        "summary": "유저 일정 등록",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "any"
+                },
+                "title": {
+                  "example": "any"
+                },
+                "contents": {
+                  "example": "any"
+                },
+                "startDate": {
+                  "example": "any"
+                },
+                "endDate": {
+                  "example": "any"
+                },
+                "recurrence": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "freq": {
+                  "example": "any"
+                },
+                "interval": {
+                  "example": "any"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "유저 스케줄 삭제",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "example": "[19, 20, 35]"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          }
+        }
+      }
     },
     "/api/user/{user_id}/calendar": {
       "get": {

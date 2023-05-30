@@ -274,6 +274,7 @@ async function deleteGroupSchedule(req, res, next) {
     }
 
     await schedule.destroy();
+    
     return res.status(204).json({ message: 'Successfully delete group schedule' });
   } catch (err) {
     return next(new ApiError());
