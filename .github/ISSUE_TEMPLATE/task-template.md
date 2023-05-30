@@ -6,10 +6,10 @@ labels: task
 assignees: ""
 ---
 
-### Description
+### 설명
 
 Spec and requirements for this development tasks
 
-### Link
+### 링크
 
 **Pre-requisite**: [Link to pre-req task](https://github.com/xERN-shareANDcommunity/Backend)
