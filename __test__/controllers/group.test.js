@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
@@ -10,6 +9,7 @@ const {
   tearDownUserDB,
   setUpUserDB,
 } = require('../dbSetup');
+const Group = require('../../src/models/group');
 
 describe('Test /api/group endpoints', () => {
   let cookie;
@@ -46,13 +46,13 @@ describe('Test /api/group endpoints', () => {
   });
 
   describe('Test GET /api/group', () => {
-    it('Group list lookup successful ', async () => {
-      const res = (await request(app).get('/api/group').set('Cookie', cookie));
+    it('Successfully get a list of group', async () => {
+      const res = await request(app).get('/api/group').set('Cookie', cookie);
       const expectedGroups = {
         groupList: [{
-          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1 },
+          groupId: 1, leader: 1, name: 'test-group1', member: 5, UserGroup: { groupId: 1, userId: 1 },
         }, {
-          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1 },
+          groupId: 2, leader: 2, name: 'test-group2', member: 6, UserGroup: { groupId: 2, userId: 1 },
         }],
       };
 
@@ -62,15 +62,69 @@ describe('Test /api/group endpoints', () => {
   });
 
   describe('Test POST /api/group', () => {
-    it('Group creation successful ', async () => {
-      const res = (await request(app).post('/api/group').set('Cookie', cookie).send({ name: 'test-group' }));
+    it('Successfully create group', async () => {
+      const res = await request(app).post('/api/group').set('Cookie', cookie).send({
+        name: 'test-group',
+      });
       expect(res.status).toEqual(200);
+    });
+  });
+
+  describe('Test DELETE /api/group', () => {
+    it('Successfully delete group', async () => {
+      const id = 1;
+      const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully fail to group (not a group leader)', async () => {
+      const id = 2;
+      const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(403);
+    });
+
+    it('Successfully fail to delete group (Group Not Found)', async () => {
+      const id = 5;
+      const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully fail to delete group (DataFormat Error)', async () => {
+      const id = 'abc';
+      const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test PATCH /api/group', () => {
+    it('Successfully update group leader', async () => {
+      const id = 1;
+      const newLeaderId = 2;
+      const res = await request(app).patch(`/api/group/${id}`).set('Cookie', cookie).send({
+        newLeaderId,
+      });
+
+      const group = await Group.findByPk(id);
+      expect(res.status).toEqual(200);
+      expect(group.leader).toEqual(2);
+    });
+
+    it('Successfully fail to update group (group not found)', async () => {
+      const id = 3;
+      const newLeaderId = 2;
+      const res = await request(app).patch(`/api/group/${id}`).set('Cookie', cookie).send({
+        newLeaderId,
+      });
+
+      expect(res.status).toEqual(404);
     });
   });
 
   describe('Test POST /api/group/calendar', () => {
     it('Group schedule creation successful ', async () => {
-      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
+      const res = await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
         groupId: 1,
         title: 'test-title',
         content: 'test-content',
@@ -81,7 +135,7 @@ describe('Test /api/group endpoints', () => {
         interval: 1,
         byweekday: 'MO',
         until: '2026-01-05',
-      }));
+      });
 
       expect(res.status).toEqual(201);
     });
@@ -106,11 +160,11 @@ describe('Test /api/group endpoints', () => {
   describe('Test PUT /api/group/calendar', () => {
     it('Group Schedule Modification Successful ', async () => {
       const id = 1;
-      const res = (await request(app).put(`/api/group/calendar/${id}`).set('Cookie', cookie).send({
+      const res = await request(app).put(`/api/group/calendar/${id}`).set('Cookie', cookie).send({
         groupId: 1,
         title: 'modified-title',
         content: 'modified-contnent',
-      }));
+      });
       const modifiedSchedule = await GroupSchedule.findOne({
         where: { title: 'modified-title' },
       });

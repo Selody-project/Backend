@@ -5,4 +5,7 @@ module.exports = {
   APIError,
   DataFormatError,
   ...require('./auth'),
+  ...require('./group'),
+  ...require('./schedule'),
+  ...require('./user'),
 };

@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const ApiError = require('../errors/apiError');
 const TokenExpireError = require('../errors/auth/TokenExpireError');
 const InvalidTokenError = require('../errors/auth/InvalidTokenError');
+
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
 const REFRESH_SECRET_KEY = process.env.JWT_SECRET;
 
@@ -69,13 +70,10 @@ function renewToken(req, res, next) {
       nickname: req.nickname,
     });
   } catch (err) {
-    console.log(err.name);
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
-    else {
-      return next(new InvalidTokenError());
-    }
+    return next(new InvalidTokenError());
   }
 }
 
