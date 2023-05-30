@@ -23,6 +23,8 @@ describe('Test /api/group endpoints', () => {
       email: 'test-user@email.com',
       password: 'super_strong_password',
     });
+    inviteCode = 'ABCDEFGHIJKL'
+
     // eslint-disable-next-line prefer-destructuring
     cookie = res.headers['set-cookie'][0];
   });
@@ -45,26 +47,46 @@ describe('Test /api/group endpoints', () => {
     await db.sequelize.close();
   });
 
+  describe('Test GET, POST /api/group/invite-link/:group_id', () => {
+    it('Successfully create invitation code ', async () => {
+      const groupId = 1
+      const res = (await request(app).post(`/api/group/invite-link/${groupId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(200);
+    });
+  });
+
+  describe('Test GET /api/group/invite-link/:inviteCode', () => {
+    it('Successfully get a invitation ', async () => {
+      let inviteCode = 'inviteCode01';
+      const res = (await request(app).get(`/api/group/invite-link/${inviteCode}`).set('Cookie', cookie));
+      const expectedGroups = {
+        groupId: 1, name: 'test-group', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z',
+      };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+
+    it('Successfully fail to get a invitation (Expired Code Error)', async () => {
+      let groupId = 100;
+      const res = (await request(app).get(`/api/group/invite-link/${groupId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(410);
+      expect(res.body).toEqual({ error: 'Expired invitation code.' });
+    });
+  });
+
   describe('Test GET /api/group', () => {
     it('Group list lookup successful ', async () => {
       const res = (await request(app).get('/api/group').set('Cookie', cookie));
       const expectedGroups = {
         groupList: [{
-          groupId: 1, name: 'test-group', member: 5, inviteCode: null, inviteExp: null, UserGroup: { groupId: 1, userId: 1 },
+          groupId: 1, name: 'test-group', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1 },
         }, {
-          groupId: 2, name: 'test-group', member: 6, inviteCode: null, inviteExp: null, UserGroup: { groupId: 2, userId: 1 },
+          groupId: 2, name: 'test-group', member: 6, inviteCode: 'InviteCode02', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1 },
         }],
       };
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);
-    });
-  });
-
-  describe('Test POST /api/group/invite-link/:group_id', () => {
-    it('Invitation Link Creation Successful ', async () => {
-      const res = (await request(app).get('/api/group').set('Cookie', cookie));
-      expect(res.status).toEqual(200);
     });
   });
 

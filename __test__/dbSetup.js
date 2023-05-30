@@ -41,11 +41,15 @@ async function setUpGroupDB() {
     groupId: 1,
     name: 'test-group',
     member: 5,
+    InviteCode: 'InviteCode01',
+    inviteExp: '2099-01-01T00:00:00.000Z',
   });
   const group2 = await Group.create({
     groupId: 2,
     name: 'test-group',
     member: 6,
+    InviteCode: 'InviteCode02',
+    inviteExp: '2099-01-01T00:00:00.000Z',
   });
   const user = await User.findAll();
   await user[0].addGroup(group1);
