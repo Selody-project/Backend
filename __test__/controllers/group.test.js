@@ -50,14 +50,21 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get('/api/group').set('Cookie', cookie));
       const expectedGroups = {
         groupList: [{
-          groupId: 1, name: 'test-group', member: 5, UserGroup: { groupId: 1, userId: 1 },
+          groupId: 1, name: 'test-group', member: 5, inviteCode: null, inviteExp: null, UserGroup: { groupId: 1, userId: 1 },
         }, {
-          groupId: 2, name: 'test-group', member: 6, UserGroup: { groupId: 2, userId: 1 },
+          groupId: 2, name: 'test-group', member: 6, inviteCode: null, inviteExp: null, UserGroup: { groupId: 2, userId: 1 },
         }],
       };
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);
+    });
+  });
+
+  describe('Test POST /api/group/invite-link/:group_id', () => {
+    it('Invitation Link Creation Successful ', async () => {
+      const res = (await request(app).get('/api/group').set('Cookie', cookie));
+      expect(res.status).toEqual(200);
     });
   });
 

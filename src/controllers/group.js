@@ -10,6 +10,7 @@ const ApiError = require('../errors/apiError');
 const NotFoundError = require('../errors/calendar/NotFound');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/ExpiredCodeError');
+const InvalidGroupJoinError = require('../errors/InvalidGroupJoinError');
 const {
   validateGroupSchema, validateGroupIdSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema,
@@ -215,7 +216,7 @@ async function deleteGroupSchedule(req, res, next) {
     const { id } = req.params;
     const schedule = await GroupSchedule.findOne({ where: { id } });
     await schedule.destroy();
-    
+
     return res.status(204).json({ message: 'Successfully delete group schedule' });
   } catch (err) {
     return next(new ApiError());
@@ -228,27 +229,32 @@ async function postInviteLink(req, res, next) {
     if (error) return next(new DataFormatError());
     const { group_id: groupId } = req.params;
     const group = await Group.findOne({ where: { groupId } });
-    if(!group) return next(new NotFoundError());
+
+    if (!group) return next(new NotFoundError());
 
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     const codeLength = 12;
     let inviteCode = '';
-    while(true) {
-      for (let i = 0; i < codeLength; i++) {
+    let duplicate = null;
+
+    while (true) {
+      inviteCode = '';
+      for (let i = 0; i < codeLength; i += 1) {
         const randomIndex = Math.floor(Math.random() * characters.length);
         inviteCode += characters.charAt(randomIndex);
       }
-      const duplicate = await Group.findOne({ where: { inviteCode } });
-      if(!duplicate) {
+      // eslint-disable-next-line no-await-in-loop
+      duplicate = await Group.findOne({ where: { inviteCode } });
+      if (!duplicate) {
         break;
       }
     }
-    let inviteExp = new Date();
+    const inviteExp = new Date();
     inviteExp.setDate(new Date().getDate() + 1);
     await group.update({ inviteCode, inviteExp });
-    return res.status(200).json({ 
+    return res.status(200).json({
       inviteCode,
-      exp: inviteExp
+      exp: inviteExp,
     });
   } catch (err) {
     return next(new ApiError());
@@ -260,10 +266,10 @@ async function getInvitation(req, res, next) {
     const { error } = validateGroupSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const {inviteCode} = req.params;
+    const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if(group.inviteExp < new Date()) return next(new ExpiredCodeError());
-    
+    if (!group || group.inviteExp < new Date()) return next(new ExpiredCodeError());
+
     return res.status(200).json({ group });
   } catch (err) {
     return next(new ApiError());
@@ -275,19 +281,19 @@ async function postGroupJoin(req, res, next) {
     const { error } = validateGroupSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const {inviteCode} = req.params;
+    const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if(group.inviteExp < new Date()) return next(new ExpiredCodeError());
+    if (!group || group.inviteExp < new Date()) return next(new ExpiredCodeError());
 
     const { nickname } = req;
-    const user = await User.findOne({ where: { nickname }});
-    
+    const user = await User.findOne({ where: { nickname } });
+    if (await user.hasGroup(group)) return next(new InvalidGroupJoinError());
+
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
-  
-    return res.status(200).json({ message: 'Successfully joined the group.'});
+
+    return res.status(200).json({ message: 'Successfully joined the group.' });
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
