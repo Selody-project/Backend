@@ -6,6 +6,6 @@ labels: bug
 assignees: ""
 ---
 
-### Description
+### 설명
 
 How, when and where does the bug occur
