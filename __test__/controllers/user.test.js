@@ -377,7 +377,7 @@ describe('Test /api/user endpoints', () => {
   describe('Test POST /api/user/calendar', () => {
     it('Insert a User schedule into the database', async () => {
       const schedule = {
-        id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+        id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0,
       };
       const expectedSchedule = {
         scheduleArr: [
