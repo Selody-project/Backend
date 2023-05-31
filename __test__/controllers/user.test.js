@@ -78,9 +78,8 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test GET /api/user/:user_id/calendar', () => {
+  describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
-      const userID = 1;
       const date = '2023-04';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
@@ -265,7 +264,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/${userID}/calendar`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         date,
       });
       expect(res.statusCode).toEqual(200);
@@ -273,9 +272,8 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test GET /api/user/:user_id/calendar/todo', () => {
+  describe('Test GET /api/user/calendar/todo', () => {
     it('Successfully get an April Schedule ', async () => {
-      const userID = 1;
       const date = '2023-04-15';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
@@ -354,7 +352,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/${userID}/calendar/todo`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar/todo').set('Cookie', cookie).query({
         date,
       });
       expect(res.statusCode).toEqual(200);

@@ -1,8 +1,7 @@
 const Sequelize = require('sequelize');
-const Op = require('sequelize');
 const moment = require('moment');
-const db = require('../models');
 const { RRule } = require('rrule');
+const db = require('../models');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
@@ -362,10 +361,10 @@ async function postGroupJoin(req, res, next) {
 
     const { nickname } = req;
     const user = await User.findOne({ where: { nickname } });
-    if (await user.hasGroup(group)) { 
+    if (await user.hasGroup(group)) {
       return next(new InvalidGroupJoinError());
     }
-    
+
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
 
