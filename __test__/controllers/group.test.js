@@ -2,12 +2,9 @@ const request = require('supertest');
 const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
 const {
-  db, syncDB,
-  tearDownGroupDB, tearDownGroupScheduleDB,
-  setUpGroupScheduleDB, setUpGroupDB,
-  dropDB,
-  tearDownUserDB,
-  setUpUserDB,
+  db, syncDB, dropDB,
+  tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
+  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
@@ -23,8 +20,6 @@ describe('Test /api/group endpoints', () => {
       email: 'test-user1@email.com',
       password: 'super_strong_password',
     });
-    inviteCode = 'ABCDEFGHIJKL'
-
     // eslint-disable-next-line prefer-destructuring
     cookie = res.headers['set-cookie'][0];
   });
@@ -198,25 +193,53 @@ describe('Test /api/group endpoints', () => {
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
-            content: 'test-content1', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-02-03T00:00:00.000Z', title: 'test-title1',
+            content: 'test-content1',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            title: 'test-title1',
           },
           {
-            content: 'test-content2', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title2',
+            content: 'test-content2',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title2',
           },
           {
-            content: 'test-content4', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-01T00:00:00.000Z', title: 'test-title4',
+            content: 'test-content4',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-01T00:00:00.000Z',
+            title: 'test-title4',
           },
           {
-            content: 'test-content5', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-03-15T00:00:00.000Z', title: 'test-title5',
+            content: 'test-content5',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-03-15T00:00:00.000Z',
+            title: 'test-title5',
           },
           {
-            content: 'test-content6', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title6',
+            content: 'test-content6',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title6',
           },
           {
-            content: 'test-content9', endDateTime: '2023-04-01T08:59:59.000Z', recurrence: 0, startDateTime: '2023-03-15T00:00:00.000Z', title: 'test-title9',
+            content: 'test-content9',
+            endDateTime: '2023-04-01T08:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-03-15T00:00:00.000Z',
+            title: 'test-title9',
           },
           {
-            content: 'test-content10', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-30T23:59:59.000Z', title: 'test-title10',
+            content: 'test-content10',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-30T23:59:59.000Z',
+            title: 'test-title10',
           },
         ],
         recurrenceSchedule: [
@@ -396,13 +419,13 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group/:group_id/invite-link', () => {
     it('Successfully generated invitation code ', async () => {
-      const groupId = 1
+      const groupId = 1;
       const res = (await request(app).post(`/api/group/${groupId}/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
     });
 
     it('Successfully failed to create invitation code (Group Not Found) ', async () => {
-      const groupId = 100
+      const groupId = 100;
       const res = (await request(app).post(`/api/group/${groupId}/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
@@ -415,11 +438,11 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get(`/api/group/invite-link/${inviteCode}`).set('Cookie', cookie));
       const expectedGroups = {
         group: {
-          groupId: 1, 
-          name: 'test-group1', 
-          leader: 1, 
-          member: 5, 
-          inviteCode: 'inviteCode01', 
+          groupId: 1,
+          name: 'test-group1',
+          leader: 1,
+          member: 5,
+          inviteCode: 'inviteCode01',
           inviteExp: '2099-01-01T00:00:00.000Z',
         },
       };
@@ -444,28 +467,28 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group/join/:inviteCode', () => {
     it('Successfully joined the group ', async () => {
-      const inviteCode = 'inviteCode03'
+      const inviteCode = 'inviteCode03';
       const res = (await request(app).post(`/api/group/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ message: 'Successfully joined the group.' });
     });
 
     it('Successfully failed to join the group (Group Not Found) ', async () => {
-      const inviteCode = 'isWrongInviteCode'
+      const inviteCode = 'isWrongInviteCode';
       const res = (await request(app).post(`/api/group/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
 
     it('Successfully failed to join the group (Expired Code Error) ', async () => {
-      const inviteCode = 'expiredCode02'
+      const inviteCode = 'expiredCode02';
       const res = (await request(app).post(`/api/group/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(410);
       expect(res.body).toEqual({ error: 'Expired invitation code.' });
     });
 
     it('Successfully failed to join the group (Invalid Group Join Error) ', async () => {
-      const inviteCode = 'inviteCode01'
+      const inviteCode = 'inviteCode01';
       const res = (await request(app).post(`/api/group/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
       expect(res.body).toEqual({ error: 'You are already a member of this group.' });

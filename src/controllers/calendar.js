@@ -4,14 +4,19 @@ const personalSchedule = require('../models/personalSchedule');
 const User = require('../models/user');
 const ApiError = require('../errors/apiError');
 const NotFoundError = require('../errors/calendar/NotFound');
-const { UserNotFoundError } = require('../errors');
+const { UserNotFoundError, DataFormatError } = require('../errors');
+const { validateUserScheduleSchema } = require('../utils/validators');
 
 async function postPersonalSchedule(req, res, next) {
-  const {
-    title, content, startDateTime, endDateTime,
-    recurrence, freq, interval, byweekday, until,
-  } = req.body;
   try {
+    const { error } = validateUserScheduleSchema(req.body);
+    if (error) {
+      return next(new DataFormatError());
+    }
+    const {
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
+    } = req.body;
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
@@ -56,5 +61,6 @@ async function deletePersonalSchedule(req, res, next) {
   }
 }
 module.exports = {
-  postPersonalSchedule, deletePersonalSchedule,
+  postPersonalSchedule,
+  deletePersonalSchedule,
 };
