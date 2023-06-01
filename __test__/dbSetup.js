@@ -39,7 +39,7 @@ async function setUpUserDB() {
       provider: 'local',
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
-    }
+    },
   ];
   await User.create(mockUserData[0]);
   await User.create(mockUserData[1]);
@@ -69,7 +69,7 @@ async function setUpGroupDB() {
     leader: 2,
     inviteCode: 'inviteCode03',
     inviteExp: '2099-01-01T00:00:00.000Z',
-  })
+  });
   const user = await User.findAll();
   await user[0].addGroup(group1);
   await user[0].addGroup(group2);

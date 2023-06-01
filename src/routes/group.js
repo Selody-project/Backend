@@ -24,8 +24,8 @@ router.post('/calendar', postGroupSchedule);
 router.put('/calendar/:id', putGroupSchedule);
 router.delete('/calendar/:id', deleteGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
-
 router.post('/:group_id/invite-link', postInviteLink);
-router.get('/invite-link/:inviteCode',getInvitation);
+router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
+
 module.exports = router;

@@ -2,13 +2,9 @@ const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
-  db,
-  tearDownUserDB,
-  setUpUserDB,
-  syncDB,
-  tearDownPersonalScheduleDB,
-  setUpPersonalScheduleDB,
-  dropDB,
+  db, syncDB, dropDB,
+  setUpUserDB, setUpPersonalScheduleDB,
+  tearDownUserDB, tearDownPersonalScheduleDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -78,35 +74,66 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test GET /api/user/:user_id/calendar', () => {
+  describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
-      const userID = 1;
       const date = '2023-04';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
-            content: 'test-content1', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-02-03T00:00:00.000Z', title: 'test-title1',
+            content: 'test-content1',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            title: 'test-title1',
           },
           {
-            content: 'test-content2', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title2',
+            content: 'test-content2',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title2',
           },
           {
-            content: 'test-content3', endDateTime: '2023-04-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-10T00:00:00.000Z', title: 'test-title3',
+            content: 'test-content3',
+            endDateTime: '2023-04-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-10T00:00:00.000Z',
+            title: 'test-title3',
           },
           {
-            content: 'test-content4', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-01T00:00:00.000Z', title: 'test-title4',
+            content: 'test-content4',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-01T00:00:00.000Z',
+            title: 'test-title4',
           },
           {
-            content: 'test-content5', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-03-15T00:00:00.000Z', title: 'test-title5',
+            content: 'test-content5',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-03-15T00:00:00.000Z',
+            title: 'test-title5',
           },
           {
-            content: 'test-content6', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title6',
+            content: 'test-content6',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title6',
           },
           {
-            content: 'test-content9', endDateTime: '2023-04-01T08:59:59.000Z', recurrence: 0, startDateTime: '2023-03-15T00:00:00.000Z', title: 'test-title9',
+            content: 'test-content9',
+            endDateTime: '2023-04-01T08:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-03-15T00:00:00.000Z',
+            title: 'test-title9',
           },
           {
-            content: 'test-content10', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-30T23:59:59.000Z', title: 'test-title10',
+            content: 'test-content10',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-30T23:59:59.000Z',
+            title: 'test-title10',
           },
         ],
         recurrenceSchedule: [
@@ -265,7 +292,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/${userID}/calendar`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         date,
       });
       expect(res.statusCode).toEqual(200);
@@ -273,29 +300,52 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test GET /api/user/:user_id/calendar/todo', () => {
+  describe('Test GET /api/user/calendar/todo', () => {
     it('Successfully get an April Schedule ', async () => {
-      const userID = 1;
       const date = '2023-04-15';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
-            content: 'test-content1', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-02-03T00:00:00.000Z', title: 'test-title1',
+            content: 'test-content1',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            title: 'test-title1',
           },
           {
-            content: 'test-content2', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title2',
+            content: 'test-content2',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title2',
           },
           {
-            content: 'test-content3', endDateTime: '2023-04-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-10T00:00:00.000Z', title: 'test-title3',
+            content: 'test-content3',
+            endDateTime: '2023-04-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-10T00:00:00.000Z',
+            title: 'test-title3',
           },
           {
-            content: 'test-content4', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-01T00:00:00.000Z', title: 'test-title4',
+            content: 'test-content4',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-01T00:00:00.000Z',
+            title: 'test-title4',
           },
           {
-            content: 'test-content5', endDateTime: '2023-04-30T23:59:59.000Z', recurrence: 0, startDateTime: '2023-03-15T00:00:00.000Z', title: 'test-title5',
+            content: 'test-content5',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-03-15T00:00:00.000Z',
+            title: 'test-title5',
           },
           {
-            content: 'test-content6', endDateTime: '2023-05-15T23:59:59.000Z', recurrence: 0, startDateTime: '2023-04-15T00:00:00.000Z', title: 'test-title6',
+            content: 'test-content6',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title6',
           },
         ],
         recurrenceSchedule: [
@@ -354,7 +404,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/${userID}/calendar/todo`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar/todo').set('Cookie', cookie).query({
         date,
       });
       expect(res.statusCode).toEqual(200);
@@ -365,7 +415,6 @@ describe('Test /api/user endpoints', () => {
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
-        id: 1,
         title: 'modified-title',
       });
       const modifiedSchedule = await PersonalSchedule.findOne({
@@ -374,33 +423,103 @@ describe('Test /api/user endpoints', () => {
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
     });
+
+    it('Successfully fail to modified user schedule (long name)', async () => {
+      const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
+        title: 'very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-name',
+      });
+      expect(res.status).toEqual(400);
+    });
   });
 
   describe('Test POST /api/user/calendar', () => {
-    it('Insert a User schedule into the database', async () => {
+    it('Successfully insert a user schedule into the database (non-recurrence)', async () => {
       const schedule = {
-        id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
+        title: 'test-title',
+        content: 'test-content1',
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        endDateTime: '2023-05-15T00:00:00.000Z',
+        recurrence: 0,
       };
       const expectedSchedule = {
         scheduleArr: [
           {
-            id: 24, title: 'test-title', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T00:00:00.000Z', recurrence: 0, userId: 1,
-
+            id: 24,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            recurrence: 0,
+            userId: 1,
           },
         ],
       };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
-
       expect(res.statusCode).toEqual(201);
       expect(res.body).toEqual(expectedSchedule);
+    });
+
+    it('Successfully insert a user schedule into the database (recurrence)', async () => {
+      const schedule = {
+        title: 'test-title',
+        content: 'test-content1',
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        endDateTime: '2023-05-15T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'WEEKLY',
+        interval: 1,
+        byweekday: 'MO',
+        until: '2026-01-05',
+      };
+      const expectedSchedule = {
+        scheduleArr: [
+          {
+            byweekday: 'MO',
+            id: 25,
+            interval: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            freq: 'WEEKLY',
+            recurrence: 1,
+            until: '2026-01-05T00:00:00.000Z',
+            userId: 1,
+          },
+        ],
+      };
+
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(expectedSchedule);
+    });
+
+    it('Successfully fail to insert a user schedule into the database (Incorrect Data format)', async () => {
+      const schedule = {
+        content: 'test-content1',
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        endDateTime: '2023-05-15T00:00:00.000Z',
+        recurrence: 0,
+      };
+      const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      expect(res.statusCode).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 
   describe('Test DELETE /api/user/calendar', () => {
-    it('Delete a User schedule from the database ', async () => {
+    it('Successfully delete a User schedule from the database ', async () => {
       const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [9] });
       expect(res.statusCode).toEqual(204);
+    });
+  });
+
+  describe('Test DELETE /api/user/calendar', () => {
+    it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
+      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [10000] });
+      expect(res.statusCode).toEqual(404);
+      expect(res.body).toEqual({ error: 'Not Found data' });
     });
   });
 });
