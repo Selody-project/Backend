@@ -98,10 +98,15 @@ async function getUserPersonalDaySchedule(req, res, next) {
 
 async function putUserSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.params);
+    const { error } = validateScheduleSchema(req.body);
     if (error) return next(new DataFormatError());
-    const { id } = req.body;
-    await PersonalSchedule.update(req.body, { where: { id } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    const { userId } = user;
+
+    await PersonalSchedule.update(req.body, { where: { id: userId } });
     return res.status(201).json({ message: 'Successfully Modified.' });
   } catch (err) {
     return next(new ApiError());

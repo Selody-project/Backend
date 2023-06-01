@@ -415,7 +415,6 @@ describe('Test /api/user endpoints', () => {
   describe('Test PUT /api/user/calendar', () => {
     it('Successfully modified user schedule ', async () => {
       const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
-        id: 1,
         title: 'modified-title',
       });
       const modifiedSchedule = await PersonalSchedule.findOne({
@@ -423,6 +422,13 @@ describe('Test /api/user endpoints', () => {
       });
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
+    });
+
+    it('Successfully fail to modified user schedule (long name)', async () => {
+      const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
+        title: 'very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-name',
+      });
+      expect(res.status).toEqual(400);
     });
   });
 
