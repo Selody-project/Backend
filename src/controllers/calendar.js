@@ -22,12 +22,12 @@ async function postPersonalSchedule(req, res, next) {
       return next(new UserNotFoundError());
     }
     const { userId } = user;
-    const newSchedule = await personalSchedule.create({
+    await personalSchedule.create({
       userId,
       title,
       content,
-      startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD'),
-      endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD'),
+      startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD HH:mm:ss'),
+      endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD HH:mm:ss'),
       recurrence,
       freq,
       interval,
@@ -35,8 +35,7 @@ async function postPersonalSchedule(req, res, next) {
       until,
     });
 
-    const scheduleArr = [{ ...newSchedule.toJSON() }];
-    return res.status(201).json({ scheduleArr });
+    return res.status(201).json({ message: 'Successfully create user schedule' });
   } catch (error) {
     return next(new ApiError());
   }

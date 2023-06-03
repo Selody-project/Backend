@@ -441,23 +441,9 @@ describe('Test /api/user endpoints', () => {
         endDateTime: '2023-05-15T00:00:00.000Z',
         recurrence: 0,
       };
-      const expectedSchedule = {
-        scheduleArr: [
-          {
-            id: 24,
-            title: 'test-title',
-            content: 'test-content1',
-            startDateTime: '2023-02-03T00:00:00.000Z',
-            endDateTime: '2023-05-15T00:00:00.000Z',
-            recurrence: 0,
-            userId: 1,
-          },
-        ],
-      };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(201);
-      expect(res.body).toEqual(expectedSchedule);
     });
 
     it('Successfully insert a user schedule into the database (recurrence)', async () => {
@@ -472,27 +458,8 @@ describe('Test /api/user endpoints', () => {
         byweekday: 'MO',
         until: '2026-01-05',
       };
-      const expectedSchedule = {
-        scheduleArr: [
-          {
-            byweekday: 'MO',
-            id: 25,
-            interval: 1,
-            title: 'test-title',
-            content: 'test-content1',
-            startDateTime: '2023-02-03T00:00:00.000Z',
-            endDateTime: '2023-05-15T00:00:00.000Z',
-            freq: 'WEEKLY',
-            recurrence: 1,
-            until: '2026-01-05T00:00:00.000Z',
-            userId: 1,
-          },
-        ],
-      };
-
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(201);
-      expect(res.body).toEqual(expectedSchedule);
     });
 
     it('Successfully fail to insert a user schedule into the database (Incorrect Data format)', async () => {
