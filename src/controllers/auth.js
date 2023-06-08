@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const { Sequelize } = require('sequelize');
 
 const { Op } = Sequelize;
+const jwt = require('jsonwebtoken');
+const jwksClient = require('jwks-rsa');
 const User = require('../models/user');
 const ApiError = require('../errors/apiError');
 const DuplicateUserError = require('../errors/auth/DuplicateUserError');
@@ -29,6 +31,42 @@ async function getNaverUserInfo(req, res, next) {
   });
 }
 
+// Google 로그인 토큰 파싱
+const client = jwksClient({
+  jwksUri: 'https://www.googleapis.com/oauth2/v3/certs',
+});
+
+function getKey(header, callback) {
+  client.getSigningKey(header.kid, (err, key) => {
+    const signingKey = key.publicKey || key.rsaPublicKey;
+    callback(null, signingKey);
+  });
+}
+
+async function getGoogleUserInfo(req, res, next) {
+  const { accessToken } = req.body;
+  if (!accessToken) {
+    return res.status(400).json({ message: '액세스 토큰이 필요합니다.' });
+  }
+
+  jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
+    }
+    const userEmail = decoded.email.split('@')[0];
+
+    const user = await User.findOne({ where: { nickname: userEmail } });
+    if (!user) {
+      await User.create({
+        nickname: userEmail,
+        provider: 'GOOGLE',
+      });
+    }
+    req.nickname = user.nickname;
+    next();
+  });
+}
+
 async function joinSocialUser(req, res, next) {
   const user = await User.findOne({ where: { snsId: req.body.id } });
   if (!user) {
@@ -38,6 +76,7 @@ async function joinSocialUser(req, res, next) {
       snsId: req.body.id,
     });
   }
+  req.nickname = user.nickname;
   next();
 }
 
@@ -123,4 +162,5 @@ module.exports = {
   login,
   logout,
   joinSocialUser,
+  getGoogleUserInfo,
 };
