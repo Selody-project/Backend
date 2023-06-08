@@ -76,7 +76,8 @@ describe('Test /api/user endpoints', () => {
 
   describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
-      const date = '2023-04';
+      const startDateTime = '2023-04-01T00:00:00.000Z';
+      const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
@@ -292,17 +293,19 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
-        date,
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+        startDateTime,
+        endDateTime,
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
     });
   });
 
-  describe('Test GET /api/user/calendar/todo', () => {
-    it('Successfully get an April Schedule ', async () => {
-      const date = '2023-04-15';
+  describe('Test GET /api/user/calendar', () => {
+    it('Successfully get an 2023-04-15 Schedule ', async () => {
+      const startDateTime = '2023-04-15T00:00:00.000Z';
+      const endDateTime = '2023-04-15T23:59:59.999Z';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
@@ -404,8 +407,9 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar/todo').set('Cookie', cookie).query({
-        date,
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+        startDateTime,
+        endDateTime,
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
@@ -477,14 +481,16 @@ describe('Test /api/user endpoints', () => {
 
   describe('Test DELETE /api/user/calendar', () => {
     it('Successfully delete a User schedule from the database ', async () => {
-      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [9] });
+      const id = 9;
+      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(204);
     });
   });
 
   describe('Test DELETE /api/user/calendar', () => {
     it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
-      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [10000] });
+      const id = 10000;
+      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
     });

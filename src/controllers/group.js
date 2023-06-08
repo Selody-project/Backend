@@ -1,7 +1,4 @@
-const Sequelize = require('sequelize');
 const moment = require('moment');
-const { RRule } = require('rrule');
-const db = require('../models');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
@@ -10,10 +7,9 @@ const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  validateGroupSchema, validateGroupIdSchema,
+  validateGroupSchema, validateGroupIdSchema, validateScheduleSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema,
 } = require('../utils/validators');
-const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
 const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
 } = require('../errors');
@@ -98,109 +94,20 @@ async function patchGroup(req, res, next) {
 
 async function getGroupSchedule(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { error: bodyError } = validateScheduleSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
 
     const { group_id: groupID } = req.params;
-    const { date: dateString } = req.query;
+    const { startDateTime, endDateTime } = req.body;
 
-    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
-    const end = moment.utc(start).endOf('month').toDate();
-
-    const nonRecurrenceStatement = `
-      SELECT 
-        title, 
-        content, 
-        startDateTime, 
-        endDateTime, 
-        recurrence 
-      FROM 
-        groupSchedule
-      WHERE 
-        groupId = :groupID AND (
-        recurrence = 0 AND ( 
-          (startDateTime BETWEEN :start AND :end)
-          OR
-          (endDateTime BETWEEN :start AND :end)
-          OR
-          (startDateTime < :start AND endDateTime > :end)
-        )
-      )`;
-    const recurrenceStatement = `
-      SELECT 
-        * 
-      FROM 
-        groupSchedule
-      WHERE 
-        groupId = :groupID AND (
-        recurrence = 1 AND 
-        startDateTime <= :end
-      )
-      `;
-    const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-      replacements: {
-        groupID,
-        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
-        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
-      },
-      type: Sequelize.QueryTypes.SELECT,
-    });
-    const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-      replacements: {
-        groupID,
-        start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
-        end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
-      },
-      type: Sequelize.QueryTypes.SELECT,
-    });
-    const recurrenceSchedule = [];
-    recurrenceScheduleList.forEach((schedule) => {
-      const byweekday = getRRuleByWeekDay(schedule.byweekday);
-      let rrule;
-      if (byweekday.length === 0) {
-        rrule = new RRule({
-          freq: getRRuleFreq(schedule.freq),
-          interval: schedule.interval,
-          dtstart: schedule.startDateTime,
-          until: schedule.until,
-        });
-      } else {
-        rrule = new RRule({
-          freq: getRRuleFreq(schedule.freq),
-          interval: schedule.interval,
-          byweekday: getRRuleByWeekDay(schedule.byweekday),
-          dtstart: schedule.startDateTime,
-          until: schedule.until,
-        });
-      }
-      const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
-      const scheduleDateList = rrule.between(
-        new Date(start.getTime() - scheduleLength),
-        new Date(end.getTime() + 1),
-      );
-      const possibleDateList = [];
-      scheduleDateList.forEach((scheduleDate) => {
-        const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
-        if (endDateTime >= start) {
-          possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
-        }
-      });
-      if (possibleDateList.length !== 0) {
-        recurrenceSchedule.push({
-          id: schedule.id,
-          groupId: schedule.groupId,
-          title: schedule.title,
-          content: schedule.content,
-          recurrence: schedule.recurrence,
-          freq: schedule.freq,
-          interval: schedule.interval,
-          byweekday: schedule.byweekday,
-          until: schedule.until,
-          recurrenceDateList: possibleDateList,
-        });
-      }
-    });
-    return res.status(200).json({ nonRecurrenceSchedule, recurrenceSchedule });
+    const start = moment.utc(startDateTime).toDate();
+    const end = moment.utc(endDateTime).toDate();
+    const schedule = await GroupSchedule.getSchedule(groupID, start, end);
+    if (schedule === null) throw new ApiError();
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }
@@ -251,6 +158,7 @@ async function putGroupSchedule(req, res, next) {
 
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
     if (bodyError) return next(new DataFormatError());
+
     const { id } = req.params;
     const schedule = await GroupSchedule.findOne({ where: { id } });
 

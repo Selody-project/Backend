@@ -3,8 +3,7 @@ const { createToken } = require('../middleware/token');
 const {
   putUserProfile,
   putUserSchedule,
-  getUserPersonalMonthSchedule,
-  getUserPersonalDaySchedule,
+  getUserPersonalSchedule,
 } = require('../controllers/user');
 const { postPersonalSchedule, deletePersonalSchedule } = require('../controllers/calendar');
 
@@ -12,8 +11,7 @@ const router = express.Router();
 
 router.put('/profile', putUserProfile, createToken);
 router.put('/calendar', putUserSchedule);
-router.get('/calendar', getUserPersonalMonthSchedule);
-router.get('/calendar/todo', getUserPersonalDaySchedule);
+router.get('/calendar', getUserPersonalSchedule);
 router.post('/calendar', postPersonalSchedule);
-router.delete('/calendar', deletePersonalSchedule);
+router.delete('/calendar/:id', deletePersonalSchedule);
 module.exports = router;
