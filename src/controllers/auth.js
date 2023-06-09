@@ -9,6 +9,8 @@ const User = require('../models/user');
 const ApiError = require('../errors/apiError');
 const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
+const InvalidTokenError = require('../errors/auth/InvalidTokenError');
+const TokenExpireError = require('../errors/auth/TokenExpireError');
 const DataFormatError = require('../errors/DataFormatError');
 const { validateLoginSchema, validateJoinSchema } = require('../utils/validators');
 
@@ -44,40 +46,52 @@ function getKey(header, callback) {
 }
 
 async function getGoogleUserInfo(req, res, next) {
-  const { accessToken } = req.body;
-  if (!accessToken) {
-    return res.status(400).json({ message: '액세스 토큰이 필요합니다.' });
-  }
+  try {
+    const { accessToken } = req.body;
+    if (!accessToken) throw new InvalidTokenError();
 
-  jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
+    jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
+      if (err) {
+        return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
+      }
+      const userEmail = decoded.email.split('@')[0];
+
+      const user = await User.findOne({ where: { nickname: userEmail } });
+      if (!user) {
+        await User.create({
+          nickname: userEmail,
+          provider: 'GOOGLE',
+        });
+      }
+      req.nickname = user.nickname;
+      next();
+    });
+  } catch (error) {
+    if (error.name === 'TokenExpireError') {
+      return next(new TokenExpireError());
     }
-    const userEmail = decoded.email.split('@')[0];
+    return next(new InvalidTokenError());
+  }
+}
 
-    const user = await User.findOne({ where: { nickname: userEmail } });
+async function joinSocialUser(req, res, next) {
+  try {
+    const user = await User.findOne({ where: { snsId: req.body.id } });
     if (!user) {
       await User.create({
-        nickname: userEmail,
-        provider: 'GOOGLE',
+        nickname: req.body.nickname,
+        provider: 'NAVER',
+        snsId: req.body.id,
       });
     }
     req.nickname = user.nickname;
     next();
-  });
-}
-
-async function joinSocialUser(req, res, next) {
-  const user = await User.findOne({ where: { snsId: req.body.id } });
-  if (!user) {
-    await User.create({
-      nickname: req.body.nickname,
-      provider: 'NAVER',
-      snsId: req.body.id,
-    });
+  } catch (error) {
+    if (error.name === 'TokenExpireError') {
+      return next(new TokenExpireError());
+    }
+    return next(new InvalidTokenError());
   }
-  req.nickname = user.nickname;
-  next();
 }
 
 async function join(req, res, next) {
