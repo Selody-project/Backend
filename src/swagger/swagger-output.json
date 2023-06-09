@@ -24,13 +24,13 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "any"
+                  "example": "example@email.com"
                 },
                 "nickname": {
-                  "example": "any"
+                  "example": "string"
                 },
                 "password": {
-                  "example": "any"
+                  "example": "string"
                 }
               }
             }
@@ -40,8 +40,14 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "409": {
             "description": "아이디/닉네임 중복"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -59,10 +65,10 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "any"
+                  "example": "example@email.com"
                 },
                 "password": {
-                  "example": "any"
+                  "example": "string"
                 }
               }
             }
@@ -72,8 +78,14 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
-            "description": "로그인 실패"
+            "description": "올바르지 않은 아이디/패스워드"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -91,13 +103,13 @@
               "type": "object",
               "properties": {
                 "access_token": {
-                  "example": "any"
+                  "example": "string"
                 },
                 "id": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "nickname": {
-                  "example": "any"
+                  "example": "string"
                 }
               }
             }
@@ -127,6 +139,9 @@
         "responses": {
           "200": {
             "description": "성공"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -149,6 +164,9 @@
           },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -171,6 +189,9 @@
           },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -193,6 +214,9 @@
           },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       },
@@ -208,7 +232,7 @@
               "type": "object",
               "properties": {
                 "name": {
-                  "example": "any"
+                  "example": "string"
                 }
               }
             }
@@ -218,8 +242,89 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "patch": {
+        "description": "",
+        "summary": "그룹 리더 변경",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "INTEGER"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "newLeaderId": {
+                  "example": "integer"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 유저/그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 삭제",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "INTEGER"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "허용되지 않은 유저"
+          },
+          "404": {
+            "description": "존재하지 않는 유저/그룹"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -234,7 +339,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "INTEGER"
           },
           {
             "name": "authorization",
@@ -246,11 +351,17 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
           },
           "404": {
             "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -277,6 +388,9 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
           },
@@ -284,7 +398,7 @@
             "description": "존재하지 않는 그룹"
           },
           "410": {
-            "description": "만료된 초대장"
+            "description": "만료된 초대코드"
           }
         }
       }
@@ -311,6 +425,9 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
           },
@@ -321,7 +438,7 @@
             "description": "존재하지 않는 그룹"
           },
           "410": {
-            "description": "만료된 초대장"
+            "description": "만료된 초대코드"
           }
         }
       }
@@ -339,31 +456,31 @@
               "type": "object",
               "properties": {
                 "groupId": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "title": {
-                  "example": "any"
+                  "example": "string"
                 },
                 "contents": {
-                  "example": "any"
+                  "example": "string"
                 },
-                "startDate": {
-                  "example": "any"
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
-                "endDate": {
-                  "example": "any"
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
                 "confirmed": {
-                  "example": "any"
+                  "example": "tinyint(1)"
                 },
                 "recurrence": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                  "example": "tinyint(1)"
                 },
                 "freq": {
-                  "example": "any"
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
                 },
                 "interval": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "byweekday": {
                   "example": "MO,TU,WE,TH,FR,SA,SU"
@@ -379,8 +496,14 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "로그인 실패"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       },
@@ -396,34 +519,34 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "groupId": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "title": {
-                  "example": "any"
+                  "example": "string"
                 },
                 "contents": {
-                  "example": "any"
+                  "example": "string"
                 },
-                "startDate": {
-                  "example": "any"
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
-                "endDate": {
-                  "example": "any"
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
                 "confirmed": {
-                  "example": "any"
+                  "example": "tinyint(1)"
                 },
                 "recurrence": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                  "example": "tinyint(1)"
                 },
                 "freq": {
-                  "example": "any"
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
                 },
                 "interval": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "byweekday": {
                   "example": "MO,TU,WE,TH,FR,SA,SU"
@@ -439,8 +562,17 @@
           "201": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 스케줄"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       },
@@ -456,7 +588,7 @@
               "type": "object",
               "properties": {
                 "id": {
-                  "example": "any"
+                  "example": "integer"
                 }
               }
             }
@@ -466,8 +598,17 @@
           "204": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 스케줄"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -475,32 +616,43 @@
     "/api/group/{group_id}/calendar": {
       "get": {
         "description": "",
-        "summary": "그룹 월간 일정 조회",
+        "summary": "그룹 일정 조회",
         "tags": ["Group"],
         "parameters": [
           {
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "INTEGER"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                }
+              }
+            }
           }
         ],
         "responses": {
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -531,11 +683,17 @@
           "200": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
           },
           "409": {
             "description": "닉네임 중복"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -553,28 +711,28 @@
               "type": "object",
               "properties": {
                 "userId": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "title": {
-                  "example": "any"
+                  "example": "string"
                 },
                 "contents": {
-                  "example": "any"
+                  "example": "string"
                 },
-                "startDate": {
-                  "example": "any"
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
-                "endDate": {
-                  "example": "any"
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
                 "recurrence": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                  "example": "tinyint(1)"
                 },
                 "freq": {
-                  "example": "any"
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
                 },
                 "interval": {
-                  "example": "any"
+                  "example": "integer"
                 },
                 "byweekday": {
                   "example": "MO,TU,WE,TH,FR,SA,SU"
@@ -587,11 +745,20 @@
           }
         ],
         "responses": {
-          "200": {
+          "201": {
             "description": "성공"
+          },
+          "400": {
+            "description":"형식에 맞지 않는 데이터"
           },
           "401": {
             "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 유저"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       },
@@ -601,24 +768,27 @@
         "tags": ["User"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "[19, 20, 35]"
-                }
-              }
-            }
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "INTEGER"
           }
         ],
         "responses": {
           "204": {
             "description": "성공"
           },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
           "401": {
             "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 스케줄"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -626,7 +796,7 @@
     "/api/user/{user_id}/calendar": {
       "get": {
         "description": "",
-        "summary": "유저 월간 일정 조회",
+        "summary": "유저 일정 조회",
         "tags": ["User"],
         "parameters": [
           {
@@ -650,41 +820,14 @@
           "200": {
             "description": "성공"
           },
-          "401": {
-            "description": "권한 없음"
-          }
-        }
-      }
-    },
-    "/api/user/{user_id}/calendar/todo": {
-      "get": {
-        "description": "",
-        "summary": "유저 일간 일정 조회",
-        "tags": ["User"],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
           },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -745,6 +888,9 @@
         },
         "member": {
           "type": "INT"
+        },
+        "leader": {
+          "type": "INT"
         }
       },
       "xml": {
@@ -756,9 +902,9 @@
       "required": [
         "userId",
         "title",
-        "startDate",
-        "endDate",
-        "repeat"
+        "startDateTime",
+        "endDateTime",
+        "recurrence"
       ],
       "properties": {
         "id": {
@@ -773,10 +919,10 @@
         "content": {
           "type": "TEXT"
         },
-        "startDate": {
+        "startDateTime": {
           "type": "DATETIME"
         },
-        "endDate": {
+        "endDateTime": {
           "type": "DATETIME"
         },
         "recurrence": {
@@ -804,9 +950,9 @@
       "required": [
         "groupId",
         "title",
-        "startDate",
-        "endDate",
-        "repeat",
+        "startDateTime",
+        "endDateTime",
+        "recurrence",
         "confirmed"
       ],
       "properties": {
@@ -822,10 +968,10 @@
         "content": {
           "type": "TEXT"
         },
-        "startDate": {
+        "startDateTime": {
           "type": "DATETIME"
         },
-        "endDate": {
+        "endDateTime": {
           "type": "DATETIME"
         },
         "recurrence": {
