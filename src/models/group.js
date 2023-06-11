@@ -28,7 +28,7 @@ class Group extends Sequelize.Model {
       inviteExp: {
         type: Sequelize.DATE,
         allowNull: true,
-      }
+      },
     }, {
       sequelize,
       timestamps: false,
