@@ -40,21 +40,17 @@ describe('Test /api/user endpoints', () => {
     await db.sequelize.close();
   });
 
-  /*
-  describe('Test PUT /api/user/profile', () => {
+  describe('Test PATCH /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
-      const newPassword = 'newPassword';
-      let res = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
+      let res = await request(app).patch('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
-        password: newPassword,
       });
       // eslint-disable-next-line prefer-destructuring
       cookie = res.headers['set-cookie'][0];
       expect(res.status).toEqual(200);
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
       delete res.body.user.createdAt;
       delete res.body.user.deletedAt;
       delete res.body.user.updatedAt;
@@ -69,12 +65,29 @@ describe('Test /api/user endpoints', () => {
           userId: 1,
         },
       };
-      expect(comparePassword).toEqual(true);
+
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProfile);
     });
   });
-  */
+  
+  describe('Test PATCH /api/user/profile/password', () => {
+    it('Successfully modified user password ', async () => {
+      const newPassword = 'newPassword';
+      let res = await request(app).patch('/api/user/profile/password').set('Cookie', cookie).send({
+        password: newPassword,
+      });
+      // eslint-disable-next-line prefer-destructuring
+      expect(res.status).toEqual(200);
+
+      res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
+      
+      expect(comparePassword).toEqual(true);
+      expect(res.status).toEqual(200);
+    });
+  });
+
   describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
