@@ -16,18 +16,23 @@ const {
 
 async function createGroup(req, res, next) {
   try {
+    console.log('1');
+
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
-
     const { nickname } = req;
     const { name } = req.body;
-
     const user = await User.findOne({ where: { nickname } });
-    const group = await Group.create({ name, member: 1, leader: user.userId });
-    await user.addGroup(group);
+    console.log('2');
 
+    const group = await Group.create({ name, member: 1, leader: user.userId });
+    console.log('3');
+
+    await user.addGroup(group);
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
+    console.log(err);
+
     return next(new ApiError());
   }
 }
@@ -109,6 +114,7 @@ async function getGroupSchedule(req, res, next) {
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
