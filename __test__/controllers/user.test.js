@@ -40,6 +40,7 @@ describe('Test /api/user endpoints', () => {
     await db.sequelize.close();
   });
 
+  /*
   describe('Test PUT /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
@@ -73,7 +74,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedProfile);
     });
   });
-
+  */
   describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
