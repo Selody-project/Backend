@@ -23,13 +23,16 @@ async function getUserProfile(req, res, next) {
   }
 }
 
-async function putUserProfile(req, res, next) {
+async function patchUserProfile(req, res, next) {
   try {
     const { error } = validateJoinSchema(req.body);
     if (error) return next(new DataFormatError());
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
-    const { nickname, password } = req.body;
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    const { nickname } = req.body;
     const duplicate = await User.findAll({
       where: {
         [Op.and]: [
@@ -43,10 +46,31 @@ async function putUserProfile(req, res, next) {
     }
     await user.update({
       nickname,
-      password: await bcrypt.hash(password, 12),
     });
     req.nickname = nickname;
     next();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function patchUserPassword(req, res, next) {
+  try {
+    const { error } = validateJoinSchema(req.body);
+    if (error) return next(new DataFormatError());
+
+    const { password } = req.body;
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    await user.update({
+      password: await bcrypt.hash(password, 12),
+    });
+
+    return res.status(200).end();
   } catch (err) {
     return next(new ApiError());
   }
@@ -92,7 +116,8 @@ async function putUserSchedule(req, res, next) {
 
 module.exports = {
   getUserProfile,
-  putUserProfile,
+  patchUserProfile,
+  patchUserPassword,
   getUserPersonalSchedule,
   putUserSchedule,
 };
