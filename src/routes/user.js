@@ -1,7 +1,8 @@
 const express = require('express');
 const { createToken } = require('../middleware/token');
 const {
-  putUserProfile,
+  patchUserProfile,
+  patchUserPassword,
   putUserSchedule,
   getUserPersonalSchedule,
 } = require('../controllers/user');
@@ -9,7 +10,8 @@ const { postPersonalSchedule, deletePersonalSchedule } = require('../controllers
 
 const router = express.Router();
 
-router.put('/profile', putUserProfile, createToken);
+router.patch('/profile', patchUserProfile, createToken);
+router.patch('/profile/password', patchUserPassword);
 router.put('/calendar', putUserSchedule);
 router.get('/calendar', getUserPersonalSchedule);
 router.post('/calendar', postPersonalSchedule);
