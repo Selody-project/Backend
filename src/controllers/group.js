@@ -17,6 +17,7 @@ const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
 const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
 } = require('../errors');
+const UserGroup = require('../models/userGroup');
 
 async function createGroup(req, res, next) {
   try {
@@ -91,6 +92,38 @@ async function patchGroup(req, res, next) {
     await group.save();
 
     return res.status(200).json({ message: 'Successfully update group leader' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deleteGroupUser(req, res, next) {
+  try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    const { userId } = user;
+    const { id: groupId } = req.params;
+
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (group.leader === userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.destroy({
+      where: {
+        userId, groupId,
+      },
+    });
+    return res.status(204).json({ message: 'Successfully delete group user' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -379,6 +412,7 @@ module.exports = {
   getGroupList,
   deleteGroup,
   patchGroup,
+  deleteGroupUser,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,

@@ -73,6 +73,8 @@ async function setUpGroupDB() {
   const user = await User.findAll();
   await user[0].addGroup(group1);
   await user[0].addGroup(group2);
+  await user[1].addGroup(group1);
+  await user[1].addGroup(group2);
 }
 
 async function setUpGroupScheduleDB() {

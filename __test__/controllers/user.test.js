@@ -509,13 +509,11 @@ describe('Test /api/user endpoints', () => {
   });
 
   describe('Test DELETE /api/user/calendar', () => {
-    it('Successfully delete a User schedule from the database ', async () => {
+    it('Successfully delete a User schedule from the database', async () => {
       const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [9] });
       expect(res.statusCode).toEqual(204);
     });
-  });
 
-  describe('Test DELETE /api/user/calendar', () => {
     it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
       const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [10000] });
       expect(res.statusCode).toEqual(404);

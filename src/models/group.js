@@ -28,7 +28,7 @@ class Group extends Sequelize.Model {
       inviteExp: {
         type: Sequelize.DATE,
         allowNull: true,
-      }
+      },
     }, {
       sequelize,
       timestamps: false,
@@ -45,7 +45,6 @@ class Group extends Sequelize.Model {
       onDelete: 'cascade',
       allowNull: false,
     });
-    db.Group.belongsToMany(db.User, { through: 'UserGroup', foreignKey: 'groupId', timestamps: false });
   }
 }
 
