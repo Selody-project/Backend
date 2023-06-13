@@ -1,21 +1,21 @@
 const express = require('express');
 const { createToken } = require('../middleware/token');
 const {
-  putUserProfile,
+  patchUserProfile,
+  patchUserPassword,
   putUserSchedule,
-  getUserPersonalMonthSchedule,
-  getUserPersonalDaySchedule,
+  getUserPersonalSchedule,
 } = require('../controllers/user');
 const { postPersonalSchedule, deletePersonalSchedule } = require('../controllers/calendar');
 const { deleteGroupUser } = require('../controllers/group');
 
 const router = express.Router();
 
-router.put('/profile', putUserProfile, createToken);
+router.patch('/profile', patchUserProfile, createToken);
+router.patch('/profile/password', patchUserPassword);
 router.put('/calendar', putUserSchedule);
-router.get('/calendar', getUserPersonalMonthSchedule);
-router.get('/calendar/todo', getUserPersonalDaySchedule);
+router.get('/calendar', getUserPersonalSchedule);
 router.post('/calendar', postPersonalSchedule);
-router.delete('/calendar', deletePersonalSchedule);
 router.delete('/group/:id', deleteGroupUser);
+router.delete('/calendar/:id', deletePersonalSchedule);
 module.exports = router;

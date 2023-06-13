@@ -54,7 +54,11 @@ function verifyToken(req, res, next) {
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
-    return next(new InvalidTokenError());
+    if (err.name === 'InvalidTokenError') {
+      return next(new InvalidTokenError());
+    }
+
+    return next(new ApiError());
   }
 }
 
@@ -73,7 +77,11 @@ function renewToken(req, res, next) {
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
-    return next(new InvalidTokenError());
+    if (err.name === 'InvalidTokenError') {
+      return next(new InvalidTokenError());
+    }
+
+    return next(new ApiError());
   }
 }
 

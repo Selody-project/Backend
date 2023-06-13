@@ -40,20 +40,17 @@ describe('Test /api/user endpoints', () => {
     await db.sequelize.close();
   });
 
-  describe('Test PUT /api/user/profile', () => {
+  describe('Test PATCH /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
-      const newPassword = 'newPassword';
-      let res = await request(app).put('/api/user/profile').set('Cookie', cookie).send({
+      let res = await request(app).patch('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
-        password: newPassword,
       });
       // eslint-disable-next-line prefer-destructuring
       cookie = res.headers['set-cookie'][0];
       expect(res.status).toEqual(200);
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
       delete res.body.user.createdAt;
       delete res.body.user.deletedAt;
       delete res.body.user.updatedAt;
@@ -68,15 +65,33 @@ describe('Test /api/user endpoints', () => {
           userId: 1,
         },
       };
-      expect(comparePassword).toEqual(true);
+
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProfile);
     });
   });
 
+  describe('Test PATCH /api/user/profile/password', () => {
+    it('Successfully modified user password ', async () => {
+      const newPassword = 'newPassword';
+      let res = await request(app).patch('/api/user/profile/password').set('Cookie', cookie).send({
+        password: newPassword,
+      });
+      // eslint-disable-next-line prefer-destructuring
+      expect(res.status).toEqual(200);
+
+      res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
+
+      expect(comparePassword).toEqual(true);
+      expect(res.status).toEqual(200);
+    });
+  });
+
   describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
-      const date = '2023-04';
+      const startDateTime = '2023-04-01T00:00:00.000Z';
+      const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
@@ -293,16 +308,18 @@ describe('Test /api/user endpoints', () => {
         ],
       };
       const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
-        date,
+        startDateTime,
+        endDateTime,
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
     });
   });
 
-  describe('Test GET /api/user/calendar/todo', () => {
-    it('Successfully get an April Schedule ', async () => {
-      const date = '2023-04-15';
+  describe('Test GET /api/user/calendar', () => {
+    it('Successfully get an 2023-04-15 Schedule ', async () => {
+      const startDateTime = '2023-04-15T00:00:00.000Z';
+      const endDateTime = '2023-04-15T23:59:59.999Z';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
@@ -404,8 +421,9 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar/todo').set('Cookie', cookie).query({
-        date,
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
+        startDateTime,
+        endDateTime,
       });
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
@@ -476,13 +494,15 @@ describe('Test /api/user endpoints', () => {
   });
 
   describe('Test DELETE /api/user/calendar', () => {
-    it('Successfully delete a User schedule from the database', async () => {
-      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [9] });
+    it('Successfully delete a User schedule from the database ', async () => {
+      const id = 9;
+      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(204);
     });
 
     it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
-      const res = await request(app).delete('/api/user/calendar').set('Cookie', cookie).send({ id: [10000] });
+      const id = 10000;
+      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
     });

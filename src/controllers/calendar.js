@@ -1,11 +1,10 @@
-const { Op } = require('sequelize');
 const moment = require('moment');
 const personalSchedule = require('../models/personalSchedule');
 const User = require('../models/user');
 const ApiError = require('../errors/apiError');
 const NotFoundError = require('../errors/calendar/NotFound');
 const { UserNotFoundError, DataFormatError } = require('../errors');
-const { validateUserScheduleSchema } = require('../utils/validators');
+const { validateUserScheduleSchema, validateScheduleIdSchema } = require('../utils/validators');
 
 async function postPersonalSchedule(req, res, next) {
   try {
@@ -42,18 +41,17 @@ async function postPersonalSchedule(req, res, next) {
 }
 
 async function deletePersonalSchedule(req, res, next) {
-  const { id } = req.body;
   try {
-    const data = await personalSchedule.destroy({
-      where: {
-        id: {
-          [Op.or]: id,
-        },
-      },
-    });
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { id } = req.params;
+
+    const data = await personalSchedule.destroy({ where: { id } });
     if (data === 0) {
       return next(new NotFoundError());
     }
+
     return res.status(204).json({ message: 'successfully deleted' });
   } catch (error) {
     return next(new ApiError());

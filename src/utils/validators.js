@@ -39,6 +39,11 @@ const groupIdSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
 });
 
+const scheduleDateScehma = Joi.object({
+  startDateTime: Joi.date(),
+  endDateTime: Joi.date(),
+});
+
 const scheduleSchema = Joi.object({
   id: Joi.number().min(0),
   title: Joi.string().max(45),
@@ -69,6 +74,7 @@ const groupScheduleSchema = Joi.object({
 });
 
 const userScheduleSchema = Joi.object({
+  userId: Joi.number(),
   title: Joi.string().max(45).required(),
   content: Joi.string(),
   startDateTime: Joi.date(),
@@ -93,6 +99,7 @@ module.exports = {
   validateScheduleSchema: validator(scheduleSchema),
   validateScheduleIdSchema: validator(scheduleIdSchema),
   validateGroupScheduleSchema: validator(groupScheduleSchema),
+  validateScheduleDateScehma: validator(scheduleDateScehma),
   validateUserScheduleSchema: validator(userScheduleSchema),
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),

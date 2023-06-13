@@ -10,8 +10,7 @@ const DataFormatError = require('../errors/DataFormatError');
 const {
   validateJoinSchema,
   validateScheduleSchema,
-  validateYYYYMMDDDateSchema,
-  validateYYYYMMDateSchema,
+  validateScheduleDateScehma,
 } = require('../utils/validators');
 const { UserNotFoundError } = require('../errors');
 
@@ -25,13 +24,16 @@ async function getUserProfile(req, res, next) {
   }
 }
 
-async function putUserProfile(req, res, next) {
+async function patchUserProfile(req, res, next) {
   try {
     const { error } = validateJoinSchema(req.body);
     if (error) return next(new DataFormatError());
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
-    const { nickname, password } = req.body;
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    const { nickname } = req.body;
     const duplicate = await User.findAll({
       where: {
         [Op.and]: [
@@ -45,7 +47,6 @@ async function putUserProfile(req, res, next) {
     }
     await user.update({
       nickname,
-      password: await bcrypt.hash(password, 12),
     });
     req.nickname = nickname;
     next();
@@ -54,40 +55,41 @@ async function putUserProfile(req, res, next) {
   }
 }
 
-async function getUserPersonalMonthSchedule(req, res, next) {
+async function patchUserPassword(req, res, next) {
   try {
-    const { error } = validateYYYYMMDateSchema(req.query);
+    const { error } = validateJoinSchema(req.body);
     if (error) return next(new DataFormatError());
 
-    const { date: dateString } = req.query;
+    const { password } = req.body;
+
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
 
-    const start = moment.utc(dateString, 'YYYY-MM').startOf('month').toDate();
-    const end = moment.utc(start).endOf('month').toDate();
-    const schedule = await PersonalSchedule.getSchedule(user.userId, start, end);
-    if (schedule === null) throw new ApiError();
-    return res.status(200).json(schedule);
+    await user.update({
+      password: await bcrypt.hash(password, 12),
+    });
+
+    return res.status(200).end();
   } catch (err) {
     return next(new ApiError());
   }
 }
 
-async function getUserPersonalDaySchedule(req, res, next) {
+async function getUserPersonalSchedule(req, res, next) {
   try {
-    const { error } = validateYYYYMMDDDateSchema(req.query);
-    if (error) return next(new DataFormatError());
-
-    const { date: dateString } = req.query;
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
 
-    const start = moment.utc(dateString, 'YYYY-MM-DD').startOf('day').toDate();
-    const end = moment.utc(start).endOf('day').toDate();
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { startDateTime, endDateTime } = req.query;
+    const start = moment.utc(startDateTime).toDate();
+    const end = moment.utc(endDateTime).toDate();
     const schedule = await PersonalSchedule.getSchedule(user.userId, start, end);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
@@ -115,8 +117,8 @@ async function putUserSchedule(req, res, next) {
 
 module.exports = {
   getUserProfile,
-  putUserProfile,
-  getUserPersonalMonthSchedule,
-  getUserPersonalDaySchedule,
+  patchUserProfile,
+  patchUserPassword,
+  getUserPersonalSchedule,
   putUserSchedule,
 };

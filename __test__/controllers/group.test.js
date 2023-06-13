@@ -189,7 +189,8 @@ describe('Test /api/group endpoints', () => {
   describe('Test GET /api/group/:group_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const groupID = 1;
-      const date = '2023-04';
+      const startDateTime = '2023-04-01T00:00:00.000Z';
+      const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
@@ -409,7 +410,8 @@ describe('Test /api/group endpoints', () => {
         ],
       };
       const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
-        date,
+        startDateTime,
+        endDateTime,
       });
 
       expect(res.status).toEqual(200);
