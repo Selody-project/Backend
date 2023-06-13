@@ -10,6 +10,7 @@ const DataFormatError = require('../errors/DataFormatError');
 const {
   validateJoinSchema,
   validateScheduleSchema,
+  validateScheduleDateScehma,
 } = require('../utils/validators');
 const { UserNotFoundError } = require('../errors');
 
@@ -78,15 +79,15 @@ async function patchUserPassword(req, res, next) {
 
 async function getUserPersonalSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
-
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
 
-    const { startDateTime, endDateTime } = req.body;
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
     const schedule = await PersonalSchedule.getSchedule(user.userId, start, end);

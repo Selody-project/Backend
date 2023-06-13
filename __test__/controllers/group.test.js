@@ -409,7 +409,7 @@ describe('Test /api/group endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).send({
+      const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });

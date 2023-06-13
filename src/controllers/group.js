@@ -7,12 +7,13 @@ const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  validateGroupSchema, validateGroupIdSchema, validateScheduleSchema,
-  validateScheduleIdSchema, validateGroupScheduleSchema,
+  validateGroupSchema, validateGroupIdSchema,
+  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
 } = require('../utils/validators');
 const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
 } = require('../errors');
+const UserGroup = require('../models/userGroup');
 
 async function createGroup(req, res, next) {
   try {
@@ -92,20 +93,56 @@ async function patchGroup(req, res, next) {
   }
 }
 
+async function deleteGroupUser(req, res, next) {
+  try {
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    const { userId } = user;
+    const { id: groupId } = req.params;
+
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (group.leader === userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.destroy({
+      where: {
+        userId, groupId,
+      },
+    });
+    return res.status(204).json({ message: 'Successfully delete group user' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function getGroupSchedule(req, res, next) {
   try {
-    const { error: paramError } = validateGroupIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    const { error } = validateScheduleIdSchema(req.params);
+    if (error) return next(new DataFormatError());
 
-    const { error: bodyError } = validateScheduleSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
+    const { id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
 
-    const { group_id: groupID } = req.params;
-    const { startDateTime, endDateTime } = req.body;
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (queryError) return next(new DataFormatError());
 
+    const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await GroupSchedule.getSchedule(groupID, start, end);
+    const schedule = await GroupSchedule.getSchedule(groupId, start, end);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
@@ -287,6 +324,7 @@ module.exports = {
   getGroupList,
   deleteGroup,
   patchGroup,
+  deleteGroupUser,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,

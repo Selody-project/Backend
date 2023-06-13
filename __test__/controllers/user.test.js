@@ -70,7 +70,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedProfile);
     });
   });
-  
+
   describe('Test PATCH /api/user/profile/password', () => {
     it('Successfully modified user password ', async () => {
       const newPassword = 'newPassword';
@@ -82,7 +82,7 @@ describe('Test /api/user endpoints', () => {
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
       const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
-      
+
       expect(comparePassword).toEqual(true);
       expect(res.status).toEqual(200);
     });
@@ -307,7 +307,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
@@ -421,7 +421,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
@@ -499,9 +499,7 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(204);
     });
-  });
 
-  describe('Test DELETE /api/user/calendar', () => {
     it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
       const id = 10000;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
