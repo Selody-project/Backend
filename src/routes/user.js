@@ -13,7 +13,7 @@ const router = express.Router();
 
 router.patch('/profile', patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);
-router.put('/calendar', putUserSchedule);
+router.put('/calendar/:id', putUserSchedule);
 router.get('/calendar', getUserPersonalSchedule);
 router.post('/calendar', postPersonalSchedule);
 router.delete('/group/:id', deleteGroupUser);

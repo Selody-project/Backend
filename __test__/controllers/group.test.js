@@ -194,6 +194,7 @@ describe('Test /api/group endpoints', () => {
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
+            id: 1,
             content: 'test-content1',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -201,6 +202,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title1',
           },
           {
+            id: 2,
             content: 'test-content2',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -208,6 +210,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title2',
           },
           {
+            id: 4,
             content: 'test-content4',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -215,6 +218,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title4',
           },
           {
+            id: 5,
             content: 'test-content5',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -222,6 +226,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title5',
           },
           {
+            id: 6,
             content: 'test-content6',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -229,6 +234,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title6',
           },
           {
+            id: 9,
             content: 'test-content9',
             endDateTime: '2023-04-01T08:59:59.000Z',
             recurrence: 0,
@@ -236,6 +242,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title9',
           },
           {
+            id: 10,
             content: 'test-content10',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
