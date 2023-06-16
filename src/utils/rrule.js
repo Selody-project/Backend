@@ -14,6 +14,9 @@ function getRRuleFreq(freq) {
 }
 
 function getRRuleByWeekDay(byweekday) {
+  if (!byweekday) {
+    return [];
+  }
   const arr = byweekday.split(',');
   const RRuleWeekDay = {
     MO: RRule.MO,
