@@ -13,7 +13,7 @@ router.use('/auth', auth);
 // 각 엔드포인트에 따로 verifyToken을 넣어주지 않아도 됨.
 router.use('/*', verifyToken);
 
-router.delete('/withdrawal/:id', userWithdrawal);
+router.delete('/withdrawal/:user_id', userWithdrawal);
 router.use('/group', group);
 router.use('/user', user);
 
