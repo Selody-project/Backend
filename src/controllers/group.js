@@ -1,7 +1,9 @@
 const moment = require('moment');
+const { Op } = require('sequelize');
 const User = require('../models/user');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
+const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
@@ -319,6 +321,31 @@ async function postGroupJoin(req, res, next) {
   }
 }
 
+async function getEventProposal(req, res, next) {
+  try {
+    const { error } = validateGroupIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findOne({ where: { groupId } });
+
+    const groupMembers = (await group.getUsers()).map(user => user.userId);
+    const events = await PersonalSchedule.findAll({
+      where: {
+        userId: {
+          [Op.in]: groupMembers,
+        }
+      }
+    })
+    console.log(groupMembers);
+    console.log(events);
+    return res.status(200).json(groupMembers);
+  } catch (err) {
+    console.log(err);
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupList,
@@ -332,4 +359,5 @@ module.exports = {
   postInviteLink,
   getInvitation,
   postGroupJoin,
+  getEventProposal,
 };
