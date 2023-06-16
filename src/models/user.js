@@ -49,7 +49,6 @@ class User extends Sequelize.Model {
       onDelete: 'cascade',
       allowNull: false,
     });
-    db.User.belongsToMany(db.Group, { through: 'UserGroup', foreignKey: 'userId', timestamps: false });
   }
 }
 

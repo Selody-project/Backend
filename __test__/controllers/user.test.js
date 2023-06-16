@@ -4,7 +4,7 @@ const app = require('../../src/app');
 const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
-  tearDownUserDB, tearDownPersonalScheduleDB,
+  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -16,6 +16,7 @@ describe('Test /api/user endpoints', () => {
     await tearDownPersonalScheduleDB();
     await tearDownUserDB();
     await setUpUserDB();
+    await setUpGroupDB();
     await setUpPersonalScheduleDB();
 
     const res = await request(app).post('/api/auth/login').send({
@@ -70,7 +71,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedProfile);
     });
   });
-  
+
   describe('Test PATCH /api/user/profile/password', () => {
     it('Successfully modified user password ', async () => {
       const newPassword = 'newPassword';
@@ -82,7 +83,7 @@ describe('Test /api/user endpoints', () => {
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
       const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
-      
+
       expect(comparePassword).toEqual(true);
       expect(res.status).toEqual(200);
     });
@@ -95,6 +96,7 @@ describe('Test /api/user endpoints', () => {
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
+            id: 1,
             content: 'test-content1',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -102,6 +104,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title1',
           },
           {
+            id: 2,
             content: 'test-content2',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -109,6 +112,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title2',
           },
           {
+            id: 3,
             content: 'test-content3',
             endDateTime: '2023-04-15T23:59:59.000Z',
             recurrence: 0,
@@ -116,6 +120,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title3',
           },
           {
+            id: 4,
             content: 'test-content4',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -123,6 +128,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title4',
           },
           {
+            id: 5,
             content: 'test-content5',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -130,6 +136,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title5',
           },
           {
+            id: 6,
             content: 'test-content6',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -137,6 +144,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title6',
           },
           {
+            id: 9,
             content: 'test-content9',
             endDateTime: '2023-04-01T08:59:59.000Z',
             recurrence: 0,
@@ -144,6 +152,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title9',
           },
           {
+            id: 10,
             content: 'test-content10',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -307,7 +316,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
@@ -323,6 +332,7 @@ describe('Test /api/user endpoints', () => {
       const expectedSchedule = {
         nonRecurrenceSchedule: [
           {
+            id: 1,
             content: 'test-content1',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -330,6 +340,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title1',
           },
           {
+            id: 2,
             content: 'test-content2',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -337,6 +348,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title2',
           },
           {
+            id: 3,
             content: 'test-content3',
             endDateTime: '2023-04-15T23:59:59.000Z',
             recurrence: 0,
@@ -344,6 +356,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title3',
           },
           {
+            id: 4,
             content: 'test-content4',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -351,6 +364,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title4',
           },
           {
+            id: 5,
             content: 'test-content5',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -358,6 +372,7 @@ describe('Test /api/user endpoints', () => {
             title: 'test-title5',
           },
           {
+            id: 6,
             content: 'test-content6',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -421,7 +436,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).send({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
@@ -430,9 +445,10 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test PUT /api/user/calendar', () => {
+  describe('Test PUT /api/user/calendar/:id', () => {
     it('Successfully modified user schedule ', async () => {
-      const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
+      const id = 1;
+      const res = await request(app).put(`/api/user/calendar/${id}`).set('Cookie', cookie).send({
         title: 'modified-title',
       });
       const modifiedSchedule = await PersonalSchedule.findOne({
@@ -443,7 +459,8 @@ describe('Test /api/user endpoints', () => {
     });
 
     it('Successfully fail to modified user schedule (long name)', async () => {
-      const res = await request(app).put('/api/user/calendar').set('Cookie', cookie).send({
+      const id = 1;
+      const res = await request(app).put(`/api/user/calendar/${id}`).set('Cookie', cookie).send({
         title: 'very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-name',
       });
       expect(res.status).toEqual(400);
@@ -499,14 +516,26 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(204);
     });
-  });
 
-  describe('Test DELETE /api/user/calendar', () => {
     it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
       const id = 10000;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
+    });
+  });
+
+  describe('Test DELETE /api/withdrawal', () => {
+    it('Successfully delete a user from user table', async () => {
+      const id = 3;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully fail to delete a user from user table (UserIsLeader Error)', async () => {
+      const id = 1;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(499);
     });
   });
 });

@@ -6,10 +6,13 @@ const PersonalSchedule = require('../models/personalSchedule');
 const ApiError = require('../errors/apiError');
 const DuplicateUserError = require('../errors/auth/DuplicateUserError');
 const DataFormatError = require('../errors/DataFormatError');
+const ScheduleNotFoundError = require('../errors/schedule/ScheduleNotFoundError');
 
 const {
   validateJoinSchema,
   validateScheduleSchema,
+  validateScheduleIdSchema,
+  validateScheduleDateScehma,
 } = require('../utils/validators');
 const { UserNotFoundError } = require('../errors');
 
@@ -78,15 +81,15 @@ async function patchUserPassword(req, res, next) {
 
 async function getUserPersonalSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
-
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
 
-    const { startDateTime, endDateTime } = req.body;
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
     const schedule = await PersonalSchedule.getSchedule(user.userId, start, end);
@@ -99,15 +102,20 @@ async function getUserPersonalSchedule(req, res, next) {
 
 async function putUserSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
-    const { userId } = user;
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
 
-    await PersonalSchedule.update(req.body, { where: { id: userId } });
+    const { error: bodyError } = validateScheduleSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { id } = req.params;
+    const schedule = await PersonalSchedule.findOne({ where: { id } });
+
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+
+    await PersonalSchedule.update(req.body, { where: { id } });
     return res.status(201).json({ message: 'Successfully Modified.' });
   } catch (err) {
     return next(new ApiError());

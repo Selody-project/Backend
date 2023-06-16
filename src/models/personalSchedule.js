@@ -76,6 +76,7 @@ class PersonalSchedule extends Sequelize.Model {
       const db = require('.');
       const nonRecurrenceStatement = `
         SELECT 
+          id,
           title, 
           content, 
           startDateTime, 

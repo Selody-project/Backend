@@ -446,7 +446,7 @@
     "/api/group/calendar": {
       "post": {
         "description": "",
-        "summary": "그룹 스케줄 생성",
+        "summary": "그룹 일정 등록",
         "tags": ["Group"],
         "parameters": [
           {
@@ -506,10 +506,12 @@
             "description": "서버 에러"
           }
         }
-      },
+      }
+    },
+    "/api/group/calendar/:id": {
       "put": {
         "description": "",
-        "summary": "그룹 스케줄 수정",
+        "summary": "그룹 일정 수정",
         "tags": ["Group"],
         "parameters": [
           {
@@ -578,7 +580,7 @@
       },
       "delete": {
         "description": "",
-        "summary": "그룹 스케줄 삭제",
+        "summary": "그룹 일정 삭제",
         "tags": ["Group"],
         "parameters": [
           {
@@ -799,10 +801,75 @@
             "description": "서버 에러"
           }
         }
+      }
+    },
+    "/api/user/calendar/:id": {
+      "put": {
+        "description": "",
+        "summary": "유저 일정 수정",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "userId": {
+                  "example": "integer"
+                },
+                "title": {
+                  "example": "string"
+                },
+                "contents": {
+                  "example": "string"
+                },
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "recurrence": {
+                  "example": "tinyint(1)"
+                },
+                "freq": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "interval": {
+                  "example": "integer"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 스케줄"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
       },
       "delete": {
         "description": "",
-        "summary": "유저 스케줄 삭제",
+        "summary": "유저 일정 삭제",
         "tags": ["User"],
         "parameters": [
           {

@@ -3,7 +3,7 @@ const auth = require('./auth');
 const group = require('./group');
 const user = require('./user');
 const { verifyToken } = require('../middleware/token');
-const { deleteWithdrawal } = require('../controllers/userSetup');
+const { userWithdrawal } = require('../controllers/userSetup');
 
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.use('/auth', auth);
 // 각 엔드포인트에 따로 verifyToken을 넣어주지 않아도 됨.
 router.use('/*', verifyToken);
 
-router.delete('/withdrawal', deleteWithdrawal);
+router.delete('/withdrawal/:id', userWithdrawal);
 router.use('/group', group);
 router.use('/user', user);
 
