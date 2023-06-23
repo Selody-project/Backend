@@ -90,6 +90,12 @@ const scheduleIdSchema = Joi.object({
   id: Joi.number().min(0).required(),
 });
 
+const eventPoroposalSchema = Joi.object({
+  date1: Joi.date().required(),
+  date2: Joi.date(),
+  date3: Joi.date(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -103,4 +109,5 @@ module.exports = {
   validateUserScheduleSchema: validator(userScheduleSchema),
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
+  validateEventProposalSchema: validator(eventPoroposalSchema),
 };

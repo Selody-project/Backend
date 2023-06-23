@@ -28,6 +28,6 @@ router.get('/:id/calendar', getGroupSchedule);
 router.post('/:group_id/invite-link', postInviteLink);
 router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
-router.get('/:group_id/calendar/proposal', getEventProposal);
+router.get('/:group_id/proposal', getEventProposal);
 
 module.exports = router;

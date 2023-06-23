@@ -97,7 +97,7 @@ class GroupSchedule extends Sequelize.Model {
       FROM 
         groupSchedule
       WHERE 
-        groupId = :groupID AND (
+        groupId IN (:groupID) AND (
         recurrence = 0 AND ( 
           (startDateTime BETWEEN :start AND :end)
           OR
@@ -112,14 +112,14 @@ class GroupSchedule extends Sequelize.Model {
         FROM 
           groupSchedule
         WHERE 
-          groupId = :groupID AND (
+          groupId IN (:groupID) AND (
           recurrence = 1 AND 
           startDateTime <= :end
         )
         `;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
-          groupID,
+          groupID: groupID.join(','),
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -127,7 +127,7 @@ class GroupSchedule extends Sequelize.Model {
       });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
-          groupID,
+          groupID: groupID.join(','),
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },

@@ -1,21 +1,24 @@
 const moment = require('moment');
-const { Op } = require('sequelize');
+const { parseEventDates, eventProposal } = require('../utils/event');
+
 const User = require('../models/user');
+const PersonalSchedule = require('../models/personalSchedule');
+const UserGroup = require('../models/userGroup');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
-const PersonalSchedule = require('../models/personalSchedule');
+
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  validateGroupSchema, validateGroupIdSchema,
-  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-} = require('../utils/validators');
-const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
 } = require('../errors');
-const UserGroup = require('../models/userGroup');
+
+const {
+  validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
+  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
+} = require('../utils/validators');
 
 async function createGroup(req, res, next) {
   try {
@@ -144,7 +147,7 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await GroupSchedule.getSchedule(groupId, start, end);
+    const schedule = await GroupSchedule.getSchedule([groupId], start, end);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
@@ -323,25 +326,40 @@ async function postGroupJoin(req, res, next) {
 
 async function getEventProposal(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: queryError } = validateEventProposalSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
 
     const { group_id: groupId } = req.params;
     const group = await Group.findOne({ where: { groupId } });
+    const groupMembers = (await group.getUsers()).map((user) => user.userId);
+    const proposal = {};
 
-    const groupMembers = (await group.getUsers()).map(user => user.userId);
-    const events = await PersonalSchedule.findAll({
-      where: {
-        userId: {
-          [Op.in]: groupMembers,
-        }
-      }
-    })
-    console.log(groupMembers);
-    console.log(events);
-    return res.status(200).json(groupMembers);
+    /* eslint-disable no-restricted-syntax */
+    for (const date of Object.values(req.query)) {
+      let events = [];
+      const start = moment.utc(date).toDate();
+      const end = moment.utc(date).add(24, 'hours').add(-1, 's').toDate();
+      const {
+        nonRecurrenceSchedule: userNonRecEvent,
+        recurrenceSchedule: userRecEvent,
+        /* eslint-disable-next-line no-await-in-loop */
+      } = await PersonalSchedule.getSchedule(groupMembers, start, end);
+      events.push(parseEventDates(userNonRecEvent, userRecEvent));
+      const {
+        nonRecurrenceSchedule: groupNonRecEvent,
+        recurrenceSchedule: groupRecEvent,
+        /* eslint-disable-next-line no-await-in-loop */
+      } = await GroupSchedule.getSchedule([groupId], start, end);
+      events.push(parseEventDates(groupNonRecEvent, groupRecEvent));
+      events = events.flat(1);
+      events.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
+      proposal[date] = eventProposal(events, start, end);
+    }
+    return res.status(200).json(proposal);
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }

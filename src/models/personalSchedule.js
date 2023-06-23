@@ -85,7 +85,7 @@ class PersonalSchedule extends Sequelize.Model {
         FROM 
           personalSchedule
         WHERE 
-          userId = :userID AND (
+          userId IN (:userID) AND (
           recurrence = 0 AND ( 
             (startDateTime BETWEEN :start AND :end)
             OR
@@ -100,13 +100,13 @@ class PersonalSchedule extends Sequelize.Model {
         FROM 
           personalSchedule
         WHERE 
-          userId = :userID AND (
+          userId IN (:userID) AND (
           recurrence = 1 AND 
           startDateTime <= :end
         )`;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
-          userID,
+          userID: userID.join(','),
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -114,7 +114,7 @@ class PersonalSchedule extends Sequelize.Model {
       });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
-          userID,
+          userID: userID.join(','),
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },

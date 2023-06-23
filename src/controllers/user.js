@@ -92,7 +92,7 @@ async function getUserPersonalSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await PersonalSchedule.getSchedule(user.userId, start, end);
+    const schedule = await PersonalSchedule.getSchedule([user.userId], start, end);
     if (schedule === null) throw new ApiError();
     return res.status(200).json(schedule);
   } catch (err) {
