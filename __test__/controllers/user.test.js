@@ -4,7 +4,7 @@ const app = require('../../src/app');
 const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
-  tearDownUserDB, tearDownPersonalScheduleDB,
+  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -16,6 +16,7 @@ describe('Test /api/user endpoints', () => {
     await tearDownPersonalScheduleDB();
     await tearDownUserDB();
     await setUpUserDB();
+    await setUpGroupDB();
     await setUpPersonalScheduleDB();
 
     const res = await request(app).post('/api/auth/login').send({
@@ -521,6 +522,20 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
+    });
+  });
+
+  describe('Test DELETE /api/withdrawal', () => {
+    it('Successfully delete a user from user table', async () => {
+      const id = 3;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully fail to delete a user from user table (UserIsLeader Error)', async () => {
+      const id = 1;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(499);
     });
   });
 });

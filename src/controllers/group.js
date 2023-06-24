@@ -19,14 +19,11 @@ async function createGroup(req, res, next) {
   try {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
-
     const { nickname } = req;
     const { name } = req.body;
-
     const user = await User.findOne({ where: { nickname } });
     const group = await Group.create({ name, member: 1, leader: user.userId });
     await user.addGroup(group);
-
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
     return next(new ApiError());

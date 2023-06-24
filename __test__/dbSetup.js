@@ -40,9 +40,20 @@ async function setUpUserDB() {
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
     },
+    {
+      userId: 3,
+      email: 'test-user3@email.com',
+      nickname: 'test-user3',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    },
   ];
+
   await User.create(mockUserData[0]);
   await User.create(mockUserData[1]);
+  await User.create(mockUserData[2]);
 }
 
 async function setUpGroupDB() {
