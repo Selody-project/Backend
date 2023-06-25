@@ -1,5 +1,6 @@
 const moment = require('moment');
 const User = require('../models/user');
+const PersonalSchedule = require('../models/personalSchedule');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const ApiError = require('../errors/apiError');
@@ -142,9 +143,19 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await GroupSchedule.getSchedule([groupId], start, end);
-
-    return res.status(200).json(schedule);
+    const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
+    const users = (await group.getUsers()).map((user) => user.userId);
+    const userEvent = await PersonalSchedule.getSchedule(users, start, end);
+    const event = {};
+    event.nonRecurrenceSchedule = [
+      ...userEvent.nonRecurrenceSchedule,
+      ...groupEvent.nonRecurrenceSchedule,
+    ];
+    event.recurrenceSchedule = [
+      ...userEvent.recurrenceSchedule,
+      ...groupEvent.recurrenceSchedule,
+    ];
+    return res.status(200).json(event);
   } catch (err) {
     return next(new ApiError());
   }
