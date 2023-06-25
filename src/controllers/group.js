@@ -142,8 +142,8 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await GroupSchedule.getSchedule(groupId, start, end);
-    if (schedule === null) throw new ApiError();
+    const schedule = await GroupSchedule.getSchedule([groupId], start, end);
+
     return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());

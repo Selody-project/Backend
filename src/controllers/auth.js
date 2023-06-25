@@ -165,16 +165,31 @@ async function logout(req, res, next) {
   }
 }
 
-/*
-exports.getGoogleUserInfo = async (req, res, next) => {
-};
-*/
+const {
+  setUpUserDB,
+  setUpGroupDB,
+  setUpGroupScheduleDB,
+  setUpPersonalScheduleDB,
+} = require('../../__test__/dbSetup');
+
+async function dbSetUp(req, res, next) {
+  try {
+    await setUpUserDB();
+    await setUpPersonalScheduleDB();
+    await setUpGroupDB();
+    await setUpGroupScheduleDB();
+    return res.status(201).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
 
 module.exports = {
   getNaverUserInfo,
+  getGoogleUserInfo,
   join,
   login,
   logout,
   joinSocialUser,
-  getGoogleUserInfo,
+  dbSetUp,
 };

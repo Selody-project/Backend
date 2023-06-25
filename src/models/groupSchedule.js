@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const { RRule } = require('rrule');
 const moment = require('moment');
 const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
+const ApiError = require('../errors/apiError');
 
 class GroupSchedule extends Sequelize.Model {
   static initiate(sequelize) {
@@ -93,11 +94,12 @@ class GroupSchedule extends Sequelize.Model {
         content, 
         startDateTime, 
         endDateTime, 
-        recurrence 
+        recurrence,
+        true AS isGroup
       FROM 
         groupSchedule
       WHERE 
-        groupId = :groupID AND (
+        groupId IN (${groupID.join(',')}) AND (
         recurrence = 0 AND ( 
           (startDateTime BETWEEN :start AND :end)
           OR
@@ -108,18 +110,18 @@ class GroupSchedule extends Sequelize.Model {
       )`;
       const recurrenceStatement = `
         SELECT 
-          * 
+          *,
+          true AS isGroup 
         FROM 
           groupSchedule
         WHERE 
-          groupId = :groupID AND (
+          groupId IN (${groupID.join(',')}) AND (
           recurrence = 1 AND 
           startDateTime <= :end
         )
         `;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
-          groupID,
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -127,7 +129,6 @@ class GroupSchedule extends Sequelize.Model {
       });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
-          groupID,
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -176,13 +177,14 @@ class GroupSchedule extends Sequelize.Model {
             interval: schedule.interval,
             byweekday: schedule.byweekday,
             until: schedule.until,
+            isGroup: schedule.isGroup,
             recurrenceDateList: possibleDateList,
           });
         }
       });
       return { nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
-      return null;
+      throw new ApiError();
     }
   }
 }

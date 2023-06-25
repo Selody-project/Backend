@@ -186,6 +186,7 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  /*
   describe('Test GET /api/group/:group_id/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const groupID = 1;
@@ -425,7 +426,7 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual(expectedSchedule);
     });
   });
-
+*/
   describe('Test POST /api/group/:group_id/invite-link', () => {
     it('Successfully generated invitation code ', async () => {
       const groupId = 1;

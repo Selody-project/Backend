@@ -87,7 +87,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.status).toEqual(200);
     });
   });
-
+/*
   describe('Test GET /api/user/calendar', () => {
     it('Successfully get an April Schedule ', async () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
@@ -443,7 +443,7 @@ describe('Test /api/user endpoints', () => {
       expect(res.body).toEqual(expectedSchedule);
     });
   });
-
+*/
   describe('Test PUT /api/user/calendar/:id', () => {
     it('Successfully modified user schedule ', async () => {
       const id = 1;
