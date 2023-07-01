@@ -4,7 +4,7 @@ const app = require('../../src/app');
 const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
-  tearDownUserDB, tearDownPersonalScheduleDB,
+  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB, tearDownGroupDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -13,10 +13,16 @@ describe('Test /api/user endpoints', () => {
   beforeAll(async () => {
     await dropDB();
     await syncDB();
+
     await tearDownPersonalScheduleDB();
+    await tearDownGroupScheduleDB();
     await tearDownUserDB();
+    await tearDownGroupDB();
+
     await setUpUserDB();
+    await setUpGroupDB();
     await setUpPersonalScheduleDB();
+    await setUpGroupScheduleDB2();
 
     const res = await request(app).post('/api/auth/login').send({
       email: 'test-user1@email.com',
@@ -28,11 +34,15 @@ describe('Test /api/user endpoints', () => {
 
   beforeEach(async () => {
     await tearDownPersonalScheduleDB();
+    await tearDownGroupScheduleDB();
+
     await setUpPersonalScheduleDB();
+    await setUpGroupScheduleDB2();
   });
 
   afterEach(async () => {
     await tearDownPersonalScheduleDB();
+    await tearDownGroupScheduleDB();
   });
 
   afterAll(async () => {
@@ -165,6 +175,33 @@ describe('Test /api/user endpoints', () => {
             recurrence: 0,
             startDateTime: '2023-04-30T23:59:59.000Z',
             title: 'test-title10',
+          },
+          {
+            id: 1,
+            isGroup: 1,
+            content: 'test-content1',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            title: 'test-title1',
+          },
+          {
+            id: 2,
+            isGroup: 1,
+            content: 'test-content2',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title2',
+          },
+          {
+            id: 3,
+            isGroup: 1,
+            content: 'test-content3',
+            endDateTime: '2023-04-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-10T00:00:00.000Z',
+            title: 'test-title3',
           },
         ],
         recurrenceSchedule: [
