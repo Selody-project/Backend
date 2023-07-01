@@ -35,7 +35,11 @@ describe('Test /api/user endpoints', () => {
   beforeEach(async () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownUserDB();
+    await tearDownGroupDB();
 
+    await setUpUserDB();
+    await setUpGroupDB();
     await setUpPersonalScheduleDB();
     await setUpGroupScheduleDB2();
   });
@@ -43,6 +47,7 @@ describe('Test /api/user endpoints', () => {
   afterEach(async () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownUserDB();
   });
 
   afterAll(async () => {
@@ -56,11 +61,12 @@ describe('Test /api/user endpoints', () => {
       let res = await request(app).patch('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
       });
+
       // eslint-disable-next-line prefer-destructuring
-      cookie = res.headers['set-cookie'][0];
+      const newCookie = res.headers['set-cookie'][0];
       expect(res.status).toEqual(200);
 
-      res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
+      res = await request(app).get('/api/auth/token/verify').set('Cookie', newCookie).send();
       delete res.body.user.createdAt;
       delete res.body.user.deletedAt;
       delete res.body.user.updatedAt;
@@ -87,7 +93,7 @@ describe('Test /api/user endpoints', () => {
       let res = await request(app).patch('/api/user/profile/password').set('Cookie', cookie).send({
         password: newPassword,
       });
-      // eslint-disable-next-line prefer-destructuring
+
       expect(res.status).toEqual(200);
 
       res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
@@ -456,6 +462,20 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
+    });
+  });
+
+  describe('Test DELETE /api/withdrawal', () => {
+    it('Successfully delete a user from user table', async () => {
+      const id = 4;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully fail to delete a user from user table (UserIsLeader Error)', async () => {
+      const id = 1;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(499);
     });
   });
 });
