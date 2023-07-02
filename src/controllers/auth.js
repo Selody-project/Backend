@@ -165,16 +165,11 @@ async function logout(req, res, next) {
   }
 }
 
-/*
-exports.getGoogleUserInfo = async (req, res, next) => {
-};
-*/
-
 module.exports = {
   getNaverUserInfo,
+  getGoogleUserInfo,
   join,
   login,
   logout,
   joinSocialUser,
-  getGoogleUserInfo,
 };
