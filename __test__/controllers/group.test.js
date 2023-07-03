@@ -4,7 +4,8 @@ const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, dropDB,
   tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
-  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB, setUpPersonalScheduleDB2,
+  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
+  setUpPersonalScheduleDB2,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
