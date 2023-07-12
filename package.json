@@ -47,6 +47,7 @@
     "swagger-ui-express": "^4.6.2"
   },
   "devDependencies": {
+    "@types/node": "^20.4.1",
     "concurrently": "^8.0.1",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
@@ -58,7 +59,9 @@
     "lint-staged": "^13.2.0",
     "nodemon": "^2.0.13",
     "prettier": "^2.4.1",
-    "supertest": "^6.3.3"
+    "supertest": "^6.3.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.1.6"
   },
   "jest": {
     "testEnvironment": "node",
