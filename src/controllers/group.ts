@@ -1,30 +1,39 @@
-const moment = require('moment');
-const User = require('../models/user');
-const PersonalSchedule = require('../models/personalSchedule');
-const Group = require('../models/group');
-const GroupSchedule = require('../models/groupSchedule');
-const ApiError = require('../errors/apiError');
-const DataFormatError = require('../errors/DataFormatError');
-const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
-const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
-const {
+import moment from 'moment';
+
+import User from '../models/user'
+import UserGroup from '../models/userGroup';
+import Group from '../models/group';
+import GroupSchedule from '../models/groupSchedule';
+import PersonalSchedule from '../models/personalSchedule';
+
+import ApiError from '../errors/apiError';
+import DataFormatError from '../errors/DataFormatError';
+import ExpiredCodeError from '../errors/group/ExpiredCodeError';
+import InvalidGroupJoinError from '../errors/group/InvalidGroupJoinError';
+import {
+  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
+} from '../errors';
+
+import {
   validateGroupSchema, validateGroupIdSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-} = require('../utils/validators');
-const {
-  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
-} = require('../errors');
-const UserGroup = require('../models/userGroup');
+} from '../utils/validators';
 
 async function createGroup(req, res, next) {
   try {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
+
     const { nickname } = req;
     const { name } = req.body;
     const user = await User.findOne({ where: { nickname } });
-    const group = await Group.create({ name, member: 1, leader: user.userId });
-    await user.addGroup(group);
+
+    const group = await Group.create({ name, member: 1, leader: user?.userId });
+
+    if (user) {
+      await user.addGroup(group);
+    }
+
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
     return next(new ApiError());
@@ -143,15 +152,20 @@ async function getGroupSchedule(req, res, next) {
     const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
     const users = (await group.getUsers()).map((user) => user.userId);
     const userEvent = await PersonalSchedule.getSchedule(users, start, end);
-    const event = {};
-    event.nonRecurrenceSchedule = [
-      ...userEvent.nonRecurrenceSchedule,
-      ...groupEvent.nonRecurrenceSchedule,
-    ];
-    event.recurrenceSchedule = [
-      ...userEvent.recurrenceSchedule,
-      ...groupEvent.recurrenceSchedule,
-    ];
+    const event: {
+      nonRecurrenceSchedule: Array<GroupSchedule>;
+      recurrenceSchedule: Array<GroupSchedule>;
+    } = {
+      nonRecurrenceSchedule: [
+        ...userEvent.nonRecurrenceSchedule,
+        ...groupEvent.nonRecurrenceSchedule,
+      ],
+      recurrenceSchedule: [
+        ...userEvent.recurrenceSchedule,
+        ...groupEvent.recurrenceSchedule,
+      ],
+    };
+
     return res.status(200).json(event);
   } catch (err) {
     return next(new ApiError());
@@ -327,7 +341,7 @@ async function postGroupJoin(req, res, next) {
   }
 }
 
-module.exports = {
+export {
   createGroup,
   getGroupList,
   deleteGroup,
