@@ -46,14 +46,9 @@ function eventProposal(events, start, end) {
         });
       }
       currEnd = event.endDateTime;
-      if (event.endDateTime.getTime() > end.getTime()) {
-        return result;
-      }
-
-      currEnd = event.endDateTime;
     }
   });
-  if (currEnd.getTime() < end.getTime() + 1000 * 60 * 60 * 24) {
+  if (currEnd.getTime() < end.getTime()) {
     result.push({
       startDateTime: currEnd,
       endDateTime: end,

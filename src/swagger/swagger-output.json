@@ -5,7 +5,7 @@
     "description": "RestFul API 클라이언트 UI",
     "version": "1.0.0"
   },
-  "host": "http://3.34.196.250",
+  "host": "127.0.0.1:8000",
   "basePath": "/",
   "schemes": [
     "http"
@@ -24,13 +24,13 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "example@email.com"
+                  "example": "testUser@email.com"
                 },
                 "nickname": {
-                  "example": "string"
+                  "example": "testUser"
                 },
                 "password": {
-                  "example": "string"
+                  "example": "super_strong_password"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "body",
@@ -304,7 +304,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -339,7 +339,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "authorization",
@@ -625,22 +625,22 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                }
-              }
-            }
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "type": "DATETIME"
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "type": "DATETIME"
           }
         ],
         "responses": {
@@ -739,6 +739,48 @@
       }
     },          
     "/api/user/calendar": {
+      "get": {
+        "description": "",
+        "summary": "유저 일정 조회",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "type": "DATETIME"
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "type": "DATETIME"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "post": {
         "description": "",
         "summary": "유저 일정 등록",
@@ -876,7 +918,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -891,45 +933,6 @@
           },
           "404": {
             "description": "존재하지 않는 스케줄"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/user/{user_id}/calendar": {
-      "get": {
-        "description": "",
-        "summary": "유저 일정 조회",
-        "tags": ["User"],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "date",
-            "in": "query",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
           },
           "500": {
             "description": "서버 에러"
@@ -1037,7 +1040,7 @@
           "type": "STRING(10)"
         },
         "interval": {
-          "type": "INTEGER"
+          "type": "integer"
         },
         "byweekday": {
           "type": "TEXT"
@@ -1086,7 +1089,7 @@
           "type": "STRING(10)"
         },
         "interval": {
-          "type": "INTEGER"
+          "type": "integer"
         },
         "byweekday": {
           "type": "TEXT"

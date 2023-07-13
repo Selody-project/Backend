@@ -24,14 +24,11 @@ async function createGroup(req, res, next) {
   try {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
-
     const { nickname } = req;
     const { name } = req.body;
-
     const user = await User.findOne({ where: { nickname } });
     const group = await Group.create({ name, member: 1, leader: user.userId });
     await user.addGroup(group);
-
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
     return next(new ApiError());
@@ -147,9 +144,19 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await GroupSchedule.getSchedule([groupId], start, end);
-    if (schedule === null) throw new ApiError();
-    return res.status(200).json(schedule);
+    const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
+    const users = (await group.getUsers()).map((user) => user.userId);
+    const userEvent = await PersonalSchedule.getSchedule(users, start, end);
+    const event = {};
+    event.nonRecurrenceSchedule = [
+      ...userEvent.nonRecurrenceSchedule,
+      ...groupEvent.nonRecurrenceSchedule,
+    ];
+    event.recurrenceSchedule = [
+      ...userEvent.recurrenceSchedule,
+      ...groupEvent.recurrenceSchedule,
+    ];
+    return res.status(200).json(event);
   } catch (err) {
     return next(new ApiError());
   }
@@ -356,7 +363,19 @@ async function getEventProposal(req, res, next) {
       events.push(parseEventDates(groupNonRecEvent, groupRecEvent));
       events = events.flat(1);
       events.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
-      proposal[date] = eventProposal(events, start, end);
+
+      // 결과값에서 9시~22시 사이의 값들을 먼저 추천할 수 있도록 정렬.
+      const result = eventProposal(events, start, end);
+      const filteredTimes = result.filter((event) => (
+        event.startDateTime.getTime() < (end.getTime() - 1000 * 60 * 60 * 2)
+          && event.endDateTime.getTime() > (start.getTime() + 1000 * 60 * 60 * 9)
+      ));
+      const remainingTimes = result.filter((event) => (
+        event.startDateTime.getTime() >= (end.getTime() - 1000 * 60 * 60 * 2)
+          || event.endDateTime.getTime() <= (start.getTime() + 1000 * 60 * 60 * 9)
+      ));
+      const sortedResult = filteredTimes.concat(remainingTimes);
+      proposal[date] = sortedResult;
     }
     return res.status(200).json(proposal);
   } catch (err) {

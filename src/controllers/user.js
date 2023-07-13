@@ -15,6 +15,7 @@ const {
   validateScheduleDateScehma,
 } = require('../utils/validators');
 const { UserNotFoundError } = require('../errors');
+const GroupSchedule = require('../models/groupSchedule');
 
 async function getUserProfile(req, res, next) {
   try {
@@ -92,9 +93,24 @@ async function getUserPersonalSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const schedule = await PersonalSchedule.getSchedule([user.userId], start, end);
-    if (schedule === null) throw new ApiError();
-    return res.status(200).json(schedule);
+
+    const userEvent = await PersonalSchedule.getSchedule([user.userId], start, end);
+    const groups = (await user.getGroups()).map((group) => group.groupId);
+    if (groups.length) {
+      const groupEvent = await GroupSchedule.getSchedule(groups, start, end);
+      const event = {};
+      event.nonRecurrenceSchedule = [
+        ...userEvent.nonRecurrenceSchedule,
+        ...groupEvent.nonRecurrenceSchedule,
+      ];
+      event.recurrenceSchedule = [
+        ...userEvent.recurrenceSchedule,
+        ...groupEvent.recurrenceSchedule,
+      ];
+      return res.status(200).json(event);
+    }
+
+    return res.status(200).json(userEvent);
   } catch (err) {
     return next(new ApiError());
   }
