@@ -33,7 +33,7 @@ function getRRuleByWeekDay(byweekday: string): Weekday[] {
   return arr.map((str) => RRuleWeekDay[str]);
 }
 
-exports = {
+export {
   getRRuleByWeekDay,
   getRRuleFreq,
 };
