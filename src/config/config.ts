@@ -13,7 +13,7 @@ const dbUsername: string = testEnv
 const dbPassword: string = testEnv
   ? process.env.DB_TEST_PASSWORD!
   : process.env.DB_PASSWORD!;
-const dbName: string = testEnv
+const dbName = testEnv
   ? process.env.DB_TEST_NAME!
   : process.env.DB_NAME!;
 
@@ -31,7 +31,7 @@ const dbConfig: {
   database: string;
   host: string;
   dialect: 'mysql';
-  port: string;
+  port;
 } = {
   username: dbUsername,
   password: dbPassword,
