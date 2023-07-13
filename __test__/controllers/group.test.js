@@ -503,4 +503,19 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'You are already a member of this group.' });
     });
   });
+
+  describe('Test GET /api/group/:group_id/proposal', () => {
+    it('Successfully get a list of Event', async () => {
+      const id = 1;
+      const date1 = "2023-04-15T00:00:00.000Z";
+      const date2 = "2030-04-16T00:00:00.000Z";
+      const res = await request(app).get(`/api/group/${id}/proposal`).set('Cookie', cookie).query({
+        date1,
+        date2
+      });
+      const expectedProposal = {};
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedProposal);
+    });
+  });
 });
