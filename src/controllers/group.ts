@@ -149,7 +149,7 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
+    const groupEvent = await GroupSchedule.getSchedule([group.groupId], start, end);
     const users = (await group.getUsers()).map((user) => user.userId);
     const userEvent = await PersonalSchedule.getSchedule(users, start, end);
     const event: {
