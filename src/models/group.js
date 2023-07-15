@@ -29,6 +29,11 @@ class Group extends Sequelize.Model {
         type: Sequelize.DATE,
         allowNull: true,
       },
+      sharePersonalEvent: {
+        type: Sequelize.TINYINT(1),
+        allowNull: true,
+        defaultValue: 1,
+      },
     }, {
       sequelize,
       timestamps: false,

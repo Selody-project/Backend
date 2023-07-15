@@ -14,6 +14,7 @@ router.use('/auth', auth);
 router.use('/*', verifyToken);
 
 router.delete('/withdrawal/:user_id', userWithdrawal);
+// router.post('/userSetup', userSetup);
 router.use('/group', group);
 router.use('/user', user);
 

@@ -123,6 +123,7 @@ async function join(req, res, next) {
       req.nickname = nickname;
       return next();
     } catch (err) {
+      console.error(err);
       return next(new ApiError());
     }
   } else {
@@ -165,16 +166,11 @@ async function logout(req, res, next) {
   }
 }
 
-/*
-exports.getGoogleUserInfo = async (req, res, next) => {
-};
-*/
-
 module.exports = {
   getNaverUserInfo,
+  getGoogleUserInfo,
   join,
   login,
   logout,
   joinSocialUser,
-  getGoogleUserInfo,
 };

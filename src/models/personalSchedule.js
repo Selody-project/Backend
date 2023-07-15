@@ -2,6 +2,7 @@ const Sequelize = require('sequelize');
 const { RRule } = require('rrule');
 const moment = require('moment');
 const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
+const ApiError = require('../errors/apiError');
 
 class PersonalSchedule extends Sequelize.Model {
   static initiate(sequelize) {
@@ -56,7 +57,7 @@ class PersonalSchedule extends Sequelize.Model {
     }, {
       sequelize,
       timestamps: false,
-      inderscpred: false,
+      underscored: false,
       modelName: 'PersonalSchedule',
       tableName: 'personalSchedule',
       paranoid: false,
@@ -81,11 +82,12 @@ class PersonalSchedule extends Sequelize.Model {
           content, 
           startDateTime, 
           endDateTime, 
-          recurrence 
+          recurrence,
+          false AS isGroup
         FROM 
           personalSchedule
         WHERE 
-          userId = :userID AND (
+          userId IN (${userID.join(',')}) AND (
           recurrence = 0 AND ( 
             (startDateTime BETWEEN :start AND :end)
             OR
@@ -96,17 +98,17 @@ class PersonalSchedule extends Sequelize.Model {
         )`;
       const recurrenceStatement = `
         SELECT 
-          * 
+          *,
+          false AS isGroup
         FROM 
           personalSchedule
         WHERE 
-          userId = :userID AND (
+          userId IN (${userID.join(',')}) AND (
           recurrence = 1 AND 
           startDateTime <= :end
         )`;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
-          userID,
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -114,7 +116,6 @@ class PersonalSchedule extends Sequelize.Model {
       });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
-          userID,
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
@@ -163,13 +164,14 @@ class PersonalSchedule extends Sequelize.Model {
             interval: schedule.interval,
             byweekday: schedule.byweekday,
             until: schedule.until,
+            isGroup: schedule.isGroup,
             recurrenceDateList: possibleDateList,
           });
         }
       });
       return { nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
-      return null;
+      throw new ApiError();
     }
   }
 }

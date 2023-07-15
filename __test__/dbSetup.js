@@ -26,6 +26,8 @@ async function setUpUserDB() {
       userId: 1,
       email: 'test-user1@email.com',
       nickname: 'test-user1',
+      eventNotification: 1,
+      sharePersonalEvent: 1,
       password: await bcrypt.hash('super_strong_password', 12),
       provider: 'local',
       createdAt: '2023-04-26',
@@ -49,11 +51,21 @@ async function setUpUserDB() {
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
     },
+    {
+      userId: 4,
+      email: 'test-user4@email.com',
+      nickname: 'test-user4',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    },
   ];
 
   await User.create(mockUserData[0]);
   await User.create(mockUserData[1]);
   await User.create(mockUserData[2]);
+  await User.create(mockUserData[3]);
 }
 
 async function setUpGroupDB() {
@@ -73,11 +85,11 @@ async function setUpGroupDB() {
     inviteCode: 'expiredCode02',
     inviteExp: '2000-01-01T00:00:00.000Z',
   });
-  await Group.create({
+  const group3 = await Group.create({
     groupId: 3,
     name: 'test-group3',
-    member: 2,
-    leader: 2,
+    member: 1,
+    leader: 3,
     inviteCode: 'inviteCode03',
     inviteExp: '2099-01-01T00:00:00.000Z',
   });
@@ -86,6 +98,7 @@ async function setUpGroupDB() {
   await user[0].addGroup(group2);
   await user[1].addGroup(group1);
   await user[1].addGroup(group2);
+  await user[2].addGroup(group3);
 }
 
 async function setUpGroupScheduleDB() {
@@ -236,6 +249,43 @@ async function setUpPersonalScheduleDB() {
   ]);
 }
 
+async function setUpPersonalScheduleDB2() {
+  await PersonalSchedule.bulkCreate([
+    {
+      id: 1, userId: 1, title: 'test-title1', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T23:59:59.999Z', recurrence: 0,
+    },
+    {
+      id: 2, userId: 1, title: 'test-title2', content: 'test-content2', startDateTime: '2023-04-15T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0,
+    },
+    {
+      id: 3, userId: 2, title: 'test-title3', content: 'test-content3', startDateTime: '2023-04-10T00:00:00.000Z', endDateTime: '2023-04-15T23:59:59.999Z', recurrence: 0,
+    },
+    {
+      id: 4, userId: 2, title: 'test-title4', content: 'test-content4', startDateTime: '2023-04-01T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0,
+    },
+    {
+      id: 5, userId: 3, title: 'test-title5', content: 'test-content5', startDateTime: '2023-04-01T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0,
+    },
+  ]);
+}
+
+async function setUpGroupScheduleDB2() {
+  await GroupSchedule.bulkCreate([
+    {
+      id: 1, groupId: 1, title: 'test-title1', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T23:59:59.999Z', recurrence: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 2, groupId: 1, title: 'test-title2', content: 'test-content2', startDateTime: '2023-04-15T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 3, groupId: 2, title: 'test-title3', content: 'test-content3', startDateTime: '2023-04-10T00:00:00.000Z', endDateTime: '2023-04-15T23:59:59.999Z', recurrence: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+    {
+      id: 4, groupId: 3, title: 'test-title4', content: 'test-content4', startDateTime: '2023-04-01T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0, confirmed: 0, possible: '["user1"]', impossible: '["user3"]',
+    },
+  ]);
+}
+
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
@@ -259,6 +309,8 @@ module.exports = {
   setUpGroupDB,
   setUpGroupScheduleDB,
   setUpPersonalScheduleDB,
+  setUpPersonalScheduleDB2,
+  setUpGroupScheduleDB2,
   tearDownUserDB,
   tearDownGroupDB,
   tearDownGroupScheduleDB,

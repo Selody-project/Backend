@@ -4,7 +4,8 @@ const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, dropDB,
   tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
-  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB,
+  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
+  setUpPersonalScheduleDB2,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
@@ -13,8 +14,16 @@ describe('Test /api/group endpoints', () => {
   beforeAll(async () => {
     await dropDB();
     await syncDB();
+
+    await tearDownPersonalScheduleDB();
+    await tearDownGroupScheduleDB();
     await tearDownUserDB();
+    await tearDownGroupDB();
+
     await setUpUserDB();
+    await setUpGroupDB();
+    await setUpGroupScheduleDB();
+    await setUpPersonalScheduleDB2();
 
     const res = await request(app).post('/api/auth/login').send({
       email: 'test-user1@email.com',
@@ -25,16 +34,18 @@ describe('Test /api/group endpoints', () => {
   });
 
   beforeEach(async () => {
+    await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
     await tearDownGroupDB();
 
+    await setUpPersonalScheduleDB2();
     await setUpGroupDB();
     await setUpGroupScheduleDB();
   });
 
   afterEach(async () => {
+    await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
-    await tearDownGroupDB();
   });
 
   afterAll(async () => {
@@ -195,6 +206,7 @@ describe('Test /api/group endpoints', () => {
         nonRecurrenceSchedule: [
           {
             id: 1,
+            isGroup: 0,
             content: 'test-content1',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -203,6 +215,43 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 2,
+            isGroup: 0,
+            content: 'test-content2',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-15T00:00:00.000Z',
+            title: 'test-title2',
+          },
+          {
+            id: 3,
+            isGroup: 0,
+            content: 'test-content3',
+            endDateTime: '2023-04-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-10T00:00:00.000Z',
+            title: 'test-title3',
+          },
+          {
+            id: 4,
+            isGroup: 0,
+            content: 'test-content4',
+            endDateTime: '2023-04-30T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-04-01T00:00:00.000Z',
+            title: 'test-title4',
+          },
+          {
+            id: 1,
+            isGroup: 1,
+            content: 'test-content1',
+            endDateTime: '2023-05-15T23:59:59.000Z',
+            recurrence: 0,
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            title: 'test-title1',
+          },
+          {
+            id: 2,
+            isGroup: 1,
             content: 'test-content2',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -211,6 +260,7 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 4,
+            isGroup: 1,
             content: 'test-content4',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -219,6 +269,7 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 5,
+            isGroup: 1,
             content: 'test-content5',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -227,6 +278,7 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 6,
+            isGroup: 1,
             content: 'test-content6',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -235,6 +287,7 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 9,
+            isGroup: 1,
             content: 'test-content9',
             endDateTime: '2023-04-01T08:59:59.000Z',
             recurrence: 0,
@@ -243,6 +296,7 @@ describe('Test /api/group endpoints', () => {
           },
           {
             id: 10,
+            isGroup: 1,
             content: 'test-content10',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -257,6 +311,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'DAILY',
             groupId: 1,
             id: 11,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -275,6 +330,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'MONTHLY',
             groupId: 1,
             id: 12,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -289,6 +345,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'WEEKLY',
             groupId: 1,
             id: 13,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -306,6 +363,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'YEARLY',
             groupId: 1,
             id: 14,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -320,6 +378,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'DAILY',
             groupId: 1,
             id: 15,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -341,6 +400,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'DAILY',
             groupId: 1,
             id: 16,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -358,6 +418,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'WEEKLY',
             groupId: 1,
             id: 17,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -378,6 +439,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'MONTHLY',
             groupId: 1,
             id: 18,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -392,6 +454,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'YEARLY',
             groupId: 1,
             id: 19,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
@@ -406,6 +469,7 @@ describe('Test /api/group endpoints', () => {
             freq: 'MONTHLY',
             groupId: 1,
             id: 21,
+            isGroup: 1,
             interval: 1,
             recurrence: 1,
             recurrenceDateList: [
