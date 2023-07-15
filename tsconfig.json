@@ -2,7 +2,9 @@
   "compilerOptions": {
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
+    "strictNullChecks": false,
     "target": "es2017",
     "outDir": "./dist",
+    "typeRoots": ["./node_modules/@types", "./src/utils/customType"],
   }
 }

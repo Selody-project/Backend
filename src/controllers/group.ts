@@ -1,17 +1,14 @@
 import moment from 'moment';
 
-import User from '../models/user'
+import User from '../models/user';
 import UserGroup from '../models/userGroup';
 import Group from '../models/group';
 import GroupSchedule from '../models/groupSchedule';
 import PersonalSchedule from '../models/personalSchedule';
 
 import ApiError from '../errors/apiError';
-import DataFormatError from '../errors/DataFormatError';
-import ExpiredCodeError from '../errors/group/ExpiredCodeError';
-import InvalidGroupJoinError from '../errors/group/InvalidGroupJoinError';
 import {
-  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
+  DataFormatError, userErrors, groupErrors, scheduleErrors,
 } from '../errors';
 
 import {
@@ -60,16 +57,16 @@ async function deleteGroup(req, res, next) {
     const group = await Group.findByPk(id);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
 
     if (group.leader !== user.userId) {
-      return next(new UnathroizedError());
+      return next(new scheduleErrors.UnauthorizedError());
     }
 
     await group.destroy();
@@ -88,7 +85,7 @@ async function patchGroup(req, res, next) {
     const { newLeaderId } = req.body;
     const group = await Group.findByPk(id);
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
 
     group.leader = newLeaderId;
@@ -107,18 +104,18 @@ async function deleteGroupUser(req, res, next) {
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
     const { userId } = user;
     const { id: groupId } = req.params;
 
     const group = await Group.findByPk(groupId);
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
 
     if (group.leader === userId) {
-      return next(new UnathroizedError());
+      return next(new scheduleErrors.UnauthorizedError());
     }
 
     await UserGroup.destroy({
@@ -140,7 +137,7 @@ async function getGroupSchedule(req, res, next) {
     const { id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
 
     const { error: queryError } = validateScheduleDateScehma(req.query);
@@ -222,7 +219,7 @@ async function putGroupSchedule(req, res, next) {
     const schedule = await GroupSchedule.findOne({ where: { id } });
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      return next(new scheduleErrors.ScheduleNotFoundError());
     }
 
     await GroupSchedule.update(req.body, { where: { id } });
@@ -241,7 +238,7 @@ async function deleteGroupSchedule(req, res, next) {
     const schedule = await GroupSchedule.findOne({ where: { id } });
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      return next(new scheduleErrors.ScheduleNotFoundError());
     }
 
     await schedule.destroy();
@@ -261,7 +258,7 @@ async function postInviteLink(req, res, next) {
     const group = await Group.findOne({ where: { groupId } });
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
 
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -301,10 +298,10 @@ async function getInvitation(req, res, next) {
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
     if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
+      return next(new groupErrors.ExpiredCodeError());
     }
     return res.status(200).json({ group });
   } catch (err) {
@@ -320,16 +317,16 @@ async function postGroupJoin(req, res, next) {
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
     if (!group) {
-      return next(new GroupNotFoundError());
+      return next(new groupErrors.GroupNotFoundError());
     }
     if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
+      return next(new groupErrors.ExpiredCodeError());
     }
 
     const { nickname } = req;
     const user = await User.findOne({ where: { nickname } });
     if (await user.hasGroup(group)) {
-      return next(new InvalidGroupJoinError());
+      return next(new groupErrors.InvalidGroupJoinError());
     }
 
     await user.addGroup(group);
