@@ -5,7 +5,7 @@
     "description": "RestFul API 클라이언트 UI",
     "version": "1.0.0"
   },
-  "host": "http://3.34.196.250",
+  "host": "127.0.0.1:8000",
   "basePath": "/",
   "schemes": [
     "http"
@@ -24,13 +24,13 @@
               "type": "object",
               "properties": {
                 "email": {
-                  "example": "example@email.com"
+                  "example": "testUser@email.com"
                 },
                 "nickname": {
-                  "example": "string"
+                  "example": "testUser"
                 },
                 "password": {
-                  "example": "string"
+                  "example": "super_strong_password"
                 }
               }
             }
@@ -262,7 +262,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "body",
@@ -304,7 +304,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -339,7 +339,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "authorization",
@@ -625,7 +625,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           },
           {
             "name": "authorization",
@@ -918,7 +918,7 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "INTEGER"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -1040,7 +1040,7 @@
           "type": "STRING(10)"
         },
         "interval": {
-          "type": "INTEGER"
+          "type": "integer"
         },
         "byweekday": {
           "type": "TEXT"
@@ -1089,7 +1089,7 @@
           "type": "STRING(10)"
         },
         "interval": {
-          "type": "INTEGER"
+          "type": "integer"
         },
         "byweekday": {
           "type": "TEXT"

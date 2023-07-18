@@ -55,19 +55,6 @@ class GroupSchedule extends Sequelize.Model {
         type: Sequelize.DATE,
         allowNull: true,
       },
-      confirmed: {
-        type: Sequelize.TINYINT(1),
-        allowNull: false,
-        defaultValue: 0,
-      },
-      possible: {
-        type: Sequelize.JSON,
-        allowNull: true,
-      },
-      impossible: {
-        type: Sequelize.JSON,
-        allowNull: true,
-      },
     }, {
       sequelize,
       timestamps: false,
