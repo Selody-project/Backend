@@ -26,8 +26,6 @@ async function setUpUserDB() {
       userId: 1,
       email: 'test-user1@email.com',
       nickname: 'test-user1',
-      eventNotification: 1,
-      sharePersonalEvent: 1,
       password: await bcrypt.hash('super_strong_password', 12),
       provider: 'local',
       createdAt: '2023-04-26',

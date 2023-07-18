@@ -31,7 +31,6 @@ async function createGroup(req, res, next) {
     await user.addGroup(group);
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
-    console.error(err);
     return next(new ApiError());
   }
 }
