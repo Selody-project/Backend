@@ -15,7 +15,7 @@ const router = express.Router();
 
 router.patch('/profile', patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);
-router.post('/userSetup/:user_id', updateUserSetUp);
+router.patch('/userSetup/:user_id', updateUserSetUp);
 router.get('/userSetup', getUserSetup);
 router.put('/calendar/:id', putUserSchedule);
 router.get('/calendar', getUserPersonalSchedule);

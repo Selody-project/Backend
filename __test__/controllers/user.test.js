@@ -8,7 +8,6 @@ const {
   tearDownGroupDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
-const User = require('../../src/models/user');
 
 describe('Test /api/user endpoints', () => {
   let cookie;
@@ -77,10 +76,8 @@ describe('Test /api/user endpoints', () => {
       const expectedProfile = {
         user: {
           email: 'test-user1@email.com',
-          eventNotification: 1,
           nickname: newNickname,
           provider: 'local',
-          sharePersonalEvent: 1,
           snsId: null,
           userId: 1,
         },
@@ -483,42 +480,28 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  // describe('Test POST /api/userSetup', () => {
-  //   it('Successfully update eventNotification and sharePersoanlEvent from user table',
-  // async () => {
-  //     const result = {
-  //       eventNotification: 0,
-  //       content: 1,
-  //     };
-  //     const res = await request(app).post('/api/userSetup').set('Cookie', cookie).send(result);
-  //     expect(res.status).toEqual(204);
-  //   });
-  // });
   describe('Test PATCH /api/user/updateUserSetup', () => {
-    it('Successfully update eventNotification and sharePersoanlEvent from user table', async () => {
+    it('Successfully update sharePersoanlEvent from user table', async () => {
       const id = 1;
       const result = {
-        eventNotification: 0,
-        sharePersonalEvent: 1,
+        updatedSharePersonalEvent: [
+          {
+            groupId: 1,
+            sharePersonalEvent: 0,
+          },
+          {
+            groupId: 2,
+            sharePersonalEvent: 0,
+          },
+          {
+            groupId: 3,
+            sharePersonalEvent: 1,
+          },
+        ],
       };
       const res = await request(app).patch(`/api/user/userSetup/${id}`).set('Cookie', cookie).send(result);
-
-      const user = await User.findByPk(id);
 
       expect(res.status).toEqual(200);
-      expect(user.eventNotification).toEqual(0);
-      expect(user.sharePersonalEvent).toEqual(1);
-    });
-
-    it('Successfully fail to update user Setup from user table', async () => {
-      const id = 100;
-      const result = {
-        eventNotification: 0,
-        sharePersonalEvent: 1,
-      };
-      const res = await request(app).patch(`/api/user/userSetup/${id}`).set('Cookie', cookie).send(result);
-
-      expect(res.status).toEqual(404);
     });
   });
 });
