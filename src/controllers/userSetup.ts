@@ -1,11 +1,18 @@
+// model
 import User from '../models/user';
 import Group from '../models/group';
 import PersonalSchedule from '../models/personalSchedule';
-import ApiError from '../errors/apiError';
-import { validateUserIdSchema } from '../utils/validators';
-import UserIsLeaderError from '../errors/user/UserIsLeaderError';
 
-import { DataFormatError } from '../errors';
+// error
+import ApiError from '../errors/apiError';
+import {
+  DataFormatError, userErrors,
+} from '../errors';
+
+// validator
+import {
+  validateUserIdSchema,
+} from '../utils/validators';
 
 async function userWithdrawal(req, res, next) {
   const { error } = validateUserIdSchema(req.params);
@@ -24,7 +31,7 @@ async function userWithdrawal(req, res, next) {
       await PersonalSchedule.destroy({ where: { userId } });
       await user.destroy();
     } else {
-      return next(new UserIsLeaderError());
+      return next(new userErrors.UserIsLeaderError());
     }
 
     return res.status(204).json({ message: 'Successfully deleted' });

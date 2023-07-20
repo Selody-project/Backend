@@ -2,13 +2,23 @@ import { Model, DataTypes, Sequelize } from 'sequelize';
 
 export default class Group extends Model {
   public groupId!: number;
+
   public name!: string;
+
   public member!: number;
+
   public leader!: number;
+
   public inviteCode!: string | null;
+
   public inviteExp!: Date | null;
-  getUsers: any
-  
+
+  addUser: any;
+
+  getUsers: any;
+
+  hasUser: any;
+
   public static initiate(sequelize: Sequelize): void {
     Group.init({
       groupId: {

@@ -2,11 +2,22 @@ import { Model, DataTypes, Sequelize } from 'sequelize';
 
 export default class User extends Model {
   public userId!: number;
+
   public email!: string | null;
+
   public nickname!: string;
+
   public password!: string | null;
+
   public provider!: 'local' | 'naver' | 'google';
+
   public snsId!: string | null;
+
+  addGroup: any;
+
+  getGroups: any;
+
+  hasGroup: any;
 
   public static initiate(sequelize: Sequelize): void {
     User.init({

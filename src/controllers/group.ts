@@ -1,16 +1,19 @@
 import moment from 'moment';
 
+// model
 import User from '../models/user';
 import UserGroup from '../models/userGroup';
 import Group from '../models/group';
 import GroupSchedule from '../models/groupSchedule';
 import PersonalSchedule from '../models/personalSchedule';
 
+// error
 import ApiError from '../errors/apiError';
 import {
   DataFormatError, userErrors, groupErrors, scheduleErrors,
 } from '../errors';
 
+// validator
 import {
   validateGroupSchema, validateGroupIdSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,

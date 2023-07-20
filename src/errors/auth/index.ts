@@ -1,10 +1,10 @@
-import InvalidPasswordError from './InvalidIdPasswordError';
+import InvalidIdPasswordError from './InvalidIdPasswordError';
 import DuplicateUserError from './DuplicateUserError';
 import InvalidTokenError from './InvalidTokenError';
 import TokenExpireError from './TokenExpireError';
 
 export {
-  InvalidPasswordError,
+  InvalidIdPasswordError,
   DuplicateUserError,
   InvalidTokenError,
   TokenExpireError,

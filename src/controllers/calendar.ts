@@ -1,15 +1,24 @@
 import moment from 'moment';
-import personalSchedule from '../models/personalSchedule';
+
+// model
 import User from '../models/user';
+import personalSchedule from '../models/personalSchedule';
+
+// error
 import ApiError from '../errors/apiError';
-import NotFoundError from '../errors/calendar/NotFound';
-import { UserNotFoundError, DataFormatError } from '../errors';
-import { validateUserScheduleSchema, validateScheduleIdSchema } from '../utils/validators';
+import {
+  DataFormatError, userErrors, calendarErrors,
+} from '../errors';
+
+// validator
+import {
+  validateUserScheduleSchema, validateScheduleIdSchema,
+} from '../utils/validators';
 
 async function postPersonalSchedule(req, res, next) {
   try {
     const { error } = validateUserScheduleSchema(req.body);
-    
+
     if (error) {
       return next(new DataFormatError());
     }
@@ -20,13 +29,13 @@ async function postPersonalSchedule(req, res, next) {
     } = req.body;
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
-    
+
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
 
     const { userId } = user;
-    
+
     await personalSchedule.create({
       userId,
       title,
@@ -49,15 +58,15 @@ async function postPersonalSchedule(req, res, next) {
 async function deletePersonalSchedule(req, res, next) {
   try {
     const { error } = validateScheduleIdSchema(req.params);
-    
+
     if (error) return next(new DataFormatError());
 
     const { id } = req.params;
 
     const data = await personalSchedule.destroy({ where: { id } });
-    
+
     if (data === 0) {
-      return next(new NotFoundError());
+      return next(new calendarErrors.NotFoundError());
     }
 
     return res.status(204).json({ message: 'successfully deleted' });

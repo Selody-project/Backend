@@ -1,21 +1,25 @@
 import moment from 'moment';
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
+
+// model
 import User from '../models/user';
 import PersonalSchedule from '../models/personalSchedule';
-import ApiError from '../errors/apiError';
-import DuplicateUserError from '../errors/auth/DuplicateUserError';
-import DataFormatError from '../errors/DataFormatError';
-import ScheduleNotFoundError from '../errors/schedule/ScheduleNotFoundError';
+import GroupSchedule from '../models/groupSchedule';
 
+// error
+import ApiError from '../errors/apiError';
+import {
+  DataFormatError, userErrors, scheduleErrors, authErrors,
+} from '../errors';
+
+// validator
 import {
   validateJoinSchema,
   validateScheduleSchema,
   validateScheduleIdSchema,
   validateScheduleDateScehma,
 } from '../utils/validators';
-import { UserNotFoundError } from '../errors';
-import GroupSchedule from '../models/groupSchedule';
 
 async function getUserProfile(req, res, next) {
   try {
@@ -38,7 +42,7 @@ async function patchUserProfile(req, res, next) {
     const user = await User.findOne({ where: { nickname: req.nickname } });
 
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
 
     const { nickname } = req.body;
@@ -53,7 +57,7 @@ async function patchUserProfile(req, res, next) {
     });
 
     if (duplicate.length > 0) {
-      return next(new DuplicateUserError());
+      return next(new authErrors.DuplicateUserError());
     }
 
     await user.update({
@@ -78,7 +82,7 @@ async function patchUserPassword(req, res, next) {
     const user = await User.findOne({ where: { nickname: req.nickname } });
 
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
 
     await user.update({
@@ -96,7 +100,7 @@ async function getUserPersonalSchedule(req, res, next) {
     const user = await User.findOne({ where: { nickname: req.nickname } });
 
     if (!user) {
-      return next(new UserNotFoundError());
+      return next(new userErrors.UserNotFoundError());
     }
 
     const { error: queryError } = validateScheduleDateScehma(req.query);
@@ -127,7 +131,7 @@ async function getUserPersonalSchedule(req, res, next) {
           ...groupEvent.recurrenceSchedule,
         ],
       };
-      
+
       return res.status(200).json(event);
     }
 
@@ -149,7 +153,7 @@ async function putUserSchedule(req, res, next) {
     const schedule = await PersonalSchedule.findOne({ where: { id } });
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      return next(new scheduleErrors.ScheduleNotFoundError());
     }
 
     await PersonalSchedule.update(req.body, { where: { id } });

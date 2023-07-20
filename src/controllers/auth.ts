@@ -2,17 +2,18 @@ import request from 'request';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import jwksClient from 'jwks-rsa';
-
 import { Op } from 'sequelize';
 
+// model
 import User from '../models/user';
-import ApiError from '../errors/apiError';
-import DuplicateUserError from '../errors/auth/DuplicateUserError';
-import InvalidIdPasswordError from '../errors/auth/InvalidIdPasswordError';
-import InvalidTokenError from '../errors/auth/InvalidTokenError';
-import TokenExpireError from '../errors/auth/TokenExpireError';
-import DataFormatError from '../errors/DataFormatError';
 
+// error
+import ApiError from '../errors/apiError';
+import {
+  DataFormatError, authErrors,
+} from '../errors';
+
+// validator
 import {
   validateLoginSchema,
   validateJoinSchema,
@@ -46,7 +47,7 @@ const client = jwksClient({
 
 function getKey(header: jwksClient.CertSigningKey, callback): void {
   client.getSigningKey(header.kid, (err, key) => {
-    const signingKey = key.getPublicKey /* || key.rsaPublicKey; */
+    const signingKey = key.getPublicKey; /* || key.rsaPublicKey; */
     callback(null, signingKey);
   });
 }
@@ -54,8 +55,8 @@ function getKey(header: jwksClient.CertSigningKey, callback): void {
 async function getGoogleUserInfo(req, res, next) {
   try {
     const { accessToken } = req.body;
-    
-    if (!accessToken) throw new InvalidTokenError();
+
+    if (!accessToken) throw new authErrors.InvalidTokenError();
 
     jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
       if (err) {
@@ -78,9 +79,9 @@ async function getGoogleUserInfo(req, res, next) {
     });
   } catch (error) {
     if (error.name === 'TokenExpireError') {
-      return next(new TokenExpireError());
+      return next(new authErrors.TokenExpireError());
     }
-    return next(new InvalidTokenError());
+    return next(new authErrors.InvalidTokenError());
   }
 }
 
@@ -100,9 +101,9 @@ async function joinSocialUser(req, res, next) {
     next();
   } catch (error) {
     if (error.name === 'TokenExpireError') {
-      return next(new TokenExpireError());
+      return next(new authErrors.TokenExpireError());
     }
-    return next(new InvalidTokenError());
+    return next(new authErrors.InvalidTokenError());
   }
 }
 
@@ -126,7 +127,7 @@ async function join(req, res, next): Promise<Response | void> {
   const user = await User.findOne(options);
 
   if (user) {
-    return next(new DuplicateUserError());
+    return next(new authErrors.DuplicateUserError());
   }
 
   if (email && nickname && password) {
@@ -162,11 +163,11 @@ async function login(req, res, next): Promise<Response | void> {
   try {
     user = await User.findOne({ where: { email } });
   } catch (err) {
-    return new ApiError();
+    return next(new ApiError());
   }
 
   if (!user) {
-    return next(new InvalidIdPasswordError());
+    return next(new authErrors.InvalidIdPasswordError());
   }
 
   try {
@@ -174,10 +175,10 @@ async function login(req, res, next): Promise<Response | void> {
 
     if (result) {
       req.nickname = user.nickname;
-      
+
       return next();
     }
-    return next(new InvalidIdPasswordError());
+    return next(new authErrors.InvalidIdPasswordError());
   } catch (err) {
     return next(new ApiError());
   }
