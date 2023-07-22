@@ -1,31 +1,27 @@
-const express = require('express');
-
-const {
-  createGroup,
-  getGroupList,
-  deleteGroup,
-  patchGroup,
-  getGroupSchedule,
-  postGroupSchedule,
-  putGroupSchedule,
-  deleteGroupSchedule,
-  postInviteLink,
-  getInvitation,
-  postGroupJoin,
-} = require('../controllers/group');
-
-const router = express.Router();
-
-router.get('/', getGroupList);
-router.post('/', createGroup);
-router.delete('/:id', deleteGroup);
-router.patch('/:id', patchGroup);
-router.post('/calendar', postGroupSchedule);
-router.put('/calendar/:id', putGroupSchedule);
-router.delete('/calendar/:id', deleteGroupSchedule);
-router.get('/:id/calendar', getGroupSchedule);
-router.post('/:group_id/invite-link', postInviteLink);
-router.get('/invite-link/:inviteCode', getInvitation);
-router.post('/join/:inviteCode', postGroupJoin);
-
-module.exports = router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require("express");
+var group_1 = require("../controllers/group");
+var group_2 = require("../controllers/group");
+var group_3 = require("../controllers/group");
+var group_4 = require("../controllers/group");
+var group_5 = require("../controllers/group");
+var group_6 = require("../controllers/group");
+var group_7 = require("../controllers/group");
+var group_8 = require("../controllers/group");
+var group_9 = require("../controllers/group");
+var group_10 = require("../controllers/group");
+var group_11 = require("../controllers/group");
+var router = express.Router();
+router.get('/', group_2.getGroupList);
+router.post('/', group_1.createGroup);
+router.delete('/:id', group_3.deleteGroup);
+router.patch('/:id', group_4.patchGroup);
+router.post('/calendar', group_6.postGroupSchedule);
+router.put('/calendar/:id', group_7.putGroupSchedule);
+router.delete('/calendar/:id', group_8.deleteGroupSchedule);
+router.get('/:id/calendar', group_5.getGroupSchedule);
+router.post('/:group_id/invite-link', group_9.postInviteLink);
+router.get('/invite-link/:inviteCode', group_10.getInvitation);
+router.post('/join/:inviteCode', group_11.postGroupJoin);
+exports.default = router;

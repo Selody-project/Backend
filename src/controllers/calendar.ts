@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment = require('moment');
 
 // model
 import User from '../models/user';

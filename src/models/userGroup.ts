@@ -14,7 +14,15 @@ export default class UserGroup extends Model {
   }
 
   static associate(db): void {
-    User.belongsToMany(db.Group, { through: 'UserGroup', foreignKey: 'userId', timestamps: false });
-    Group.belongsToMany(db.User, { through: 'UserGroup', foreignKey: 'groupId', timestamps: false });
+    User.belongsToMany(db.Group, {
+      through: 'UserGroup',
+      foreignKey: 'userId',
+      timestamps: false,
+    });
+    Group.belongsToMany(db.User, {
+      through: 'UserGroup',
+      foreignKey: 'groupId',
+      timestamps: false,
+    });
   }
 }

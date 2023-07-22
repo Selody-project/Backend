@@ -1,10 +1,18 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "CommonJS", // Mixed JavaScript 모드 설정
+    "target": "es2017",
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": false,
-    "target": "es2017",
-    "outDir": "./dist",
+    "moduleResolution": "node", 
+    "outDir": "./dist",  
     "typeRoots": ["./node_modules/@types", "./src/utils/customType"],
-  }
+    "esModuleInterop": true
+  },
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./node_modules"
+  ]
 }

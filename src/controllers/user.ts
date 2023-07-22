@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment = require('moment');
 import { Op } from 'sequelize';
 import bcrypt from 'bcrypt';
 

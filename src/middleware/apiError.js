@@ -1,4 +1,5 @@
-// eslint-disable-next-line no-unused-vars
-const apiError = (error, req, res, next) => res.status(error.status).json({ error: error.message });
-
-module.exports = apiError;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+// eslint-disable-next-line max-len, no-unused-vars
+var apiError = function (error, req, res, next) { return res.status(error.status).json({ error: error.message }); };
+exports.default = apiError;

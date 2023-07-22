@@ -1,20 +1,32 @@
-import { Model, DataTypes, Sequelize, QueryTypes } from 'sequelize';
+import {
+  Model, DataTypes, Sequelize, QueryTypes,
+} from 'sequelize';
 import { RRule } from 'rrule';
-import moment from 'moment';
+import moment = require('moment');
 import { getRRuleByWeekDay, getRRuleFreq } from '../utils/rrule';
 import ApiError from '../errors/apiError';
 
 export default class PersonalSchedule extends Model {
   public id!: number;
+
   public userId!: number;
+
   public title!: string;
+
   public content!: string | null;
+
   public startDateTime!: Date;
+
   public endDateTime!: Date;
+
   public recurrence!: number;
+
   public freq!: string | null;
+
   public interval!: number | null;
+
   public byweekday!: string | null;
+
   public until!: Date | null;
 
   public static initiate(sequelize: Sequelize): void {
@@ -108,7 +120,7 @@ export default class PersonalSchedule extends Model {
             (startDateTime < :start AND endDateTime > :end)
           )
         )`;
-      
+
       const recurrenceStatement = `
         SELECT 
           *,
@@ -120,7 +132,7 @@ export default class PersonalSchedule extends Model {
           recurrence = 1 AND 
           startDateTime <= :end
         )`;
-      
+
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),

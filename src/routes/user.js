@@ -1,21 +1,20 @@
-const express = require('express');
-const { createToken } = require('../middleware/token');
-const {
-  patchUserProfile,
-  patchUserPassword,
-  putUserSchedule,
-  getUserPersonalSchedule,
-} = require('../controllers/user');
-const { postPersonalSchedule, deletePersonalSchedule } = require('../controllers/calendar');
-const { deleteGroupUser } = require('../controllers/group');
-
-const router = express.Router();
-
-router.patch('/profile', patchUserProfile, createToken);
-router.patch('/profile/password', patchUserPassword);
-router.put('/calendar/:id', putUserSchedule);
-router.get('/calendar', getUserPersonalSchedule);
-router.post('/calendar', postPersonalSchedule);
-router.delete('/group/:id', deleteGroupUser);
-router.delete('/calendar/:id', deletePersonalSchedule);
-module.exports = router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require("express");
+var token_1 = require("../middleware/token");
+var user_1 = require("../controllers/user");
+var user_2 = require("../controllers/user");
+var user_3 = require("../controllers/user");
+var user_4 = require("../controllers/user");
+var calendar_1 = require("../controllers/calendar");
+var calendar_2 = require("../controllers/calendar");
+var group_1 = require("../controllers/group");
+var router = express.Router();
+router.patch('/profile', user_1.patchUserProfile, token_1.createToken);
+router.patch('/profile/password', user_2.patchUserPassword);
+router.put('/calendar/:id', user_3.putUserSchedule);
+router.get('/calendar', user_4.getUserPersonalSchedule);
+router.post('/calendar', calendar_1.postPersonalSchedule);
+router.delete('/group/:id', group_1.deleteGroupUser);
+router.delete('/calendar/:id', calendar_2.deletePersonalSchedule);
+exports.default = router;

@@ -1,7 +1,10 @@
 import { Sequelize } from 'sequelize';
-import fs from 'fs';
-import path from 'path';
 import { dbConfig } from '../config/config';
+import User from './user';
+import Group from './group';
+import PersonalSchedule from './personalSchedule';
+import GroupSchedule from './groupSchedule';
+import UserGroup from './userGroup';
 
 const db: any = {};
 
@@ -16,13 +19,26 @@ const sequelize = new Sequelize(
       min: 0,
       idle: 10000,
     },
+    logging: false,
     // eslint-disable-next-line no-console
-    logging: process.env.NODE_ENV == 'test' ? false : console.log,
+    // logging: process.env.NODE_ENV == 'test' ? false : console.log,
   },
 );
 
 db.sequelize = sequelize;
 
+db.User = User;
+db.Group = Group;
+db.PersonalSchedule = PersonalSchedule;
+db.GroupSchedule = GroupSchedule;
+db.UserGroup = UserGroup;
+
+User.initiate(sequelize);
+Group.initiate(sequelize);
+PersonalSchedule.initiate(sequelize);
+GroupSchedule.initiate(sequelize);
+UserGroup.initiate(sequelize);
+/*
 const basename = path.basename(__filename);
 fs
   .readdirSync(__dirname)
@@ -32,11 +48,14 @@ fs
     db[model.name] = model;
     model.initiate(sequelize);
   });
-
+*/
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
     db[modelName].associate(db);
   }
 });
 
-export { db, sequelize };
+export {
+  db,
+  sequelize,
+};

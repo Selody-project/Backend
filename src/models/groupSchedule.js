@@ -1,192 +1,226 @@
-const Sequelize = require('sequelize');
-const { RRule } = require('rrule');
-const moment = require('moment');
-const { getRRuleByWeekDay, getRRuleFreq } = require('../utils/rrule');
-const ApiError = require('../errors/apiError');
-
-class GroupSchedule extends Sequelize.Model {
-  static initiate(sequelize) {
-    GroupSchedule.init({
-      id: {
-        type: Sequelize.BIGINT,
-        primaryKey: true,
-        allowNull: false,
-        autoIncrement: true,
-      },
-      groupId: {
-        type: Sequelize.BIGINT,
-        primaryKey: true,
-        allowNull: false,
-      },
-      title: {
-        type: Sequelize.STRING(45),
-        allowNull: false,
-      },
-      content: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      startDateTime: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      endDateTime: {
-        type: Sequelize.DATE,
-        allowNull: false,
-      },
-      recurrence: {
-        type: Sequelize.TINYINT(1),
-        allowNull: false,
-        defaultValue: 0,
-      },
-      freq: {
-        type: Sequelize.STRING(10),
-        allowNull: true,
-      },
-      interval: {
-        type: Sequelize.INTEGER,
-        allowNull: true,
-      },
-      byweekday: {
-        type: Sequelize.TEXT,
-        allowNull: true,
-      },
-      until: {
-        type: Sequelize.DATE,
-        allowNull: true,
-      },
-      confirmed: {
-        type: Sequelize.TINYINT(1),
-        allowNull: false,
-        defaultValue: 0,
-      },
-      possible: {
-        type: Sequelize.JSON,
-        allowNull: true,
-      },
-      impossible: {
-        type: Sequelize.JSON,
-        allowNull: true,
-      },
-    }, {
-      sequelize,
-      timestamps: false,
-      modelName: 'GroupSchedule',
-      tableName: 'groupSchedule',
-      charset: 'utf8',
-      collate: 'utf8_general_ci',
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-  }
-
-  static associate(db) {
-    db.GroupSchedule.belongsTo(db.Group, {
-      foreignKey: 'groupId',
-    });
-  }
-
-  static async getSchedule(groupID, start, end) {
-    try {
-      const db = require('.');
-      const nonRecurrenceStatement = `
-      SELECT 
-        id,
-        title, 
-        content, 
-        startDateTime, 
-        endDateTime, 
-        recurrence,
-        true AS isGroup
-      FROM 
-        groupSchedule
-      WHERE 
-        groupId IN (${groupID.join(',')}) AND (
-        recurrence = 0 AND ( 
-          (startDateTime BETWEEN :start AND :end)
-          OR
-          (endDateTime BETWEEN :start AND :end)
-          OR
-          (startDateTime < :start AND endDateTime > :end)
-        )
-      )`;
-      const recurrenceStatement = `
-        SELECT 
-          *,
-          true AS isGroup 
-        FROM 
-          groupSchedule
-        WHERE 
-          groupId IN (${groupID.join(',')}) AND (
-          recurrence = 1 AND 
-          startDateTime <= :end
-        )
-        `;
-      const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
-        replacements: {
-          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
-          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
-        },
-        type: Sequelize.QueryTypes.SELECT,
-      });
-      const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
-        replacements: {
-          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
-          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
-        },
-        type: Sequelize.QueryTypes.SELECT,
-      });
-      const recurrenceSchedule = [];
-      recurrenceScheduleList.forEach((schedule) => {
-        const byweekday = getRRuleByWeekDay(schedule.byweekday);
-        let rrule;
-        if (byweekday.length === 0) {
-          rrule = new RRule({
-            freq: getRRuleFreq(schedule.freq),
-            interval: schedule.interval,
-            dtstart: schedule.startDateTime,
-            until: schedule.until,
-          });
-        } else {
-          rrule = new RRule({
-            freq: getRRuleFreq(schedule.freq),
-            interval: schedule.interval,
-            byweekday: getRRuleByWeekDay(schedule.byweekday),
-            dtstart: schedule.startDateTime,
-            until: schedule.until,
-          });
-        }
-        const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
-        const scheduleDateList = rrule.between(
-          new Date(start.getTime() - scheduleLength),
-          new Date(end.getTime() + 1),
-        );
-        const possibleDateList = [];
-        scheduleDateList.forEach((scheduleDate) => {
-          const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
-          if (endDateTime >= start) {
-            possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
-          }
-        });
-        if (possibleDateList.length !== 0) {
-          recurrenceSchedule.push({
-            id: schedule.id,
-            groupId: schedule.groupId,
-            title: schedule.title,
-            content: schedule.content,
-            recurrence: schedule.recurrence,
-            freq: schedule.freq,
-            interval: schedule.interval,
-            byweekday: schedule.byweekday,
-            until: schedule.until,
-            isGroup: schedule.isGroup,
-            recurrenceDateList: possibleDateList,
-          });
-        }
-      });
-      return { nonRecurrenceSchedule, recurrenceSchedule };
-    } catch (err) {
-      throw new ApiError();
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
-  }
-}
-
-module.exports = GroupSchedule;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var sequelize_1 = require("sequelize");
+var rrule_1 = require("rrule");
+var moment = require("moment");
+var rrule_2 = require("../utils/rrule");
+var apiError_1 = require("../errors/apiError");
+var GroupSchedule = /** @class */ (function (_super) {
+    __extends(GroupSchedule, _super);
+    function GroupSchedule() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    GroupSchedule.initiate = function (sequelize) {
+        GroupSchedule.init({
+            id: {
+                type: sequelize_1.DataTypes.BIGINT,
+                primaryKey: true,
+                allowNull: false,
+                autoIncrement: true,
+            },
+            groupId: {
+                type: sequelize_1.DataTypes.BIGINT,
+                primaryKey: true,
+                allowNull: false,
+            },
+            title: {
+                type: sequelize_1.DataTypes.STRING(45),
+                allowNull: false,
+            },
+            content: {
+                type: sequelize_1.DataTypes.TEXT,
+                allowNull: true,
+            },
+            startDateTime: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+            },
+            endDateTime: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: false,
+            },
+            recurrence: {
+                type: sequelize_1.DataTypes.TINYINT,
+                allowNull: false,
+                defaultValue: 0,
+            },
+            freq: {
+                type: sequelize_1.DataTypes.STRING(10),
+                allowNull: true,
+            },
+            interval: {
+                type: sequelize_1.DataTypes.INTEGER,
+                allowNull: true,
+            },
+            byweekday: {
+                type: sequelize_1.DataTypes.TEXT,
+                allowNull: true,
+            },
+            until: {
+                type: sequelize_1.DataTypes.DATE,
+                allowNull: true,
+            },
+            confirmed: {
+                type: sequelize_1.DataTypes.TINYINT,
+                allowNull: false,
+                defaultValue: 0,
+            },
+            possible: {
+                type: sequelize_1.DataTypes.JSON,
+                allowNull: true,
+            },
+            impossible: {
+                type: sequelize_1.DataTypes.JSON,
+                allowNull: true,
+            },
+        }, {
+            sequelize: sequelize,
+            timestamps: false,
+            modelName: 'GroupSchedule',
+            tableName: 'groupSchedule',
+            charset: 'utf8',
+            collate: 'utf8_general_ci',
+        });
+    };
+    GroupSchedule.associate = function (db) {
+        db.GroupSchedule.belongsTo(db.Group, {
+            foreignKey: 'groupId',
+        });
+    };
+    GroupSchedule.getSchedule = function (groupID, start, end) {
+        return __awaiter(this, void 0, void 0, function () {
+            var db, nonRecurrenceStatement, recurrenceStatement, nonRecurrenceSchedule, recurrenceScheduleList, recurrenceSchedule_1, err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 3, , 4]);
+                        db = require('.');
+                        nonRecurrenceStatement = "\n      SELECT \n        id,\n        title, \n        content, \n        startDateTime, \n        endDateTime, \n        recurrence,\n        true AS isGroup\n      FROM \n        groupSchedule\n      WHERE \n        groupId IN (".concat(groupID.join(','), ") AND (\n        recurrence = 0 AND ( \n          (startDateTime BETWEEN :start AND :end)\n          OR\n          (endDateTime BETWEEN :start AND :end)\n          OR\n          (startDateTime < :start AND endDateTime > :end)\n        )\n      )");
+                        recurrenceStatement = "\n        SELECT \n          *,\n          true AS isGroup \n        FROM \n          groupSchedule\n        WHERE \n          groupId IN (".concat(groupID.join(','), ") AND (\n          recurrence = 1 AND \n          startDateTime <= :end\n        )");
+                        return [4 /*yield*/, db.sequelize.query(nonRecurrenceStatement, {
+                                replacements: {
+                                    start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+                                    end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+                                },
+                                type: sequelize_1.QueryTypes.SELECT,
+                            })];
+                    case 1:
+                        nonRecurrenceSchedule = _a.sent();
+                        return [4 /*yield*/, db.sequelize.query(recurrenceStatement, {
+                                replacements: {
+                                    start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+                                    end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+                                },
+                                type: sequelize_1.QueryTypes.SELECT,
+                            })];
+                    case 2:
+                        recurrenceScheduleList = _a.sent();
+                        recurrenceSchedule_1 = [];
+                        recurrenceScheduleList.forEach(function (schedule) {
+                            var byweekday = (0, rrule_2.getRRuleByWeekDay)(schedule.byweekday);
+                            var rrule;
+                            if (byweekday.length === 0) {
+                                rrule = new rrule_1.RRule({
+                                    freq: (0, rrule_2.getRRuleFreq)(schedule.freq),
+                                    interval: schedule.interval,
+                                    dtstart: schedule.startDateTime,
+                                    until: schedule.until,
+                                });
+                            }
+                            else {
+                                rrule = new rrule_1.RRule({
+                                    freq: (0, rrule_2.getRRuleFreq)(schedule.freq),
+                                    interval: schedule.interval,
+                                    byweekday: (0, rrule_2.getRRuleByWeekDay)(schedule.byweekday),
+                                    dtstart: schedule.startDateTime,
+                                    until: schedule.until,
+                                });
+                            }
+                            var scheduleLength = new Date(schedule.endDateTime).getTime() - new Date(schedule.startDateTime).getTime();
+                            var scheduleDateList = rrule.between(new Date(start.getTime() - scheduleLength), new Date(end.getTime() + 1));
+                            var possibleDateList = [];
+                            scheduleDateList.forEach(function (scheduleDate) {
+                                var endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+                                if (endDateTime >= start) {
+                                    possibleDateList.push({ startDateTime: scheduleDate, endDateTime: endDateTime });
+                                }
+                            });
+                            if (possibleDateList.length !== 0) {
+                                recurrenceSchedule_1.push({
+                                    id: schedule.id,
+                                    groupId: schedule.groupId,
+                                    title: schedule.title,
+                                    content: schedule.content,
+                                    recurrence: schedule.recurrence,
+                                    freq: schedule.freq,
+                                    interval: schedule.interval,
+                                    byweekday: schedule.byweekday,
+                                    until: schedule.until,
+                                    isGroup: schedule.isGroup,
+                                    recurrenceDateList: possibleDateList,
+                                });
+                            }
+                        });
+                        return [2 /*return*/, { nonRecurrenceSchedule: nonRecurrenceSchedule, recurrenceSchedule: recurrenceSchedule_1 }];
+                    case 3:
+                        err_1 = _a.sent();
+                        throw new apiError_1.default();
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return GroupSchedule;
+}(sequelize_1.Model));
+exports.default = GroupSchedule;

@@ -1,23 +1,38 @@
-import { Model, DataTypes, Sequelize, QueryTypes } from 'sequelize';
+import {
+  Model, DataTypes, Sequelize, QueryTypes,
+} from 'sequelize';
 import { RRule } from 'rrule';
-import moment from 'moment';
+import moment = require('moment');
 import { getRRuleByWeekDay, getRRuleFreq } from '../utils/rrule';
 import ApiError from '../errors/apiError';
 
 export default class GroupSchedule extends Model {
   public id!: number;
+
   public groupId!: number;
+
   public title!: string;
+
   public content!: string | null;
+
   public startDateTime!: Date;
+
   public endDateTime!: Date;
+
   public recurrence!: number;
+
   public freq!: string | null;
+
   public interval!: number | null;
+
   public byweekday!: string | null;
+
   public until!: Date | null;
+
   public confirmed!: number;
+
   public possible!: any[] | null;
+
   public impossible!: any[] | null;
 
   public static initiate(sequelize: Sequelize) {
@@ -135,7 +150,7 @@ export default class GroupSchedule extends Model {
           recurrence = 1 AND 
           startDateTime <= :end
         )`;
-      
+
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
@@ -150,7 +165,7 @@ export default class GroupSchedule extends Model {
         },
         type: QueryTypes.SELECT,
       });
-      
+
       const recurrenceSchedule = [];
       recurrenceScheduleList.forEach((schedule) => {
         const byweekday = getRRuleByWeekDay(schedule.byweekday);
@@ -177,7 +192,7 @@ export default class GroupSchedule extends Model {
           new Date(start.getTime() - scheduleLength),
           new Date(end.getTime() + 1),
         );
-        
+
         const possibleDateList = [];
         scheduleDateList.forEach((scheduleDate) => {
           const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);

@@ -1,7 +1,7 @@
 import request from 'request';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import jwksClient from 'jwks-rsa';
+import jwt = require('jsonwebtoken');
+import jwksClient = require('jwks-rsa');
 import { Op } from 'sequelize';
 
 // model
@@ -47,7 +47,7 @@ const client = jwksClient({
 
 function getKey(header: jwksClient.CertSigningKey, callback): void {
   client.getSigningKey(header.kid, (err, key) => {
-    const signingKey = key.getPublicKey; /* || key.rsaPublicKey; */
+    const signingKey = key.getPublicKey; // || key.rsaPublicKey;
     callback(null, signingKey);
   });
 }

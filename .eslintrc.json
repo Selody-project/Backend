@@ -12,9 +12,11 @@
     "sourceType": "module"
   },
   "rules": {
+    "max-len": "off",
     "global-require": "off",
     "import/no-dynamic-require" : 1,
     "consistent-return" : 1,
+    "import/prefer-default-export" : 0,
     "eqeqeq": "off"
   },
   "overrides": [

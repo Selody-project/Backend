@@ -1,4 +1,10 @@
-import { Model, DataTypes, Sequelize } from 'sequelize';
+import {
+  Model, DataTypes, Sequelize,
+  BelongsToManyAddAssociationMixin,
+  BelongsToManyGetAssociationsMixin,
+  BelongsToManyHasAssociationMixin,
+} from 'sequelize';
+import Group from './group';
 
 export default class User extends Model {
   public userId!: number;
@@ -13,11 +19,11 @@ export default class User extends Model {
 
   public snsId!: string | null;
 
-  addGroup: any;
+  declare addGroup: BelongsToManyAddAssociationMixin<Group, number>;
 
-  getGroups: any;
+  declare getGroups: BelongsToManyGetAssociationsMixin<Group>;
 
-  hasGroup: any;
+  declare hasGroup: BelongsToManyHasAssociationMixin<Group, number>;
 
   public static initiate(sequelize: Sequelize): void {
     User.init({

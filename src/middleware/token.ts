@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import { Response, NextFunction } from 'express';
+import jwt = require('jsonwebtoken');
 import ApiError from '../errors/apiError';
 import TokenExpireError from '../errors/auth/TokenExpireError';
 import InvalidTokenError from '../errors/auth/InvalidTokenError';
@@ -32,7 +32,7 @@ const token = () => ({
 
 // jwt 발급
 // nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req에 nickname을 전달해줘야함.
-function createToken(req: Request, res: Response, next: NextFunction): Response | void {
+function createToken(req: any, res: Response, next: NextFunction): Response | void {
   try {
     const { nickname } = req;
     const accessToken: string = token().access(nickname);
@@ -49,7 +49,7 @@ function createToken(req: Request, res: Response, next: NextFunction): Response 
 }
 
 // jwt 검증
-function verifyToken(req: Request, res: Response, next: NextFunction): void {
+function verifyToken(req: any, res: Response, next: NextFunction): void {
   try {
     const authToken: string | undefined = req.cookies.accessToken;
     if (!authToken) throw new InvalidTokenError();
@@ -68,7 +68,7 @@ function verifyToken(req: Request, res: Response, next: NextFunction): void {
   }
 }
 
-function renewToken(req: Request, res: Response, next: NextFunction): Response | void {
+function renewToken(req: any, res: Response, next: NextFunction): Response | void {
   try {
     const authToken: string | undefined = req.cookies.refreshToken;
     if (!authToken) throw new InvalidTokenError();
@@ -91,7 +91,7 @@ function renewToken(req: Request, res: Response, next: NextFunction): Response |
   }
 }
 
-export default {
+export {
   createToken,
   verifyToken,
   renewToken,

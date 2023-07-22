@@ -1,8 +1,10 @@
-import CoreJoi, { ObjectSchema } from "joi";
-import JoiDate from "@joi/date";
+import { ObjectSchema } from 'joi';
+import * as JoiBase from 'joi';
+import JoiDate from '@joi/date';
 
-const Joi = CoreJoi.extend(JoiDate)
+const Joi = JoiBase.extend(JoiDate);
 
+// eslint-disable-next-line max-len
 const validator = (schema: ObjectSchema) => (payload: string) => schema.validate(payload, { abortEarly: false });
 
 const joinSchema = Joi.object({
@@ -92,18 +94,18 @@ const scheduleIdSchema = Joi.object({
   id: Joi.number().min(0).required(),
 });
 
-const validateLoginSchema = validator(loginSchema)
-const validateJoinSchema = validator(joinSchema)
-const validateUserIdSchema = validator(userIdSchema)
-const validateGroupSchema = validator(groupSchema)
-const validateGroupIdSchema = validator(groupIdSchema)
-const validateScheduleSchema = validator(scheduleSchema)
-const validateScheduleIdSchema = validator(scheduleIdSchema)
-const validateGroupScheduleSchema = validator(groupScheduleSchema)
-const validateScheduleDateScehma = validator(scheduleDateSchema)
-const validateUserScheduleSchema = validator(userScheduleSchema)
-const validateYYYYMMDateSchema = validator(yearMonthSchema)
-const validateYYYYMMDDDateSchema = validator(yearMonthDaySchema)
+const validateLoginSchema = validator(loginSchema);
+const validateJoinSchema = validator(joinSchema);
+const validateUserIdSchema = validator(userIdSchema);
+const validateGroupSchema = validator(groupSchema);
+const validateGroupIdSchema = validator(groupIdSchema);
+const validateScheduleSchema = validator(scheduleSchema);
+const validateScheduleIdSchema = validator(scheduleIdSchema);
+const validateGroupScheduleSchema = validator(groupScheduleSchema);
+const validateScheduleDateScehma = validator(scheduleDateSchema);
+const validateUserScheduleSchema = validator(userScheduleSchema);
+const validateYYYYMMDateSchema = validator(yearMonthSchema);
+const validateYYYYMMDDDateSchema = validator(yearMonthDaySchema);
 
 export {
   validateLoginSchema,

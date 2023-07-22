@@ -1,19 +1,22 @@
-const express = require('express');
-
-const {
-  getNaverUserInfo, joinSocialUser, join, login, logout, getGoogleUserInfo,
-} = require('../controllers/auth');
-const { createToken, verifyToken, renewToken } = require('../middleware/token');
-const { getUserProfile } = require('../controllers/user');
-
-const router = express.Router();
-
-router.post('/join', join, createToken);
-router.post('/login', login, createToken);
-router.delete('/logout', verifyToken, logout);
-router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
-router.post('/google', getGoogleUserInfo, createToken);
-router.get('/token/refresh', renewToken);
-router.get('/token/verify', verifyToken, getUserProfile);
-
-module.exports = router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+var express = require("express");
+var auth_1 = require("../controllers/auth");
+var auth_2 = require("../controllers/auth");
+var auth_3 = require("../controllers/auth");
+var auth_4 = require("../controllers/auth");
+var auth_5 = require("../controllers/auth");
+var auth_6 = require("../controllers/auth");
+var token_1 = require("../middleware/token");
+var token_2 = require("../middleware/token");
+var token_3 = require("../middleware/token");
+var user_1 = require("../controllers/user");
+var router = express.Router();
+router.post('/join', auth_4.join, token_1.createToken);
+router.post('/login', auth_5.login, token_1.createToken);
+router.delete('/logout', token_2.verifyToken, auth_6.logout);
+router.post('/naver', auth_1.getNaverUserInfo, auth_3.joinSocialUser, token_1.createToken);
+router.post('/google', auth_2.getGoogleUserInfo, token_1.createToken);
+router.get('/token/refresh', token_3.renewToken);
+router.get('/token/verify', token_2.verifyToken, user_1.getUserProfile);
+exports.default = router;

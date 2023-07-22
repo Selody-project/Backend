@@ -1,63 +1,118 @@
-const moment = require('moment');
-const personalSchedule = require('../models/personalSchedule');
-const User = require('../models/user');
-const ApiError = require('../errors/apiError');
-const NotFoundError = require('../errors/calendar/NotFound');
-const { UserNotFoundError, DataFormatError } = require('../errors');
-const { validateUserScheduleSchema, validateScheduleIdSchema } = require('../utils/validators');
-
-async function postPersonalSchedule(req, res, next) {
-  try {
-    const { error } = validateUserScheduleSchema(req.body);
-    if (error) {
-      return next(new DataFormatError());
-    }
-    const {
-      title, content, startDateTime, endDateTime,
-      recurrence, freq, interval, byweekday, until,
-    } = req.body;
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
-    const { userId } = user;
-    await personalSchedule.create({
-      userId,
-      title,
-      content,
-      startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD HH:mm:ss'),
-      endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD HH:mm:ss'),
-      recurrence,
-      freq,
-      interval,
-      byweekday,
-      until,
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
-
-    return res.status(201).json({ message: 'Successfully create user schedule' });
-  } catch (error) {
-    return next(new ApiError());
-  }
-}
-
-async function deletePersonalSchedule(req, res, next) {
-  try {
-    const { error } = validateScheduleIdSchema(req.params);
-    if (error) return next(new DataFormatError());
-
-    const { id } = req.params;
-
-    const data = await personalSchedule.destroy({ where: { id } });
-    if (data === 0) {
-      return next(new NotFoundError());
-    }
-
-    return res.status(204).json({ message: 'successfully deleted' });
-  } catch (error) {
-    return next(new ApiError());
-  }
-}
-module.exports = {
-  postPersonalSchedule,
-  deletePersonalSchedule,
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.deletePersonalSchedule = exports.postPersonalSchedule = void 0;
+var moment = require("moment");
+// model
+var user_1 = require("../models/user");
+var personalSchedule_1 = require("../models/personalSchedule");
+// error
+var apiError_1 = require("../errors/apiError");
+var errors_1 = require("../errors");
+// validator
+var validators_1 = require("../utils/validators");
+function postPersonalSchedule(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var error, _a, title, content, startDateTime, endDateTime, recurrence, freq, interval, byweekday, until, user, userId, error_1;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 3, , 4]);
+                    error = (0, validators_1.validateUserScheduleSchema)(req.body).error;
+                    if (error) {
+                        return [2 /*return*/, next(new errors_1.DataFormatError())];
+                    }
+                    _a = req.body, title = _a.title, content = _a.content, startDateTime = _a.startDateTime, endDateTime = _a.endDateTime, recurrence = _a.recurrence, freq = _a.freq, interval = _a.interval, byweekday = _a.byweekday, until = _a.until;
+                    return [4 /*yield*/, user_1.default.findOne({ where: { nickname: req.nickname } })];
+                case 1:
+                    user = _b.sent();
+                    if (!user) {
+                        return [2 /*return*/, next(new errors_1.userErrors.UserNotFoundError())];
+                    }
+                    userId = user.userId;
+                    return [4 /*yield*/, personalSchedule_1.default.create({
+                            userId: userId,
+                            title: title,
+                            content: content,
+                            startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD HH:mm:ss'),
+                            endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD HH:mm:ss'),
+                            recurrence: recurrence,
+                            freq: freq,
+                            interval: interval,
+                            byweekday: byweekday,
+                            until: until,
+                        })];
+                case 2:
+                    _b.sent();
+                    return [2 /*return*/, res.status(201).json({ message: 'Successfully create user schedule' })];
+                case 3:
+                    error_1 = _b.sent();
+                    return [2 /*return*/, next(new apiError_1.default())];
+                case 4: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.postPersonalSchedule = postPersonalSchedule;
+function deletePersonalSchedule(req, res, next) {
+    return __awaiter(this, void 0, void 0, function () {
+        var error, id, data, error_2;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    _a.trys.push([0, 2, , 3]);
+                    error = (0, validators_1.validateScheduleIdSchema)(req.params).error;
+                    if (error)
+                        return [2 /*return*/, next(new errors_1.DataFormatError())];
+                    id = req.params.id;
+                    return [4 /*yield*/, personalSchedule_1.default.destroy({ where: { id: id } })];
+                case 1:
+                    data = _a.sent();
+                    if (data === 0) {
+                        return [2 /*return*/, next(new errors_1.calendarErrors.NotFoundError())];
+                    }
+                    return [2 /*return*/, res.status(204).json({ message: 'successfully deleted' })];
+                case 2:
+                    error_2 = _a.sent();
+                    return [2 /*return*/, next(new apiError_1.default())];
+                case 3: return [2 /*return*/];
+            }
+        });
+    });
+}
+exports.deletePersonalSchedule = deletePersonalSchedule;
