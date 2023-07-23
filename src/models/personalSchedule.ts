@@ -1,35 +1,37 @@
 import {
-  Model, DataTypes, Sequelize, QueryTypes,
+  Model, Sequelize, DataTypes, QueryTypes, CreationOptional,
 } from 'sequelize';
 import { RRule } from 'rrule';
 import moment = require('moment');
 import { getRRuleByWeekDay, getRRuleFreq } from '../utils/rrule';
 import ApiError from '../errors/apiError';
 
+import User from './user';
+
 export default class PersonalSchedule extends Model {
-  public id!: number;
+  declare id: CreationOptional<number>;
 
-  public userId!: number;
+  declare userId: number;
 
-  public title!: string;
+  declare title: string;
 
-  public content!: string | null;
+  declare content: string;
 
-  public startDateTime!: Date;
+  declare startDateTime: Date;
 
-  public endDateTime!: Date;
+  declare endDateTime: Date;
 
-  public recurrence!: number;
+  declare recurrence: number;
 
-  public freq!: string | null;
+  declare freq: CreationOptional<string>;
 
-  public interval!: number | null;
+  declare interval: CreationOptional<number>;
 
-  public byweekday!: string | null;
+  declare byweekday: CreationOptional<string>;
 
-  public until!: Date | null;
+  declare until: CreationOptional<Date>;
 
-  public static initiate(sequelize: Sequelize): void {
+  static initiate(sequelize: Sequelize) {
     PersonalSchedule.init({
       id: {
         type: DataTypes.BIGINT,
@@ -90,8 +92,8 @@ export default class PersonalSchedule extends Model {
     });
   }
 
-  public static associate(db): void {
-    db.PersonalSchedule.belongsTo(db.User, {
+  static associate() {
+    PersonalSchedule.belongsTo(User, {
       foreignKey: 'userId',
     });
   }

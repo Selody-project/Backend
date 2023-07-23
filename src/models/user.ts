@@ -1,23 +1,29 @@
 import {
-  Model, DataTypes, Sequelize,
+  Model, Sequelize, DataTypes,
   BelongsToManyAddAssociationMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationMixin,
+  CreationOptional,
 } from 'sequelize';
 import Group from './group';
+import PersonalSchedule from './personalSchedule';
 
-export default class User extends Model {
-  public userId!: number;
+class User extends Model {
+  declare userId: CreationOptional<number>;
 
-  public email!: string | null;
+  declare email: string;
 
-  public nickname!: string;
+  declare nickname: string;
 
-  public password!: string | null;
+  declare password: string;
 
-  public provider!: 'local' | 'naver' | 'google';
+  declare provider: 'local' | 'naver' | 'google';
 
-  public snsId!: string | null;
+  declare snsId: CreationOptional<string>;
+
+  declare createdAt: CreationOptional<Date>;
+
+  declare updatedAt: CreationOptional<Date>;
 
   declare addGroup: BelongsToManyAddAssociationMixin<Group, number>;
 
@@ -25,7 +31,7 @@ export default class User extends Model {
 
   declare hasGroup: BelongsToManyHasAssociationMixin<Group, number>;
 
-  public static initiate(sequelize: Sequelize): void {
+  static initiate(sequelize: Sequelize) {
     User.init({
       userId: {
         type: DataTypes.BIGINT,
@@ -67,11 +73,12 @@ export default class User extends Model {
     });
   }
 
-  static associate(db): void {
-    db.User.hasMany(db.PersonalSchedule, {
+  static associate() {
+    User.hasMany(PersonalSchedule, {
       foreignKey: 'userId',
       onDelete: 'cascade',
-      allowNull: false,
     });
   }
 }
+
+export default User;

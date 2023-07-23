@@ -16,6 +16,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize_1 = require("sequelize");
+var groupSchedule_1 = require("./groupSchedule");
 var Group = /** @class */ (function (_super) {
     __extends(Group, _super);
     function Group() {
@@ -58,11 +59,10 @@ var Group = /** @class */ (function (_super) {
             collate: 'utf8_general_ci',
         });
     };
-    Group.associate = function (db) {
-        db.Group.hasMany(db.GroupSchedule, {
+    Group.associate = function () {
+        Group.hasMany(groupSchedule_1.default, {
             foreignKey: 'groupId',
             onDelete: 'cascade',
-            allowNull: false,
         });
     };
     return Group;

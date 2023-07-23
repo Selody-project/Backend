@@ -31,16 +31,16 @@ var UserGroup = /** @class */ (function (_super) {
             timestamps: false,
         });
     };
-    UserGroup.associate = function (db) {
-        user_1.default.belongsToMany(db.Group, {
+    UserGroup.associate = function () {
+        user_1.default.belongsToMany(group_1.default, {
             through: 'UserGroup',
             foreignKey: 'userId',
-            timestamps: false
+            timestamps: false,
         });
-        group_1.default.belongsToMany(db.User, {
+        group_1.default.belongsToMany(user_1.default, {
             through: 'UserGroup',
             foreignKey: 'groupId',
-            timestamps: false
+            timestamps: false,
         });
     };
     return UserGroup;

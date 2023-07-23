@@ -3,21 +3,23 @@ import {
   BelongsToManyAddAssociationMixin,
   BelongsToManyGetAssociationsMixin,
   BelongsToManyHasAssociationMixin,
+  CreationOptional,
 } from 'sequelize';
 import User from './user';
+import GroupSchedule from './groupSchedule';
 
-export default class Group extends Model {
-  public groupId!: number;
+class Group extends Model {
+  declare groupId: CreationOptional<number>;
 
-  public name!: string;
+  declare name: string;
 
-  public member!: number;
+  declare member: number;
 
-  public leader!: number;
+  declare leader: number;
 
-  public inviteCode!: string | null;
+  declare inviteCode: CreationOptional<string>;
 
-  public inviteExp!: Date | null;
+  declare inviteExp: CreationOptional<Date>
 
   declare addUser: BelongsToManyAddAssociationMixin<User, number>;
 
@@ -25,7 +27,7 @@ export default class Group extends Model {
 
   declare hasUser: BelongsToManyHasAssociationMixin<User, number>;
 
-  public static initiate(sequelize: Sequelize): void {
+  static initiate(sequelize: Sequelize) {
     Group.init({
       groupId: {
         type: DataTypes.BIGINT,
@@ -63,11 +65,12 @@ export default class Group extends Model {
     });
   }
 
-  public static associate(db): void {
-    db.Group.hasMany(db.GroupSchedule, {
+  static associate() {
+    Group.hasMany(GroupSchedule, {
       foreignKey: 'groupId',
       onDelete: 'cascade',
-      allowNull: false,
     });
   }
 }
+
+export default Group;

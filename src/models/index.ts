@@ -1,19 +1,17 @@
 import { Sequelize } from 'sequelize';
-import { dbConfig } from '../config/config';
+import config from '../config/config';
 import User from './user';
 import Group from './group';
 import PersonalSchedule from './personalSchedule';
 import GroupSchedule from './groupSchedule';
 import UserGroup from './userGroup';
 
-const db: any = {};
-
 const sequelize = new Sequelize(
-  dbConfig.database, dbConfig.username, dbConfig.password,
+  config.database, config.username, config.password,
   {
-    host: dbConfig.host,
+    host: config.host,
     dialect: 'mysql',
-    port: dbConfig.port,
+    port: config.port,
     pool: {
       max: 5,
       min: 0,
@@ -25,37 +23,21 @@ const sequelize = new Sequelize(
   },
 );
 
-db.sequelize = sequelize;
-
-db.User = User;
-db.Group = Group;
-db.PersonalSchedule = PersonalSchedule;
-db.GroupSchedule = GroupSchedule;
-db.UserGroup = UserGroup;
-
 User.initiate(sequelize);
 Group.initiate(sequelize);
 PersonalSchedule.initiate(sequelize);
 GroupSchedule.initiate(sequelize);
 UserGroup.initiate(sequelize);
-/*
-const basename = path.basename(__filename);
-fs
-  .readdirSync(__dirname)
-  .filter((file) => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-  .forEach((file) => {
-    const model = require(path.join(__dirname, file));
-    db[model.name] = model;
-    model.initiate(sequelize);
-  });
-*/
-Object.keys(db).forEach((modelName) => {
-  if (db[modelName].associate) {
-    db[modelName].associate(db);
-  }
-});
+
+User.associate();
+Group.associate();
+PersonalSchedule.associate();
+GroupSchedule.associate();
+UserGroup.associate();
 
 export {
-  db,
+  User, Group,
+  PersonalSchedule, GroupSchedule,
+  UserGroup,
   sequelize,
 };

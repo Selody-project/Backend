@@ -18,14 +18,8 @@ const dbName = testEnv
   : process.env.DB_NAME!;
 
 const config: {
-  APP_URL: string | undefined;
-  PORT: string | undefined;
-} = {
-  APP_URL: process.env.APP_URL,
-  PORT: process.env.PORT,
-};
-
-const dbConfig: {
+  APP_URL: string;
+  APP_PORT: string,
   username: string;
   password: string;
   database: string;
@@ -33,6 +27,8 @@ const dbConfig: {
   dialect: 'mysql';
   port;
 } = {
+  APP_URL: process.env.APP_URL,
+  APP_PORT: process.env.APP_PORT,
   username: dbUsername,
   password: dbPassword,
   database: dbName,
@@ -41,7 +37,4 @@ const dbConfig: {
   port: dbPort,
 };
 
-export {
-  config,
-  dbConfig,
-};
+export default config;

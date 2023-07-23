@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.dbConfig = exports.config = void 0;
 /* istanbul ignore file */
 var testEnv = process.env.NODE_ENV === 'test';
 var dbHost = testEnv
@@ -20,10 +19,7 @@ var dbName = testEnv
     : process.env.DB_NAME;
 var config = {
     APP_URL: process.env.APP_URL,
-    PORT: process.env.PORT,
-};
-exports.config = config;
-var dbConfig = {
+    APP_PORT: process.env.APP_PORT,
     username: dbUsername,
     password: dbPassword,
     database: dbName,
@@ -31,4 +27,4 @@ var dbConfig = {
     dialect: 'mysql',
     port: dbPort,
 };
-exports.dbConfig = dbConfig;
+exports.default = config;

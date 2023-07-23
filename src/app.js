@@ -41,17 +41,17 @@ var express = require("express");
 var express_rate_limit_1 = require("express-rate-limit");
 var morgan = require("morgan");
 var dotenv = require("dotenv");
-dotenv.config({ path: __dirname + '\\..\\.env' });
+dotenv.config({ path: "".concat(__dirname, "/../.env") });
 var cookieParser = require("cookie-parser");
 var cors = require("cors");
 var swaggerUi = require("swagger-ui-express");
-var config_1 = require("./config/config");
 var apiError_1 = require("./middleware/apiError");
 var routes_1 = require("./routes");
 var models_1 = require("./models");
+var config_1 = require("./config/config");
 process.env.TZ = 'Etc/Universal';
-var appUrl = config_1.config.APP_URL;
-var port = config_1.config.PORT || 8000;
+var appUrl = config_1.default.APP_URL;
+var port = config_1.default.APP_PORT || 8000;
 var app = express();
 app.use('/api/', (0, express_rate_limit_1.default)({
     windowMs: 1 * 60 * 1000,

@@ -38,7 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.joinSocialUser = exports.logout = exports.login = exports.join = exports.getGoogleUserInfo = exports.getNaverUserInfo = void 0;
 var request_1 = require("request");
-var bcrypt_1 = require("bcrypt");
+var bcrypt = require("bcrypt");
 var jwt = require("jsonwebtoken");
 var jwksClient = require("jwks-rsa");
 var sequelize_1 = require("sequelize");
@@ -202,14 +202,14 @@ function join(req, res, next) {
                     _c.label = 2;
                 case 2:
                     _c.trys.push([2, 5, , 6]);
-                    return [4 /*yield*/, bcrypt_1.default.hash(password, 12)];
+                    return [4 /*yield*/, bcrypt.hash(password, 12)];
                 case 3:
                     hash = _c.sent();
                     return [4 /*yield*/, user_1.default.create({
                             email: email,
                             nickname: nickname,
                             password: hash,
-                            provider: 'local',
+                            provider: 'LOCAL',
                         })];
                 case 4:
                     _c.sent();
@@ -217,6 +217,7 @@ function join(req, res, next) {
                     return [2 /*return*/, next()];
                 case 5:
                     err_1 = _c.sent();
+                    console.log(err_1);
                     return [2 /*return*/, next(new apiError_1.default())];
                 case 6: return [3 /*break*/, 8];
                 case 7: return [2 /*return*/, res.status(200).send({ message: "It's possible to use" })];
@@ -253,7 +254,7 @@ function login(req, res, next) {
                     _b.label = 5;
                 case 5:
                     _b.trys.push([5, 7, , 8]);
-                    return [4 /*yield*/, bcrypt_1.default.compare(password, user.password)];
+                    return [4 /*yield*/, bcrypt.compare(password, user.password)];
                 case 6:
                     result = _b.sent();
                     if (result) {

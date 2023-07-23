@@ -1,9 +1,9 @@
-import { Model, Sequelize } from 'sequelize';
+import { Sequelize, Model } from 'sequelize';
 import User from './user';
 import Group from './group';
 
-export default class UserGroup extends Model {
-  static initiate(sequelize: Sequelize): void {
+class UserGroup extends Model {
+  static initiate(sequelize: Sequelize) {
     UserGroup.init({
     }, {
       sequelize,
@@ -13,16 +13,18 @@ export default class UserGroup extends Model {
     });
   }
 
-  static associate(db): void {
-    User.belongsToMany(db.Group, {
+  static associate() {
+    User.belongsToMany(Group, {
       through: 'UserGroup',
       foreignKey: 'userId',
       timestamps: false,
     });
-    Group.belongsToMany(db.User, {
+    Group.belongsToMany(User, {
       through: 'UserGroup',
       foreignKey: 'groupId',
       timestamps: false,
     });
   }
 }
+
+export default UserGroup;

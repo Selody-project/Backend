@@ -1,19 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sequelize = exports.db = void 0;
+exports.sequelize = exports.UserGroup = exports.GroupSchedule = exports.PersonalSchedule = exports.Group = exports.User = void 0;
 var sequelize_1 = require("sequelize");
 var config_1 = require("../config/config");
 var user_1 = require("./user");
+exports.User = user_1.default;
 var group_1 = require("./group");
+exports.Group = group_1.default;
 var personalSchedule_1 = require("./personalSchedule");
+exports.PersonalSchedule = personalSchedule_1.default;
 var groupSchedule_1 = require("./groupSchedule");
+exports.GroupSchedule = groupSchedule_1.default;
 var userGroup_1 = require("./userGroup");
-var db = {};
-exports.db = db;
-var sequelize = new sequelize_1.Sequelize(config_1.dbConfig.database, config_1.dbConfig.username, config_1.dbConfig.password, {
-    host: config_1.dbConfig.host,
+exports.UserGroup = userGroup_1.default;
+var sequelize = new sequelize_1.Sequelize(config_1.default.database, config_1.default.username, config_1.default.password, {
+    host: config_1.default.host,
     dialect: 'mysql',
-    port: config_1.dbConfig.port,
+    port: config_1.default.port,
     pool: {
         max: 5,
         min: 0,
@@ -21,33 +24,16 @@ var sequelize = new sequelize_1.Sequelize(config_1.dbConfig.database, config_1.d
     },
     logging: false,
     // eslint-disable-next-line no-console
-    //logging: process.env.NODE_ENV == 'test' ? false : console.log,
+    // logging: process.env.NODE_ENV == 'test' ? false : console.log,
 });
 exports.sequelize = sequelize;
-db.sequelize = sequelize;
-db['User'] = user_1.default;
-db['Group'] = group_1.default;
-db['PersonalSchedule'] = personalSchedule_1.default;
-db['GroupSchedule'] = groupSchedule_1.default;
-db['UserGroup'] = userGroup_1.default;
 user_1.default.initiate(sequelize);
 group_1.default.initiate(sequelize);
 personalSchedule_1.default.initiate(sequelize);
 groupSchedule_1.default.initiate(sequelize);
 userGroup_1.default.initiate(sequelize);
-/*
-const basename = path.basename(__filename);
-fs
-  .readdirSync(__dirname)
-  .filter((file) => (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js'))
-  .forEach((file) => {
-    const model = require(path.join(__dirname, file));
-    db[model.name] = model;
-    model.initiate(sequelize);
-  });
-*/
-Object.keys(db).forEach(function (modelName) {
-    if (db[modelName].associate) {
-        db[modelName].associate(db);
-    }
-});
+user_1.default.associate();
+group_1.default.associate();
+personalSchedule_1.default.associate();
+groupSchedule_1.default.associate();
+userGroup_1.default.associate();

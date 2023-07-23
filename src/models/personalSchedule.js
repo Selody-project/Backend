@@ -56,6 +56,7 @@ var rrule_1 = require("rrule");
 var moment = require("moment");
 var rrule_2 = require("../utils/rrule");
 var apiError_1 = require("../errors/apiError");
+var user_1 = require("./user");
 var PersonalSchedule = /** @class */ (function (_super) {
     __extends(PersonalSchedule, _super);
     function PersonalSchedule() {
@@ -121,8 +122,8 @@ var PersonalSchedule = /** @class */ (function (_super) {
             collate: 'utf8_general_ci',
         });
     };
-    PersonalSchedule.associate = function (db) {
-        db.PersonalSchedule.belongsTo(db.User, {
+    PersonalSchedule.associate = function () {
+        PersonalSchedule.belongsTo(user_1.default, {
             foreignKey: 'userId',
         });
     };

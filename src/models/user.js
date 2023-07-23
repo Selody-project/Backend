@@ -16,6 +16,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize_1 = require("sequelize");
+var personalSchedule_1 = require("./personalSchedule");
 var User = /** @class */ (function (_super) {
     __extends(User, _super);
     function User() {
@@ -62,11 +63,10 @@ var User = /** @class */ (function (_super) {
             collate: 'utf8_general_ci',
         });
     };
-    User.associate = function (db) {
-        db.User.hasMany(db.PersonalSchedule, {
+    User.associate = function () {
+        User.hasMany(personalSchedule_1.default, {
             foreignKey: 'userId',
             onDelete: 'cascade',
-            allowNull: false,
         });
     };
     return User;

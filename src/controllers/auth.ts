@@ -1,5 +1,5 @@
 import request from 'request';
-import bcrypt from 'bcrypt';
+import bcrypt = require('bcrypt');
 import jwt = require('jsonwebtoken');
 import jwksClient = require('jwks-rsa');
 import { Op } from 'sequelize';
@@ -138,12 +138,13 @@ async function join(req, res, next): Promise<Response | void> {
         email,
         nickname,
         password: hash,
-        provider: 'local',
+        provider: 'LOCAL',
       });
 
       req.nickname = nickname;
       return next();
     } catch (err) {
+      console.log(err);
       return next(new ApiError());
     }
   } else {

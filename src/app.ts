@@ -9,18 +9,19 @@ import cookieParser = require('cookie-parser');
 
 import cors = require('cors');
 import swaggerUi = require('swagger-ui-express');
-import { config } from './config/config';
 
 import apiError from './middleware/apiError';
 
 import indexRouter from './routes';
 import { sequelize } from './models';
 
-dotenv.config({ path: `${__dirname}\\..\\.env` });
+import config from './config/config';
+
+dotenv.config({ path: `${__dirname}/../.env` });
 
 process.env.TZ = 'Etc/Universal';
 const appUrl = config.APP_URL;
-const port = config.PORT || 8000;
+const port = config.APP_PORT || 8000;
 
 const app = express();
 

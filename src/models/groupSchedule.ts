@@ -1,41 +1,37 @@
 import {
-  Model, DataTypes, Sequelize, QueryTypes,
+  Model, Sequelize, DataTypes, QueryTypes, CreationOptional,
 } from 'sequelize';
 import { RRule } from 'rrule';
 import moment = require('moment');
 import { getRRuleByWeekDay, getRRuleFreq } from '../utils/rrule';
 import ApiError from '../errors/apiError';
 
-export default class GroupSchedule extends Model {
-  public id!: number;
+import Group from './group';
 
-  public groupId!: number;
+class GroupSchedule extends Model {
+  declare id: CreationOptional<number>;
 
-  public title!: string;
+  declare groupId: number;
 
-  public content!: string | null;
+  declare title: string;
 
-  public startDateTime!: Date;
+  declare content: string | null;
 
-  public endDateTime!: Date;
+  declare startDateTime: Date;
 
-  public recurrence!: number;
+  declare endDateTime: Date;
 
-  public freq!: string | null;
+  declare recurrence: number;
 
-  public interval!: number | null;
+  declare freq: CreationOptional<string>;;
 
-  public byweekday!: string | null;
+  declare interval: CreationOptional<number>;
 
-  public until!: Date | null;
+  declare byweekday: CreationOptional<string>;
 
-  public confirmed!: number;
+  declare until: CreationOptional<Date>;
 
-  public possible!: any[] | null;
-
-  public impossible!: any[] | null;
-
-  public static initiate(sequelize: Sequelize) {
+  static initiate(sequelize: Sequelize) {
     GroupSchedule.init({
       id: {
         type: DataTypes.BIGINT,
@@ -85,19 +81,6 @@ export default class GroupSchedule extends Model {
         type: DataTypes.DATE,
         allowNull: true,
       },
-      confirmed: {
-        type: DataTypes.TINYINT,
-        allowNull: false,
-        defaultValue: 0,
-      },
-      possible: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
-      impossible: {
-        type: DataTypes.JSON,
-        allowNull: true,
-      },
     }, {
       sequelize,
       timestamps: false,
@@ -108,8 +91,8 @@ export default class GroupSchedule extends Model {
     });
   }
 
-  public static associate(db): void {
-    db.GroupSchedule.belongsTo(db.Group, {
+  static associate() {
+    GroupSchedule.belongsTo(Group, {
       foreignKey: 'groupId',
     });
   }
@@ -222,3 +205,5 @@ export default class GroupSchedule extends Model {
     }
   }
 }
+
+export default GroupSchedule;

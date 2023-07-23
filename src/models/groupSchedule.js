@@ -56,11 +56,13 @@ var rrule_1 = require("rrule");
 var moment = require("moment");
 var rrule_2 = require("../utils/rrule");
 var apiError_1 = require("../errors/apiError");
+var group_1 = require("./group");
 var GroupSchedule = /** @class */ (function (_super) {
     __extends(GroupSchedule, _super);
     function GroupSchedule() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
+    ;
     GroupSchedule.initiate = function (sequelize) {
         GroupSchedule.init({
             id: {
@@ -111,19 +113,6 @@ var GroupSchedule = /** @class */ (function (_super) {
                 type: sequelize_1.DataTypes.DATE,
                 allowNull: true,
             },
-            confirmed: {
-                type: sequelize_1.DataTypes.TINYINT,
-                allowNull: false,
-                defaultValue: 0,
-            },
-            possible: {
-                type: sequelize_1.DataTypes.JSON,
-                allowNull: true,
-            },
-            impossible: {
-                type: sequelize_1.DataTypes.JSON,
-                allowNull: true,
-            },
         }, {
             sequelize: sequelize,
             timestamps: false,
@@ -133,8 +122,8 @@ var GroupSchedule = /** @class */ (function (_super) {
             collate: 'utf8_general_ci',
         });
     };
-    GroupSchedule.associate = function (db) {
-        db.GroupSchedule.belongsTo(db.Group, {
+    GroupSchedule.associate = function () {
+        GroupSchedule.belongsTo(group_1.default, {
             foreignKey: 'groupId',
         });
     };

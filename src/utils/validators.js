@@ -4,6 +4,7 @@ exports.validateYYYYMMDDDateSchema = exports.validateYYYYMMDateSchema = exports.
 var JoiBase = require("joi");
 var date_1 = require("@joi/date");
 var Joi = JoiBase.extend(date_1.default);
+// eslint-disable-next-line max-len
 var validator = function (schema) { return function (payload) { return schema.validate(payload, { abortEarly: false }); }; };
 var joinSchema = Joi.object({
     userId: Joi.number(),
