@@ -121,6 +121,12 @@ async function deleteGroupUser(req, res, next) {
         userId, groupId,
       },
     });
+
+    await Group.update(
+      { where: groupId },
+      { member: group.member - 1 },
+    );
+
     return res.status(204).json({ message: 'Successfully delete group user' });
   } catch (err) {
     return next(new ApiError());
