@@ -16,6 +16,6 @@ router.patch('/profile/password', patchUserPassword);
 router.put('/calendar/:id', putUserSchedule);
 router.get('/calendar', getUserPersonalSchedule);
 router.post('/calendar', postPersonalSchedule);
-router.delete('/group/:id', deleteGroupUser);
+router.delete('/group/:group_id', deleteGroupUser);
 router.delete('/calendar/:id', deletePersonalSchedule);
 module.exports = router;
