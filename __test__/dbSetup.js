@@ -264,6 +264,24 @@ async function setUpPersonalScheduleDB2() {
     {
       id: 5, userId: 3, title: 'test-title5', content: 'test-content5', startDateTime: '2023-04-01T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0,
     },
+    {
+      id: 6, userId: 1, title: 'test-title6', content: 'test-content6', startDateTime: '2000-04-01T08:00:00.000Z', endDateTime: '2000-04-01T09:30:00.000Z', recurrence: 0,
+    },
+    {
+      id: 7, userId: 1, title: 'test-title7', content: 'test-content7', startDateTime: '2000-04-01T13:00:00.000Z', endDateTime: '2000-04-01T18:00:00.000Z', recurrence: 0,
+    },
+    {
+      id: 8, userId: 2, title: 'test-title8', content: 'test-content8', startDateTime: '2000-04-01T21:00:00.000Z', endDateTime: '2000-04-01T22:40:00.000Z', recurrence: 0,
+    },
+    {
+      id: 9, userId: 2, title: 'test-title9', content: 'test-content9', startDateTime: '2000-04-01T23:30:00.000Z', endDateTime: '2000-04-02T01:00:00.000Z', recurrence: 0,
+    },
+    {
+      id: 10, userId: 2, title: 'test-title10', content: 'test-content10', startDateTime: '2000-04-01T20:30:00.000Z', endDateTime: '2000-04-01T22:00:00.000Z', recurrence: 0,
+    },
+    {
+      id: 11, userId: 2, title: 'test-title11', content: 'test-content11', startDateTime: '2000-03-31T23:00:00.000Z', endDateTime: '2000-04-01T06:00:00.000Z', recurrence: 0,
+    },
   ]);
 }
 

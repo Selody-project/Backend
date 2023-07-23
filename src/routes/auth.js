@@ -1,7 +1,7 @@
 const express = require('express');
 
 const {
-  getNaverUserInfo, joinSocialUser, join, login, logout, getGoogleUserInfo,
+  getNaverUserInfo, getGoogleUserInfo, joinSocialUser, join, login, logout,
 } = require('../controllers/auth');
 const { createToken, verifyToken, renewToken } = require('../middleware/token');
 const { getUserProfile } = require('../controllers/user');

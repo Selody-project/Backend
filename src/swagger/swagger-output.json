@@ -659,6 +659,56 @@
         }
       }
     },
+    "/api/group/{group_id}/proposal": {
+      "get": {
+        "description": "",
+        "summary": "그룹 새 일정 시간대 추천 받기",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "date1",
+            "in": "query",
+            "required": true,
+            "type": "DATETIME"
+          },
+          {
+            "name": "date2",
+            "in": "query",
+            "type": "DATETIME"
+          },
+          {
+            "name": "date3",
+            "in": "query",
+            "type": "DATETIME"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/user/profile": {
       "patch": {
         "description": "",
