@@ -43,7 +43,10 @@ class Group extends Sequelize.Model {
     db.Group.hasMany(db.GroupSchedule, {
       foreignKey: 'groupId',
       onDelete: 'cascade',
-      allowNull: false,
+    });
+    db.Group.hasMany(db.Post, {
+      foreignKey: 'groupId',
+      onDelete: 'cascade',
     });
   }
 }
