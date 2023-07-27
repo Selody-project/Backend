@@ -27,6 +27,17 @@ async function getUserProfile(req, res, next) {
   }
 }
 
+async function getUserGroup(req, res, next) {
+  try {
+    const { nickname } = req;
+    const user = await User.findOne({ where: { nickname } });
+    const groupList = await user.getGroups();
+    return res.status(200).json({ groupList });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function patchUserProfile(req, res, next) {
   try {
     const { error } = validateJoinSchema(req.body);
@@ -140,6 +151,7 @@ async function putUserSchedule(req, res, next) {
 
 module.exports = {
   getUserProfile,
+  getUserGroup,
   patchUserProfile,
   patchUserPassword,
   getUserPersonalSchedule,

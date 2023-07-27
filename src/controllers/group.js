@@ -35,17 +35,6 @@ async function createGroup(req, res, next) {
   }
 }
 
-async function getGroupList(req, res, next) {
-  try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
-    const groupList = await user.getGroups();
-    return res.status(200).json({ groupList });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
 async function deleteGroup(req, res, next) {
   try {
     const { error } = validateScheduleIdSchema(req.params);
@@ -388,7 +377,6 @@ async function getEventProposal(req, res, next) {
 
 module.exports = {
   createGroup,
-  getGroupList,
   deleteGroup,
   patchGroup,
   deleteGroupUser,
