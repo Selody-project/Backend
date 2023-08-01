@@ -2,7 +2,6 @@ const express = require('express');
 
 const {
   createGroup,
-  getGroupList,
   deleteGroup,
   patchGroup,
   getGroupSchedule,
@@ -17,7 +16,6 @@ const {
 
 const router = express.Router();
 
-router.get('/', getGroupList);
 router.post('/', createGroup);
 router.delete('/:id', deleteGroup);
 router.patch('/:id', patchGroup);

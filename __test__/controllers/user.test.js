@@ -55,6 +55,22 @@ describe('Test /api/user endpoints', () => {
     await db.sequelize.close();
   });
 
+  describe('Test GET /api/user/group', () => {
+    it('Successfully get a list of group', async () => {
+      const res = await request(app).get('/api/user/group').set('Cookie', cookie);
+      const expectedGroups = {
+        groupList: [{
+          groupId: 1, leader: 1, name: 'test-group1', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1 },
+        }, {
+          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1 },
+        }],
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+  });
+
   describe('Test PATCH /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';

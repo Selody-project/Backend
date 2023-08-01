@@ -35,17 +35,6 @@ async function createGroup(req, res, next) {
   }
 }
 
-async function getGroupList(req, res, next) {
-  try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
-    const groupList = await user.getGroups();
-    return res.status(200).json({ groupList });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
 async function deleteGroup(req, res, next) {
   try {
     const { error } = validateScheduleIdSchema(req.params);
@@ -97,7 +86,7 @@ async function patchGroup(req, res, next) {
 
 async function deleteGroupUser(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
+    const { error } = validateGroupIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
@@ -105,7 +94,7 @@ async function deleteGroupUser(req, res, next) {
       return next(new UserNotFoundError());
     }
     const { userId } = user;
-    const { id: groupId } = req.params;
+    const { group_id: groupId } = req.params;
 
     const group = await Group.findByPk(groupId);
     if (!group) {
@@ -121,6 +110,9 @@ async function deleteGroupUser(req, res, next) {
         userId, groupId,
       },
     });
+
+    await group.update({ member: group.member - 1 });
+
     return res.status(204).json({ message: 'Successfully delete group user' });
   } catch (err) {
     return next(new ApiError());
@@ -385,7 +377,6 @@ async function getEventProposal(req, res, next) {
 
 module.exports = {
   createGroup,
-  getGroupList,
   deleteGroup,
   patchGroup,
   deleteGroupUser,
