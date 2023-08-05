@@ -27,7 +27,11 @@ async function createGroup(req, res, next) {
     const { nickname } = req;
     const { name } = req.body;
     const user = await User.findOne({ where: { nickname } });
-    const group = await Group.create({ name, member: 1, leader: user.userId });
+    const group = await Group.create({
+      name, member: 1, leader: user.userId, sharePersonalEvent: 1,
+    });
+    // await UserGroup.create({ userId: user.userId, groupId: group.groupId
+    // , sharePersonalEvent: 1 });
     await user.addGroup(group);
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {

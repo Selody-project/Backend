@@ -4,7 +4,8 @@ const app = require('../../src/app');
 const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
-  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB, tearDownGroupDB, setUpGroupDB,
+  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB,
+  tearDownGroupDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -392,7 +393,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/calendar`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });

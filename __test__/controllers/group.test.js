@@ -4,7 +4,8 @@ const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, dropDB,
   tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
-  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB, setUpPersonalScheduleDB2,
+  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
+  setUpPersonalScheduleDB2,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
@@ -51,6 +52,23 @@ describe('Test /api/group endpoints', () => {
     await dropDB();
     await db.sequelize.close();
   });
+
+  describe('Test GET /api/group', () => {
+    it('Successfully get a list of group', async () => {
+      const res = await request(app).get('/api/group').set('Cookie', cookie);
+      const expectedGroups = {
+        groupList: [{
+          groupId: 1, leader: 1, name: 'test-group1', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1 },
+        }, {
+          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1 },
+        }],
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+  });
+
 
   describe('Test POST /api/group', () => {
     it('Successfully create group', async () => {

@@ -57,7 +57,7 @@ class PersonalSchedule extends Sequelize.Model {
     }, {
       sequelize,
       timestamps: false,
-      inderscpred: false,
+      underscored: false,
       modelName: 'PersonalSchedule',
       tableName: 'personalSchedule',
       paranoid: false,
