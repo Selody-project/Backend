@@ -123,6 +123,7 @@ async function join(req, res, next) {
       req.nickname = nickname;
       return next();
     } catch (err) {
+      console.error(err);
       return next(new ApiError());
     }
   } else {
