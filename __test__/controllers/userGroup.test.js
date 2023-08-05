@@ -40,10 +40,10 @@ describe('Test /api/group endpoints', () => {
     await db.sequelize.close();
   });
 
-  describe('Test DELETE /api/user/group/:id', () => {
+  describe('Test DELETE /api/user/group/:group_id', () => {
     it('Successfully delete a user from group', async () => {
       const groupId = 2;
-      const res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
+      let res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
       expect(res.status).toEqual(204);
     });
 
