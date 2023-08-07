@@ -5,7 +5,7 @@
     "description": "RestFul API 클라이언트 UI",
     "version": "1.0.0"
   },
-  "host": "127.0.0.1:8000",
+  "host": "43.200.173.176:8000",
   "basePath": "/",
   "schemes": [
     "http"
