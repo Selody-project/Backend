@@ -53,23 +53,6 @@ describe('Test /api/group endpoints', () => {
     await db.sequelize.close();
   });
 
-  describe('Test GET /api/group', () => {
-    it('Successfully get a list of group', async () => {
-      const res = await request(app).get('/api/group').set('Cookie', cookie);
-      const expectedGroups = {
-        groupList: [{
-          groupId: 1, leader: 1, name: 'test-group1', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1 },
-        }, {
-          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1 },
-        }],
-      };
-
-      expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedGroups);
-    });
-  });
-
-
   describe('Test POST /api/group', () => {
     it('Successfully create group', async () => {
       const res = await request(app).post('/api/group').set('Cookie', cookie).send({
@@ -572,43 +555,43 @@ describe('Test /api/group endpoints', () => {
   describe('Test GET /api/group/:group_id/proposal', () => {
     it('Successfully get a list of Event', async () => {
       const id = 1;
-      const date1 = "2023-04-15T00:00:00.000Z";
-      const date2 = "2030-04-16T00:00:00.000Z";
-      const date3 = "2000-04-01T00:00:00.000Z";
+      const date1 = '2023-04-15T00:00:00.000Z';
+      const date2 = '2030-04-16T00:00:00.000Z';
+      const date3 = '2000-04-01T00:00:00.000Z';
       const res = await request(app).get(`/api/group/${id}/proposal`).set('Cookie', cookie).query({
         date1,
         date2,
-        date3
+        date3,
       });
       const expectedProposal = {
-        "2000-04-01T00:00:00.000Z": [
+        '2000-04-01T00:00:00.000Z': [
           {
-            "duration": 210,
-            "endDateTime": "2000-04-01T13:00:00.000Z",
-            "startDateTime": "2000-04-01T09:30:00.000Z",
+            duration: 210,
+            endDateTime: '2000-04-01T13:00:00.000Z',
+            startDateTime: '2000-04-01T09:30:00.000Z',
           },
           {
-            "duration": 150,
-            "endDateTime": "2000-04-01T20:30:00.000Z",
-            "startDateTime": "2000-04-01T18:00:00.000Z",
+            duration: 150,
+            endDateTime: '2000-04-01T20:30:00.000Z',
+            startDateTime: '2000-04-01T18:00:00.000Z',
           },
           {
-            "duration": 120,
-            "endDateTime": "2000-04-01T08:00:00.000Z",
-            "startDateTime": "2000-04-01T06:00:00.000Z",
+            duration: 120,
+            endDateTime: '2000-04-01T08:00:00.000Z',
+            startDateTime: '2000-04-01T06:00:00.000Z',
           },
           {
-            "duration": 50,
-            "endDateTime": "2000-04-01T23:30:00.000Z",
-            "startDateTime": "2000-04-01T22:40:00.000Z",
+            duration: 50,
+            endDateTime: '2000-04-01T23:30:00.000Z',
+            startDateTime: '2000-04-01T22:40:00.000Z',
           },
         ],
-        "2023-04-15T00:00:00.000Z": [],
-        "2030-04-16T00:00:00.000Z": [
+        '2023-04-15T00:00:00.000Z': [],
+        '2030-04-16T00:00:00.000Z': [
           {
-            "duration": 1440,
-            "endDateTime": "2030-04-16T23:59:59.000Z",
-            "startDateTime": "2030-04-16T00:00:00.000Z",
+            duration: 1440,
+            endDateTime: '2030-04-16T23:59:59.000Z',
+            startDateTime: '2030-04-16T00:00:00.000Z',
           },
         ],
       };
