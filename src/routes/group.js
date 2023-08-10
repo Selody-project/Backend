@@ -31,6 +31,6 @@ router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
 router.get('/:group_id/proposal', getEventProposal);
 
-router.post('/:group_id/feed', postGroupPost);
+router.post('/:group_id/post', postGroupPost);
 
 module.exports = router;

@@ -7,7 +7,6 @@ const UserGroup = require('../models/userGroup');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const Post = require('../models/post');
-const PostDetail = require('../models/postDetail');
 
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
@@ -433,11 +432,10 @@ async function postGroupPost(req, res, next) {
 
     const { title, content } = req.body;
     const post = await Post.create({ title });
-    const postDetail = await PostDetail.create({ content });
+    await post.createPostDetail({ content });
 
     await user.addPosts(post);
     await group.addPosts(post);
-    await post.addPostDetails(postDetail);
 
     return res.status(201).json({ message: 'Successfully created the post.' });
   } catch (err) {

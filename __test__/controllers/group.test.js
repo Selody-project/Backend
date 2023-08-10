@@ -648,4 +648,43 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual(expectedProposal);
     });
   });
+
+  describe('Test POST /api/group/:group_id/post', () => {
+    it('Successfully created the post ', async () => {
+      const groupId = 1;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+
+      expect(res.status).toEqual(201);
+      expect(res.body).toEqual({ message: 'Successfully created the post.' });
+    });
+
+    it('Successfully failed to create the post (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to create the post (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const title = 123;
+      const content = 123;
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });
