@@ -96,6 +96,11 @@ const eventPoroposalSchema = Joi.object({
   date3: Joi.date(),
 });
 
+const postSchema = Joi.object({
+  title: Joi.string(),
+  content: Joi.string(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -110,4 +115,5 @@ module.exports = {
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
   validateEventProposalSchema: validator(eventPoroposalSchema),
+  validatePostSchema: validator(postSchema),
 };
