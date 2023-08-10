@@ -114,6 +114,54 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test GET /api/group/:group_id', () => {
+    it('Successfully get a group detail', async () => {
+      const id = 1;
+      const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
+      const expectedGroups = {
+        "group": {
+          "groupId": 1,
+          "inviteCode": "inviteCode01",
+          "inviteExp": "2099-01-01T00:00:00.000Z",
+          "isPublicGroup": 0,
+          "leader": 1,
+          "member": 2,
+          "name": "test-group1",
+        },
+        "leaderInfo": {
+          "nickname": "test-user1",
+          "userId": 1,
+        },
+        "memberInfo": [
+          {
+            "nickname": "test-user1",
+            "userId": 1,
+          },
+          {
+            "nickname": "test-user2",
+            "userId": 2,
+          },
+        ]
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+
+    it('Successfully fail to get an group detail (DataFormat Error)', async () => {
+      const id = 'abc';
+      const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+
+    it('Successfully failed to get an group detail (Group Not Found)', async () => {
+      const id = 10000;
+      const res = (await request(app).get(`/api/group/${id}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+  });
+
   describe('Test POST /api/group/calendar', () => {
     it('Group schedule creation successful ', async () => {
       const res = await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
@@ -498,9 +546,10 @@ describe('Test /api/group endpoints', () => {
           groupId: 1,
           name: 'test-group1',
           leader: 1,
-          member: 5,
+          member: 2,
           inviteCode: 'inviteCode01',
           inviteExp: '2099-01-01T00:00:00.000Z',
+          isPublicGroup: 0,
         },
       };
       expect(res.status).toEqual(200);

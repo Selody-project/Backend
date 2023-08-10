@@ -39,13 +39,41 @@ async function createGroup(req, res, next) {
   }
 }
 
-async function deleteGroup(req, res, next) {
+async function getGroupDetail(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
+    const { error } = validateGroupIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const group = await Group.findByPk(id);
+    const { group_id: groupId } = req.params;
+
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const memberInfo = [];
+    let leaderInfo;
+    (await group.getUsers()).forEach((user) => {
+      const { userId, nickname } = user.dataValues;
+      if (userId === group.leader) {
+        leaderInfo = { userId, nickname };
+      }
+      memberInfo.push({ userId, nickname });
+    });
+
+    return res.status(200).json({ group, leaderInfo, memberInfo });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deleteGroup(req, res, next) {
+  try {
+    const { error } = validateGroupIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -69,12 +97,12 @@ async function deleteGroup(req, res, next) {
 
 async function patchGroup(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
+    const { error } = validateGroupIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.params;
+    const { group_id: groupId } = req.params;
     const { newLeaderId } = req.body;
-    const group = await Group.findByPk(id);
+    const group = await Group.findByPk(groupId);
     if (!group) {
       return next(new GroupNotFoundError());
     }
@@ -125,10 +153,10 @@ async function deleteGroupUser(req, res, next) {
 
 async function getGroupSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
+    const { error } = validateGroupIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id: groupId } = req.params;
+    const { group_id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
     if (!group) {
       return next(new GroupNotFoundError());
@@ -381,6 +409,7 @@ async function getEventProposal(req, res, next) {
 
 module.exports = {
   createGroup,
+  getGroupDetail,
   deleteGroup,
   patchGroup,
   deleteGroupUser,
