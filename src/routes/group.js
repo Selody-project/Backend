@@ -13,6 +13,7 @@ const {
   getInvitation,
   postGroupJoin,
   getEventProposal,
+  postGroupPost,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -29,5 +30,7 @@ router.post('/:group_id/invite-link', postInviteLink);
 router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
 router.get('/:group_id/proposal', getEventProposal);
+
+router.post('/:group_id/feed', postGroupPost);
 
 module.exports = router;
