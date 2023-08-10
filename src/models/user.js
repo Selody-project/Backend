@@ -47,7 +47,12 @@ class User extends Sequelize.Model {
     db.User.hasMany(db.PersonalSchedule, {
       foreignKey: 'userId',
       onDelete: 'cascade',
-      allowNull: false,
+    });
+    db.User.hasMany(db.Post, {
+      foreignKey: 'userId',
+    });
+    db.User.hasMany(db.Comment, {
+      foreignKey: 'userId',
     });
   }
 }

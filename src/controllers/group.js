@@ -1,20 +1,24 @@
 const moment = require('moment');
+const { parseEventDates, eventProposal } = require('../utils/event');
+
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
+const UserGroup = require('../models/userGroup');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
+
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  validateGroupSchema, validateGroupIdSchema,
-  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-} = require('../utils/validators');
-const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
 } = require('../errors');
-const UserGroup = require('../models/userGroup');
+
+const {
+  validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
+  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
+} = require('../utils/validators');
 
 async function createGroup(req, res, next) {
   try {
@@ -23,20 +27,13 @@ async function createGroup(req, res, next) {
     const { nickname } = req;
     const { name } = req.body;
     const user = await User.findOne({ where: { nickname } });
-    const group = await Group.create({ name, member: 1, leader: user.userId });
-    await user.addGroup(group);
+    const group = await Group.create({
+      name, member: 1, leader: user.userId,
+    });
+    if (user) {
+      await user.addGroup(group);
+    }
     return res.status(200).json({ message: 'Successfully create group' });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
-async function getGroupList(req, res, next) {
-  try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
-    const groupList = await user.getGroups();
-    return res.status(200).json({ groupList });
   } catch (err) {
     return next(new ApiError());
   }
@@ -121,7 +118,7 @@ async function patchGroup(req, res, next) {
 
 async function deleteGroupUser(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
+    const { error } = validateGroupIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
@@ -129,7 +126,7 @@ async function deleteGroupUser(req, res, next) {
       return next(new UserNotFoundError());
     }
     const { userId } = user;
-    const { id: groupId } = req.params;
+    const { group_id: groupId } = req.params;
 
     const group = await Group.findByPk(groupId);
     if (!group) {
@@ -145,6 +142,9 @@ async function deleteGroupUser(req, res, next) {
         userId, groupId,
       },
     });
+
+    await group.update({ member: group.member - 1 });
+
     return res.status(204).json({ message: 'Successfully delete group user' });
   } catch (err) {
     return next(new ApiError());
@@ -355,9 +355,60 @@ async function postGroupJoin(req, res, next) {
   }
 }
 
+async function getEventProposal(req, res, next) {
+  try {
+    const { error: queryError } = validateEventProposalSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findOne({ where: { groupId } });
+    const groupMembers = (await group.getUsers()).map((user) => user.userId);
+    const proposal = {};
+
+    /* eslint-disable no-restricted-syntax */
+    for (const date of Object.values(req.query)) {
+      let events = [];
+      const start = moment.utc(date).toDate();
+      const end = moment.utc(date).add(24, 'hours').add(-1, 's').toDate();
+      const {
+        nonRecurrenceSchedule: userNonRecEvent,
+        recurrenceSchedule: userRecEvent,
+        /* eslint-disable-next-line no-await-in-loop */
+      } = await PersonalSchedule.getSchedule(groupMembers, start, end);
+      events.push(parseEventDates(userNonRecEvent, userRecEvent));
+      const {
+        nonRecurrenceSchedule: groupNonRecEvent,
+        recurrenceSchedule: groupRecEvent,
+        /* eslint-disable-next-line no-await-in-loop */
+      } = await GroupSchedule.getSchedule([groupId], start, end);
+      events.push(parseEventDates(groupNonRecEvent, groupRecEvent));
+      events = events.flat(1);
+      events.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
+
+      // 결과값에서 9시~22시 사이의 값들을 먼저 추천할 수 있도록 정렬.
+      const result = eventProposal(events, start, end);
+      const filteredTimes = result.filter((event) => (
+        event.startDateTime.getTime() < (end.getTime() - 1000 * 60 * 60 * 2)
+          && event.endDateTime.getTime() > (start.getTime() + 1000 * 60 * 60 * 9)
+      ));
+      const remainingTimes = result.filter((event) => (
+        event.startDateTime.getTime() >= (end.getTime() - 1000 * 60 * 60 * 2)
+          || event.endDateTime.getTime() <= (start.getTime() + 1000 * 60 * 60 * 9)
+      ));
+      const sortedResult = filteredTimes.concat(remainingTimes);
+      proposal[date] = sortedResult;
+    }
+    return res.status(200).json(proposal);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
-  getGroupList,
   getGroupDetail,
   deleteGroup,
   patchGroup,
@@ -369,4 +420,5 @@ module.exports = {
   postInviteLink,
   getInvitation,
   postGroupJoin,
+  getEventProposal,
 };

@@ -4,7 +4,8 @@ const app = require('../../src/app');
 const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
-  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB, tearDownGroupDB, setUpGroupDB,
+  tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB,
+  tearDownGroupDB, setUpGroupDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -53,6 +54,22 @@ describe('Test /api/user endpoints', () => {
   afterAll(async () => {
     await dropDB();
     await db.sequelize.close();
+  });
+
+  describe('Test GET /api/user/group', () => {
+    it('Successfully get a list of group', async () => {
+      const res = await request(app).get('/api/user/group').set('Cookie', cookie);
+      const expectedGroups = {
+        groupList: [{
+          groupId: 1, leader: 1, name: 'test-group1', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1, sharePersonalEvent: 1 },
+        }, {
+          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1, sharePersonalEvent: 1 },
+        }],
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
   });
 
   describe('Test PATCH /api/user/profile', () => {
@@ -376,7 +393,7 @@ describe('Test /api/user endpoints', () => {
           },
         ],
       };
-      const res = await request(app).get(`/api/user/calendar`).set('Cookie', cookie).query({
+      const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
@@ -476,6 +493,31 @@ describe('Test /api/user endpoints', () => {
       const id = 1;
       const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(499);
+    });
+  });
+
+  describe('Test PATCH /api/user/updateUserSetup', () => {
+    it('Successfully update sharePersoanlEvent from user table', async () => {
+      const id = 1;
+      const result = {
+        updatedSharePersonalEvent: [
+          {
+            groupId: 1,
+            sharePersonalEvent: 0,
+          },
+          {
+            groupId: 2,
+            sharePersonalEvent: 0,
+          },
+          {
+            groupId: 3,
+            sharePersonalEvent: 1,
+          },
+        ],
+      };
+      const res = await request(app).patch(`/api/user/userSetup/${id}`).set('Cookie', cookie).send(result);
+
+      expect(res.status).toEqual(200);
     });
   });
 });
