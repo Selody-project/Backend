@@ -53,23 +53,6 @@ describe('Test /api/group endpoints', () => {
     await db.sequelize.close();
   });
 
-  describe('Test GET /api/group', () => {
-    it('Successfully get a list of group', async () => {
-      const res = await request(app).get('/api/group').set('Cookie', cookie);
-      const expectedGroups = {
-        groupList: [{
-          groupId: 1, leader: 1, name: 'test-group1', member: 5, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', UserGroup: { groupId: 1, userId: 1 },
-        }, {
-          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', UserGroup: { groupId: 2, userId: 1 },
-        }],
-      };
-
-      expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedGroups);
-    });
-  });
-
-
   describe('Test POST /api/group', () => {
     it('Successfully create group', async () => {
       const res = await request(app).post('/api/group').set('Cookie', cookie).send({
@@ -128,6 +111,54 @@ describe('Test /api/group endpoints', () => {
       });
 
       expect(res.status).toEqual(404);
+    });
+  });
+
+  describe('Test GET /api/group/:group_id', () => {
+    it('Successfully get a group detail', async () => {
+      const id = 1;
+      const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
+      const expectedGroups = {
+        "group": {
+          "groupId": 1,
+          "inviteCode": "inviteCode01",
+          "inviteExp": "2099-01-01T00:00:00.000Z",
+          "isPublicGroup": 0,
+          "leader": 1,
+          "member": 2,
+          "name": "test-group1",
+        },
+        "leaderInfo": {
+          "nickname": "test-user1",
+          "userId": 1,
+        },
+        "memberInfo": [
+          {
+            "nickname": "test-user1",
+            "userId": 1,
+          },
+          {
+            "nickname": "test-user2",
+            "userId": 2,
+          },
+        ]
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+
+    it('Successfully fail to get an group detail (DataFormat Error)', async () => {
+      const id = 'abc';
+      const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+
+    it('Successfully failed to get an group detail (Group Not Found)', async () => {
+      const id = 10000;
+      const res = (await request(app).get(`/api/group/${id}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
     });
   });
 
@@ -515,9 +546,10 @@ describe('Test /api/group endpoints', () => {
           groupId: 1,
           name: 'test-group1',
           leader: 1,
-          member: 5,
+          member: 2,
           inviteCode: 'inviteCode01',
           inviteExp: '2099-01-01T00:00:00.000Z',
+          isPublicGroup: 0,
         },
       };
       expect(res.status).toEqual(200);
@@ -572,48 +604,87 @@ describe('Test /api/group endpoints', () => {
   describe('Test GET /api/group/:group_id/proposal', () => {
     it('Successfully get a list of Event', async () => {
       const id = 1;
-      const date1 = "2023-04-15T00:00:00.000Z";
-      const date2 = "2030-04-16T00:00:00.000Z";
-      const date3 = "2000-04-01T00:00:00.000Z";
+      const date1 = '2023-04-15T00:00:00.000Z';
+      const date2 = '2030-04-16T00:00:00.000Z';
+      const date3 = '2000-04-01T00:00:00.000Z';
       const res = await request(app).get(`/api/group/${id}/proposal`).set('Cookie', cookie).query({
         date1,
         date2,
-        date3
+        date3,
       });
       const expectedProposal = {
-        "2000-04-01T00:00:00.000Z": [
+        '2000-04-01T00:00:00.000Z': [
           {
-            "duration": 210,
-            "endDateTime": "2000-04-01T13:00:00.000Z",
-            "startDateTime": "2000-04-01T09:30:00.000Z",
+            duration: 210,
+            endDateTime: '2000-04-01T13:00:00.000Z',
+            startDateTime: '2000-04-01T09:30:00.000Z',
           },
           {
-            "duration": 150,
-            "endDateTime": "2000-04-01T20:30:00.000Z",
-            "startDateTime": "2000-04-01T18:00:00.000Z",
+            duration: 150,
+            endDateTime: '2000-04-01T20:30:00.000Z',
+            startDateTime: '2000-04-01T18:00:00.000Z',
           },
           {
-            "duration": 120,
-            "endDateTime": "2000-04-01T08:00:00.000Z",
-            "startDateTime": "2000-04-01T06:00:00.000Z",
+            duration: 120,
+            endDateTime: '2000-04-01T08:00:00.000Z',
+            startDateTime: '2000-04-01T06:00:00.000Z',
           },
           {
-            "duration": 50,
-            "endDateTime": "2000-04-01T23:30:00.000Z",
-            "startDateTime": "2000-04-01T22:40:00.000Z",
+            duration: 50,
+            endDateTime: '2000-04-01T23:30:00.000Z',
+            startDateTime: '2000-04-01T22:40:00.000Z',
           },
         ],
-        "2023-04-15T00:00:00.000Z": [],
-        "2030-04-16T00:00:00.000Z": [
+        '2023-04-15T00:00:00.000Z': [],
+        '2030-04-16T00:00:00.000Z': [
           {
-            "duration": 1440,
-            "endDateTime": "2030-04-16T23:59:59.000Z",
-            "startDateTime": "2030-04-16T00:00:00.000Z",
+            duration: 1440,
+            endDateTime: '2030-04-16T23:59:59.000Z',
+            startDateTime: '2030-04-16T00:00:00.000Z',
           },
         ],
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProposal);
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/post', () => {
+    it('Successfully created the post ', async () => {
+      const groupId = 1;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+
+      expect(res.status).toEqual(201);
+      expect(res.body).toEqual({ message: 'Successfully created the post.' });
+    });
+
+    it('Successfully failed to create the post (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to create the post (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const title = 123;
+      const content = 123;
+      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 });

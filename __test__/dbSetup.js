@@ -70,7 +70,7 @@ async function setUpGroupDB() {
   const group1 = await Group.create({
     groupId: 1,
     name: 'test-group1',
-    member: 5,
+    member: 2,
     leader: 1,
     inviteCode: 'inviteCode01',
     inviteExp: '2099-01-01T00:00:00.000Z',
