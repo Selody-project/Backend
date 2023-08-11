@@ -7,19 +7,21 @@ const UserGroup = require('../models/userGroup');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const Post = require('../models/post');
+const PostDetail = require('../models/postDetail');
 
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
+  UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
+  GroupNotFoundError, PostNotFoundError,
 } = require('../errors');
 
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-  validatePostSchema,
+  validatePostSchema, validatePostIdSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -443,6 +445,37 @@ async function postGroupPost(req, res, next) {
   }
 }
 
+async function putGroupPost(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { error: bodyError } = validatePostSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { title, content } = req.body;
+
+    await post.update({ title });
+    await PostDetail.update({ content, where: { postId } });
+
+    return res.status(200).json({ message: 'Successfully modified the post.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupDetail,
@@ -458,4 +491,5 @@ module.exports = {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  putGroupPost,
 };
