@@ -482,6 +482,37 @@ async function putGroupPost(req, res, next) {
   }
 }
 
+async function deleteGroupPost(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { nickname } = req;
+    const user = await User.findOne({ where: { nickname } });
+    if (!user || (user.userId !== post.userId)) {
+      return next(new EditPermissionError());
+    }
+
+    await post.destroy();
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupDetail,
@@ -498,4 +529,5 @@ module.exports = {
   getEventProposal,
   postGroupPost,
   putGroupPost,
+  deleteGroupPost,
 };
