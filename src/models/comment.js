@@ -22,7 +22,7 @@ class Comment extends Sequelize.Model {
       sequelize,
       timestamps: true,
       modelName: 'Comment',
-      tableName: 'Comments',
+      tableName: 'comments',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });

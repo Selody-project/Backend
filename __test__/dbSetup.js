@@ -341,8 +341,8 @@ async function tearDownPersonalScheduleDB() {
 }
 
 async function tearDownGroupPostDB() {
-  await db.sequelize.query('DELETE FROM posts');
-  await db.sequelize.query('DELETE FROM postDetails');
+  await db.sequelize.query('DELETE FROM `posts`');
+  await db.sequelize.query('DELETE FROM `postDetails`');
 }
 
 module.exports = {
