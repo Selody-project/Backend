@@ -15,6 +15,7 @@ const {
   getEventProposal,
   postGroupPost,
   putGroupPost,
+  deleteGroupPost,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -34,5 +35,6 @@ router.get('/:group_id/proposal', getEventProposal);
 
 router.post('/:group_id/post', postGroupPost);
 router.put('/:group_id/post/:post_id', putGroupPost);
+router.delete('/:group_id/post/:post_id', deleteGroupPost);
 
 module.exports = router;
