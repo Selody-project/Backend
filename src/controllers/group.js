@@ -15,7 +15,7 @@ const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
-  GroupNotFoundError, PostNotFoundError,
+  GroupNotFoundError, PostNotFoundError, EditPermissionError,
 } = require('../errors');
 
 const {
@@ -465,10 +465,16 @@ async function putGroupPost(req, res, next) {
       return next(new PostNotFoundError());
     }
 
+    const { nickname } = req;
+    const user = await User.findOne({ where: { nickname } });
+    if (!user || (user.userId !== post.userId)) {
+      return next(new EditPermissionError());
+    }
+
     const { title, content } = req.body;
 
     await post.update({ title });
-    await PostDetail.update({ content, where: { postId } });
+    await PostDetail.update({ content }, { where: { postId } });
 
     return res.status(200).json({ message: 'Successfully modified the post.' });
   } catch (err) {

@@ -4,6 +4,8 @@ const Group = require('../src/models/group');
 const GroupSchedule = require('../src/models/groupSchedule');
 const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
+const Post = require('../src/models/post');
+const PostDetail = require('../src/models/postDetail');
 
 const mockUser = {
   email: 'test-user1@email.com',
@@ -302,6 +304,26 @@ async function setUpGroupScheduleDB2() {
   ]);
 }
 
+async function setUpGroupPostDB() {
+  await Post.bulkCreate([
+    {
+      postId: 1, userId: 1, groupId: 1, title: 'test-title1'
+    },
+    {
+      postId: 2, userId: 2, groupId: 1, title: 'test-title2'
+    },
+  ]);
+
+  await PostDetail.bulkCreate([
+    {
+      PostDetailId: 1, postId: 1, content: 'test-content1'
+    },
+    {
+      PostDetailId: 2, postId: 2, content: 'test-content2'
+    },
+  ])
+}
+
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
@@ -318,6 +340,11 @@ async function tearDownPersonalScheduleDB() {
   await db.sequelize.query('DELETE FROM personalSchedule');
 }
 
+async function tearDownGroupPostDB() {
+  await db.sequelize.query('DELETE FROM posts');
+  await db.sequelize.query('DELETE FROM postDetails');
+}
+
 module.exports = {
   db,
   mockUser,
@@ -327,10 +354,12 @@ module.exports = {
   setUpPersonalScheduleDB,
   setUpPersonalScheduleDB2,
   setUpGroupScheduleDB2,
+  setUpGroupPostDB,
   tearDownUserDB,
   tearDownGroupDB,
   tearDownGroupScheduleDB,
   tearDownPersonalScheduleDB,
+  tearDownGroupPostDB,
   syncDB,
   dropDB,
 };
