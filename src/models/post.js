@@ -17,7 +17,7 @@ class Post extends Sequelize.Model {
       sequelize,
       timestamps: true,
       modelName: 'Post',
-      tableName: 'Posts',
+      tableName: 'posts',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });

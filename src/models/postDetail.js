@@ -17,7 +17,7 @@ class PostDetail extends Sequelize.Model {
       sequelize,
       timestamps: true,
       modelName: 'PostDetail',
-      tableName: 'PostDetails',
+      tableName: 'postDetails',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });

@@ -8,4 +8,5 @@ module.exports = {
   ...require('./group'),
   ...require('./schedule'),
   ...require('./user'),
+  ...require('./feed'),
 };

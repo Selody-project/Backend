@@ -5,7 +5,7 @@ const {
   db, syncDB, dropDB,
   tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
   setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
-  setUpPersonalScheduleDB2,
+  setUpPersonalScheduleDB2, setUpGroupPostDB, tearDownGroupPostDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
@@ -17,12 +17,14 @@ describe('Test /api/group endpoints', () => {
 
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownGroupPostDB();
     await tearDownUserDB();
     await tearDownGroupDB();
 
     await setUpUserDB();
     await setUpGroupDB();
     await setUpGroupScheduleDB();
+    await setUpGroupPostDB();
     await setUpPersonalScheduleDB2();
 
     const res = await request(app).post('/api/auth/login').send({
@@ -36,16 +38,19 @@ describe('Test /api/group endpoints', () => {
   beforeEach(async () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownGroupPostDB();
     await tearDownGroupDB();
 
     await setUpPersonalScheduleDB2();
     await setUpGroupDB();
     await setUpGroupScheduleDB();
+    await setUpGroupPostDB();
   });
 
   afterEach(async () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownGroupPostDB();
   });
 
   afterAll(async () => {
@@ -685,6 +690,74 @@ describe('Test /api/group endpoints', () => {
       }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test PUT /api/group/:group_id/post/:post_id', () => {
+    it('Successfully modified the post ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const title = "modified-title";
+      const content = "modified-content";
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual({ message: 'Successfully modified the post.' });
+    });
+
+    it('Successfully failed to modified the post (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to modified the post (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const title = "testTitle";
+      const content = "testContent";
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to modified the post (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const title = 123;
+      const content = 123;
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to modified the post (Edit Permission Error) ', async () => {
+      const groupId = 1;
+      const postId = 2;
+      const title = "modified-title";
+      const content = "modified-content";
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
+        title,
+        content,
+      }));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
     });
   });
 });
