@@ -507,7 +507,7 @@ async function deleteGroupPost(req, res, next) {
 
     await post.destroy();
 
-    return res.status(204).json({ message: 'Successfully deleted the post.' });
+    return res.status(204).end();
   } catch (err) {
     return next(new ApiError());
   }

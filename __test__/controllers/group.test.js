@@ -760,4 +760,47 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
     });
   });
+
+  describe('Test DELETE /api/group/:group_id/post/:post_id', () => {
+    it('Successfully deleted the post ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+
+      expect(res.status).toEqual(204);
+      expect(res.body).toEqual({});
+    });
+
+    it('Successfully failed to deleted the post (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to deleted the post (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to deleted the post (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const postId = 'abc';
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to deleted the post (Edit Permission Error) ', async () => {
+      const groupId = 1;
+      const postId = 2;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
+    });
+  });
 });
