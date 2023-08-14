@@ -803,4 +803,103 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
     });
   });
+
+  describe('Test GET /api/group/:group_id/post/:post_id', () => {
+    it('Successfully retrieved the post ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      const expectedPost = {
+        "author": "test-user1",
+        "content": "test-content1",
+        "title": "test-title1",
+      };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedPost);
+    });
+
+    it('Successfully failed to retrieved the post. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to retrieved the post. (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to retrieved the post. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const postId = 'abc';
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test GET /api/group/:group_id/post', () => {
+    it('Successfully retrieved the posts. ', async () => {
+      const groupId = 1;
+      const page = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        page,
+      }));
+      const expectedResult = [
+        {
+          author: 'test-user1', title: 'test-title1', content: 'test-content1',
+        },
+        {
+          author: 'test-user2', title: 'test-title2', content: 'test-content2', 
+        },
+        {
+          author: 'test-user1', title: 'test-title3', content: 'test-content3', 
+        },
+        {
+          author: 'test-user1', title: 'test-title4', content: 'test-content4', 
+        },
+        {
+          author: 'test-user1', title: 'test-title5', content: 'test-content5',  
+        },
+        {
+          author: 'test-user2', title: 'test-title7', content: 'test-content7', 
+        },
+        {
+          author: 'test-user2', title: 'test-title8', content: 'test-content8', 
+        }, 
+      ];
+      const result = res.body.map(post => ({
+        title: post.title,
+        author: post.author,
+        content: post.content,
+      }));
+      expect(res.status).toEqual(200);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieved the posts. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const page = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        page,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to retrieved the posts. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const page = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        page,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });

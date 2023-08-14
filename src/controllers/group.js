@@ -490,7 +490,7 @@ async function getGroupPosts(req, res, next) {
     const pageSize = 7;
 
     const startIndex = (page - 1) * pageSize;
-    const { count, rows } = await Post.findAndCountAll({
+    const { rows } = await Post.findAndCountAll({
       where: {
         groupId,
       },
@@ -503,8 +503,16 @@ async function getGroupPosts(req, res, next) {
       offset: startIndex,
       limit: pageSize,
     });
-    return res.status(200).json({ count, rows });
+
+    const result = rows.map((post) => ({
+      title: post.title,
+      author: post.author,
+      createdAt: post.createdAt,
+      content: post.postDetail.content,
+    }));
+    return res.status(200).json(result);
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
