@@ -45,9 +45,9 @@ async function deletePersonalSchedule(req, res, next) {
     const { error } = validateScheduleIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.params;
+    const { schedule_id: scheduleId } = req.params;
 
-    const data = await personalSchedule.destroy({ where: { id } });
+    const data = await personalSchedule.destroy({ where: { id: scheduleId } });
     if (data === 0) {
       return next(new NotFoundError());
     }

@@ -135,15 +135,32 @@ async function putUserSchedule(req, res, next) {
     const { error: bodyError } = validateScheduleSchema(req.body);
     if (bodyError) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const schedule = await PersonalSchedule.findOne({ where: { id } });
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await PersonalSchedule.findOne({ where: { id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
 
-    await PersonalSchedule.update(req.body, { where: { id } });
+    await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
     return res.status(201).json({ message: 'Successfully Modified.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+
+async function getSingleUserSchedule(req, res, next) {
+  try {
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await PersonalSchedule.findOne({ where: { id: scheduleId } });
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+    return res.status(201).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }
@@ -156,4 +173,5 @@ module.exports = {
   patchUserPassword,
   getUserPersonalSchedule,
   putUserSchedule,
+  getSingleUserSchedule,
 };

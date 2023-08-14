@@ -457,93 +457,28 @@
         }
       }
     },
-    "/api/group/calendar": {
-      "post": {
-        "description": "",
-        "summary": "그룹 일정 등록",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "groupId": {
-                  "example": "integer"
-                },
-                "title": {
-                  "example": "string"
-                },
-                "contents": {
-                  "example": "string"
-                },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "confirmed": {
-                  "example": "tinyint(1)"
-                },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "로그인 실패"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/calendar/:id": {
+    "/api/group/calendar/{schedule_id}": {
       "put": {
         "description": "",
         "summary": "그룹 일정 수정",
         "tags": ["Group"],
         "parameters": [
           {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "id": {
-                  "example": "integer"
-                },
-                "groupId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -551,9 +486,6 @@
                 },
                 "endDateTime": {
                   "example": "2099-01-01T12:00:00.000Z"
-                },
-                "confirmed": {
-                  "example": "tinyint(1)"
                 },
                 "recurrence": {
                   "example": "tinyint(1)"
@@ -598,16 +530,10 @@
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "integer"
-                }
-              }
-            }
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
           }
         ],
         "responses": {
@@ -630,6 +556,69 @@
       }
     },
     "/api/group/{group_id}/calendar": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 등록",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "string"
+                },
+                "content": {
+                  "example": "string"
+                },
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "recurrence": {
+                  "example": "tinyint(1)"
+                },
+                "freq": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "interval": {
+                  "example": "integer"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "로그인 실패"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "get": {
         "description": "",
         "summary": "그룹 일정 조회",
@@ -1105,13 +1094,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -1158,25 +1144,28 @@
         }
       }
     },
-    "/api/user/calendar/:id": {
+    "/api/user/calendar/{schedule_id}": {
       "put": {
         "description": "",
         "summary": "유저 일정 수정",
         "tags": ["User"],
         "parameters": [
           {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -1228,7 +1217,7 @@
         "tags": ["User"],
         "parameters": [
           {
-            "name": "id",
+            "name": "schedule_id",
             "in": "path",
             "required": true,
             "type": "integer"
@@ -1405,8 +1394,7 @@
         "title",
         "startDateTime",
         "endDateTime",
-        "recurrence",
-        "confirmed"
+        "recurrence"
       ],
       "properties": {
         "id": {
@@ -1441,15 +1429,6 @@
         },
         "until": {
           "type": "DATETIME"
-        },
-        "confirmed": {
-          "type": "TINYINT(1)"
-        },
-        "possible": {
-          "type": "JSON"
-        },
-        "impossible": {
-          "type": "JSON"
         }
       },
       "xml": {

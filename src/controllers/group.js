@@ -193,11 +193,15 @@ async function getGroupSchedule(req, res, next) {
 
 async function postGroupSchedule(req, res, next) {
   try {
-    const { error } = validateGroupScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
+    const { error: bodyError } = validateGroupScheduleSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { error: paramsError } = validateGroupIdSchema(req.params);
+    if (paramsError) return next(new DataFormatError());
+    
+    const { group_id: groupId } = req.params;
 
     const {
-      groupId,
       title,
       content,
       startDateTime,
@@ -237,14 +241,14 @@ async function putGroupSchedule(req, res, next) {
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
     if (bodyError) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id } });
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
 
-    await GroupSchedule.update(req.body, { where: { id } });
+    await GroupSchedule.update(req.body, { where: { id: scheduleId } });
     return res.status(201).json({ message: 'Successfully modify group schedule' });
   } catch (err) {
     return next(new ApiError());
@@ -256,8 +260,8 @@ async function deleteGroupSchedule(req, res, next) {
     const { error } = validateScheduleIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id } });
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
@@ -266,6 +270,22 @@ async function deleteGroupSchedule(req, res, next) {
     await schedule.destroy();
 
     return res.status(204).json({ message: 'Successfully delete group schedule' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getSingleGroupSchedule(req, res, next) {
+  try {
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+    return res.status(201).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }
@@ -594,6 +614,7 @@ module.exports = {
   postGroupSchedule,
   putGroupSchedule,
   deleteGroupSchedule,
+  getSingleGroupSchedule,
   postInviteLink,
   getInvitation,
   postGroupJoin,
