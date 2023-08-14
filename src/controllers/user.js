@@ -149,7 +149,6 @@ async function putUserSchedule(req, res, next) {
   }
 }
 
-
 async function getSingleUserSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
@@ -160,7 +159,7 @@ async function getSingleUserSchedule(req, res, next) {
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
-    return res.status(201).json(schedule);
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }

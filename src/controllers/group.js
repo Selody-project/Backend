@@ -198,7 +198,7 @@ async function postGroupSchedule(req, res, next) {
 
     const { error: paramsError } = validateGroupIdSchema(req.params);
     if (paramsError) return next(new DataFormatError());
-    
+
     const { group_id: groupId } = req.params;
 
     const {
@@ -285,7 +285,7 @@ async function getSingleGroupSchedule(req, res, next) {
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
-    return res.status(201).json(schedule);
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }
