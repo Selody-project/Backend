@@ -167,10 +167,10 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test POST /api/group/calendar', () => {
+  describe('Test POST /api/group/:group_id/calendar', () => {
     it('Group schedule creation successful ', async () => {
-      const res = await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
-        groupId: 1,
+      const groupId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/calendar`).set('Cookie', cookie).send({
         title: 'test-title',
         content: 'test-content',
         startDateTime: '2023-05-06',
@@ -183,22 +183,6 @@ describe('Test /api/group endpoints', () => {
       });
 
       expect(res.status).toEqual(201);
-    });
-
-    it('Succssfully failed to create group schedule (missing groupid) ', async () => {
-      const res = (await request(app).post('/api/group/calendar').set('Cookie', cookie).send({
-        title: 'test-title',
-        content: 'test-content',
-        startDateTime: '2023-05-06',
-        endDateTime: '2023-05-07',
-        recurrence: 1,
-        freq: 'WEEKLY',
-        interval: 1,
-        byweekday: 'MO',
-        until: '2026-01-05',
-      }));
-
-      expect(res.status).toEqual(400);
     });
   });
 
@@ -651,6 +635,42 @@ describe('Test /api/group endpoints', () => {
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProposal);
+    });
+  });
+
+  describe('Test GET /api/group/calendar/:schedule_id', () => {
+    it('Successfully retrieved a schedule', async () => {
+      const scheduleId = 1;
+      const res = await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie);
+      const expectedResult = {
+        "byweekday": null,
+        "content": "test-content1",
+        "endDateTime": "2023-05-15T23:59:59.000Z",
+        "freq": null,
+        "groupId": 1,
+        "id": 1,
+        "interval": null,
+        "recurrence": 0,
+        "startDateTime": "2023-02-03T00:00:00.000Z",
+        "title": "test-title1",
+        "until": null,
+      }
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieved a schedule. (Schedule Not Found) ', async () => {
+      const scheduleId = 10000;
+      const res = (await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Schedule Not Found' });
+    });
+
+    it('Successfully failed to retrieved a schedule. (DataFormat Error) ', async () => {
+      const scheduleId = 'abc';
+      const res = (await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 
