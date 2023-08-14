@@ -512,7 +512,6 @@ async function getGroupPosts(req, res, next) {
     }));
     return res.status(200).json(result);
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
