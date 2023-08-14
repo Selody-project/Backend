@@ -21,7 +21,7 @@ const {
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-  validatePostSchema, validatePostIdSchema,
+  validatePostSchema, validatePostIdSchema, validatePageSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -433,13 +433,84 @@ async function postGroupPost(req, res, next) {
     }
 
     const { title, content } = req.body;
-    const post = await Post.create({ title });
+    const post = await Post.create({ author: nickname, title });
     await post.createPostDetail({ content });
 
     await user.addPosts(post);
     await group.addPosts(post);
 
     return res.status(201).json({ message: 'Successfully created the post.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getSinglePost(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { title } = post;
+    const { author } = post;
+    const { content } = (await post.getPostDetail()).dataValues;
+
+    return res.status(200).json({ author, title, content });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getGroupPosts(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { page } = req.query;
+    const pageSize = 7;
+
+    const startIndex = (page - 1) * pageSize;
+    const { rows } = await Post.findAndCountAll({
+      where: {
+        groupId,
+      },
+      include: [
+        {
+          model: PostDetail,
+          as: 'postDetail',
+        },
+      ],
+      offset: startIndex,
+      limit: pageSize,
+    });
+
+    const result = rows.map((post) => ({
+      title: post.title,
+      author: post.author,
+      createdAt: post.createdAt,
+      content: post.postDetail.content,
+    }));
+    return res.status(200).json(result);
   } catch (err) {
     return next(new ApiError());
   }
@@ -528,6 +599,8 @@ module.exports = {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  getSinglePost,
+  getGroupPosts,
   putGroupPost,
   deleteGroupPost,
 };

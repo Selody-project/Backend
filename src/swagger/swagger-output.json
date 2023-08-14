@@ -724,6 +724,44 @@
       }
     },
     "/api/group/{group_id}/post": {
+      "get": {
+        "description": "페이지네이션",
+        "summary": "그룹 포스트 페이지 조회(7개 단위)",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "post": {
         "description": "",
         "summary": "그룹 포스트 작성",
@@ -773,6 +811,44 @@
       }
     },
     "/api/group/{group_id}/post/{post_id}": {
+      "get": {
+        "description": "",
+        "summary": "단일 포스트 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "put": {
         "description": "",
         "summary": "그룹 포스트 수정",
