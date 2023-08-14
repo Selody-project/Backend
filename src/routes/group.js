@@ -14,6 +14,8 @@ const {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  getSinglePost,
+  getGroupPosts,
   putGroupPost,
   deleteGroupPost,
 } = require('../controllers/group');
@@ -32,8 +34,9 @@ router.post('/:group_id/invite-link', postInviteLink);
 router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
 router.get('/:group_id/proposal', getEventProposal);
-
 router.post('/:group_id/post', postGroupPost);
+router.get('/:group_id/post/:post_id', getSinglePost);
+router.get('/:group_id/post', getGroupPosts);
 router.put('/:group_id/post/:post_id', putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);
 

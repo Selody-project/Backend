@@ -25,6 +25,7 @@ class PostDetail extends Sequelize.Model {
 
   static associate(db) {
     db.PostDetail.belongsTo(db.Post, {
+      as: 'post',
       foreignKey: 'postId',
     });
   }

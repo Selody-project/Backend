@@ -106,6 +106,10 @@ const postIdSchema = Joi.object({
   post_id: Joi.number().min(0).required(),
 });
 
+const pageSchema = Joi.object({
+  page: Joi.number().min(0).required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -122,4 +126,5 @@ module.exports = {
   validateEventProposalSchema: validator(eventPoroposalSchema),
   validatePostSchema: validator(postSchema),
   validatePostIdSchema: validator(postIdSchema),
+  validatePageSchema: validator(pageSchema),
 };
