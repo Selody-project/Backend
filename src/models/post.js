@@ -13,11 +13,15 @@ class Post extends Sequelize.Model {
         type: Sequelize.STRING(45),
         allowNull: false,
       },
+      author: {
+        type: Sequelize.STRING(45),
+        allowNull: false,
+      },
     }, {
       sequelize,
       timestamps: true,
       modelName: 'Post',
-      tableName: 'Posts',
+      tableName: 'posts',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });
@@ -29,6 +33,7 @@ class Post extends Sequelize.Model {
       onDelete: 'cascade',
     });
     db.Post.hasOne(db.PostDetail, {
+      as: 'postDetail',
       foreignKey: 'postId',
       onDelete: 'cascade',
     });

@@ -55,13 +55,10 @@ const scheduleSchema = Joi.object({
   interval: Joi.number(),
   byweekday: Joi.string(),
   until: Joi.date(),
-  confirmed: Joi.number(),
-  possible: Joi.object(),
-  impossible: Joi.object(),
 });
 
 const groupScheduleSchema = Joi.object({
-  groupId: Joi.number().required(),
+  groupId: Joi.number(),
   title: Joi.string().max(45).required(),
   content: Joi.string(),
   startDateTime: Joi.date(),
@@ -87,7 +84,7 @@ const userScheduleSchema = Joi.object({
 });
 
 const scheduleIdSchema = Joi.object({
-  id: Joi.number().min(0).required(),
+  schedule_id: Joi.number().min(0).required(),
 });
 
 const eventPoroposalSchema = Joi.object({
@@ -99,6 +96,15 @@ const eventPoroposalSchema = Joi.object({
 const postSchema = Joi.object({
   title: Joi.string(),
   content: Joi.string(),
+});
+
+const postIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  post_id: Joi.number().min(0).required(),
+});
+
+const pageSchema = Joi.object({
+  page: Joi.number().min(0).required(),
 });
 
 module.exports = {
@@ -116,4 +122,6 @@ module.exports = {
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
   validateEventProposalSchema: validator(eventPoroposalSchema),
   validatePostSchema: validator(postSchema),
+  validatePostIdSchema: validator(postIdSchema),
+  validatePageSchema: validator(pageSchema),
 };
