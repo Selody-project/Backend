@@ -7,19 +7,21 @@ const UserGroup = require('../models/userGroup');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const Post = require('../models/post');
+const PostDetail = require('../models/postDetail');
 
 const ApiError = require('../errors/apiError');
 const DataFormatError = require('../errors/DataFormatError');
 const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
-  UserNotFoundError, UnathroizedError, ScheduleNotFoundError, GroupNotFoundError,
+  UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
+  GroupNotFoundError, PostNotFoundError, EditPermissionError,
 } = require('../errors');
 
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-  validatePostSchema,
+  validatePostSchema, validatePostIdSchema, validatePageSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -37,7 +39,6 @@ async function createGroup(req, res, next) {
     }
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
@@ -191,11 +192,15 @@ async function getGroupSchedule(req, res, next) {
 
 async function postGroupSchedule(req, res, next) {
   try {
-    const { error } = validateGroupScheduleSchema(req.body);
-    if (error) return next(new DataFormatError());
+    const { error: bodyError } = validateGroupScheduleSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { error: paramsError } = validateGroupIdSchema(req.params);
+    if (paramsError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
 
     const {
-      groupId,
       title,
       content,
       startDateTime,
@@ -235,14 +240,14 @@ async function putGroupSchedule(req, res, next) {
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
     if (bodyError) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id } });
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
 
-    await GroupSchedule.update(req.body, { where: { id } });
+    await GroupSchedule.update(req.body, { where: { id: scheduleId } });
     return res.status(201).json({ message: 'Successfully modify group schedule' });
   } catch (err) {
     return next(new ApiError());
@@ -254,8 +259,8 @@ async function deleteGroupSchedule(req, res, next) {
     const { error } = validateScheduleIdSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { id } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id } });
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
@@ -264,6 +269,22 @@ async function deleteGroupSchedule(req, res, next) {
     await schedule.destroy();
 
     return res.status(204).json({ message: 'Successfully delete group schedule' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getSingleGroupSchedule(req, res, next) {
+  try {
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { schedule_id: scheduleId } = req.params;
+    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+    return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());
   }
@@ -431,7 +452,7 @@ async function postGroupPost(req, res, next) {
     }
 
     const { title, content } = req.body;
-    const post = await Post.create({ title });
+    const post = await Post.create({ author: nickname, title });
     await post.createPostDetail({ content });
 
     await user.addPosts(post);
@@ -442,12 +463,163 @@ async function postGroupPost(req, res, next) {
     return next(new ApiError());
   }
 }
-async function getGroupList(req, res, next) {
-  const { page } = req.query;
-  const limit = 20;
-  const offset = (page - 1) * limit;
+
+async function getSinglePost(req, res, next) {
   try {
-    return offset;
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { title } = post;
+    const { author } = post;
+    const { content } = (await post.getPostDetail()).dataValues;
+
+    return res.status(200).json({ author, title, content });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getGroupPosts(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { page } = req.query;
+    const pageSize = 7;
+
+    const startIndex = (page - 1) * pageSize;
+    const { rows } = await Post.findAndCountAll({
+      where: {
+        groupId,
+      },
+      include: [
+        {
+          model: PostDetail,
+          as: 'postDetail',
+        },
+      ],
+      offset: startIndex,
+      limit: pageSize,
+    });
+
+    const result = rows.map((post) => ({
+      title: post.title,
+      author: post.author,
+      createdAt: post.createdAt,
+      content: post.postDetail.content,
+    }));
+    return res.status(200).json(result);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function putGroupPost(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { error: bodyError } = validatePostSchema(req.body);
+    if (bodyError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { nickname } = req;
+    const user = await User.findOne({ where: { nickname } });
+    if (!user || (user.userId !== post.userId)) {
+      return next(new EditPermissionError());
+    }
+
+    const { title, content } = req.body;
+
+    await post.update({ title });
+    await PostDetail.update({ content }, { where: { postId } });
+
+    return res.status(200).json({ message: 'Successfully modified the post.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deleteGroupPost(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { post_id: postId } = req.params;
+    const post = await Post.findByPk(postId);
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { nickname } = req;
+    const user = await User.findOne({ where: { nickname } });
+    if (!user || (user.userId !== post.userId)) {
+      return next(new EditPermissionError());
+    }
+
+    await post.destroy();
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getGroupList(req, res, next) {
+  try {
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { page } = req.query;
+    const pageSize = 9;
+    const startIndex = (page - 1) * pageSize;
+    const { rows } = await Group.findAndCountAll({
+      offset: startIndex,
+      limit: pageSize,
+    });
+    const result = rows.map((group) => ({
+      name: group.name,
+      member: group.member,
+    }));
+    return res.status(200).json(result);
   } catch {
     return next(new ApiError());
   }
@@ -463,10 +635,15 @@ module.exports = {
   postGroupSchedule,
   putGroupSchedule,
   deleteGroupSchedule,
+  getSingleGroupSchedule,
   postInviteLink,
   getInvitation,
   postGroupJoin,
   getEventProposal,
   postGroupPost,
   getGroupList,
+  getSinglePost,
+  getGroupPosts,
+  putGroupPost,
+  deleteGroupPost,
 };

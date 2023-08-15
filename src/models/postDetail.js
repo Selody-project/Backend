@@ -17,7 +17,7 @@ class PostDetail extends Sequelize.Model {
       sequelize,
       timestamps: true,
       modelName: 'PostDetail',
-      tableName: 'PostDetails',
+      tableName: 'postDetails',
       charset: 'utf8',
       collate: 'utf8_general_ci',
     });
@@ -25,6 +25,7 @@ class PostDetail extends Sequelize.Model {
 
   static associate(db) {
     db.PostDetail.belongsTo(db.Post, {
+      as: 'post',
       foreignKey: 'postId',
     });
   }

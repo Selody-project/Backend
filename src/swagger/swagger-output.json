@@ -304,6 +304,29 @@
             "description": "서버 에러"
           }
         }
+      },
+      "get": {
+        "description": "",
+        "summary": "그룹 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
       }
     },
     "/api/group/{group_id}": {
@@ -457,25 +480,63 @@
         }
       }
     },
-    "/api/group/calendar": {
-      "post": {
-        "description": "",
-        "summary": "그룹 일정 등록",
-        "tags": ["Group"],
+    "/api/group/calendar/{schedule_id}": {
+      "get": {
+        "description": "그룹 일정을 단일 조회합니다.",
+        "summary": "그룹 일정 단일 조회",
+        "tags": ["Group Schedule"],
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "summary": "그룹 일정 수정",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
           {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "groupId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -484,8 +545,103 @@
                 "endDateTime": {
                   "example": "2099-01-01T12:00:00.000Z"
                 },
-                "confirmed": {
+                "recurrence": {
                   "example": "tinyint(1)"
+                },
+                "freq": {
+                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
+                },
+                "interval": {
+                  "example": "integer"
+                },
+                "byweekday": {
+                  "example": "MO,TU,WE,TH,FR,SA,SU"
+                },
+                "until": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 일정 삭제",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/calendar": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 등록",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "string"
+                },
+                "content": {
+                  "example": "string"
+                },
+                "startDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
+                },
+                "endDateTime": {
+                  "example": "2099-01-01T12:00:00.000Z"
                 },
                 "recurrence": {
                   "example": "tinyint(1)"
@@ -520,120 +676,11 @@
             "description": "서버 에러"
           }
         }
-      }
-    },
-    "/api/group/calendar/:id": {
-      "put": {
-        "description": "",
-        "summary": "그룹 일정 수정",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "integer"
-                },
-                "groupId": {
-                  "example": "integer"
-                },
-                "title": {
-                  "example": "string"
-                },
-                "contents": {
-                  "example": "string"
-                },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "confirmed": {
-                  "example": "tinyint(1)"
-                },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "403": {
-            "description": "존재하지 않는 스케줄"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
       },
-      "delete": {
-        "description": "",
-        "summary": "그룹 일정 삭제",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "example": "integer"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "403": {
-            "description": "존재하지 않는 스케줄"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}/calendar": {
       "get": {
         "description": "",
         "summary": "그룹 일정 조회",
-        "tags": ["Group"],
+        "tags": ["Group Schedule"],
         "parameters": [
           {
             "name": "group_id",
@@ -677,7 +724,7 @@
       "get": {
         "description": "",
         "summary": "그룹 새 일정 시간대 추천 받기",
-        "tags": ["Group"],
+        "tags": ["Group Schedule"],
         "parameters": [
           {
             "name": "group_id",
@@ -724,10 +771,48 @@
       }
     },
     "/api/group/{group_id}/post": {
+      "get": {
+        "description": "페이지네이션",
+        "summary": "그룹 포스트 페이지 조회(7개 단위)",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "post": {
         "description": "",
-        "summary": "그룹 피드 작성",
-        "tags": ["Group"],
+        "summary": "그룹 포스트 작성",
+        "tags": ["Feed"],
         "parameters": [
           {
             "name": "group_id",
@@ -749,7 +834,7 @@
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 }
               }
@@ -765,6 +850,143 @@
           },
           "404": {
             "description": "존재하지 않는 그룹/유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/post/{post_id}": {
+      "get": {
+        "description": "",
+        "summary": "포스트 단일 조회",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "summary": "그룹 포스트 수정",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "title": {
+                  "example": "modified-title"
+                },
+                "content": {
+                  "example": "modified-content"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "403": {
+            "description": "수정할 권한이 없음(글 작성자가 아닌 경우)"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/포스트"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 포스트 삭제",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "403": {
+            "description": "수정할 권한이 없음(글 작성자가 아닌 경우)"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/포스트"
           },
           "500": {
             "description": "서버 에러"
@@ -880,7 +1102,7 @@
       "get": {
         "description": "",
         "summary": "유저 일정 조회",
-        "tags": ["User"],
+        "tags": ["User Schedule"],
         "parameters": [
           {
             "name": "user_id",
@@ -922,7 +1144,7 @@
       "post": {
         "description": "",
         "summary": "유저 일정 등록",
-        "tags": ["User"],
+        "tags": ["User Schedule"],
         "parameters": [
           {
             "name": "body",
@@ -930,13 +1152,10 @@
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -983,25 +1202,63 @@
         }
       }
     },
-    "/api/user/calendar/:id": {
+    "/api/user/calendar/{schedule_id}": {
+      "get": {
+        "description": "유저 일정을 단일 조회합니다.",
+        "summary": "유저 일정 단일 조회",
+        "tags": ["User Schedule"],
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "put": {
         "description": "",
         "summary": "유저 일정 수정",
-        "tags": ["User"],
+        "tags": ["User Schedule"],
         "parameters": [
+          {
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
           {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
-                  "example": "integer"
-                },
                 "title": {
                   "example": "string"
                 },
-                "contents": {
+                "content": {
                   "example": "string"
                 },
                 "startDateTime": {
@@ -1040,7 +1297,7 @@
             "description": "권한 없음"
           },
           "403": {
-            "description": "존재하지 않는 스케줄"
+            "description": "존재하지 않는 일정"
           },
           "500": {
             "description": "서버 에러"
@@ -1050,10 +1307,10 @@
       "delete": {
         "description": "",
         "summary": "유저 일정 삭제",
-        "tags": ["User"],
+        "tags": ["User Schedule"],
         "parameters": [
           {
-            "name": "id",
+            "name": "schedule_id",
             "in": "path",
             "required": true,
             "type": "integer"
@@ -1070,7 +1327,7 @@
             "description": "권한 없음"
           },
           "404": {
-            "description": "존재하지 않는 스케줄"
+            "description": "존재하지 않는 일정"
           },
           "500": {
             "description": "서버 에러"
@@ -1230,8 +1487,7 @@
         "title",
         "startDateTime",
         "endDateTime",
-        "recurrence",
-        "confirmed"
+        "recurrence"
       ],
       "properties": {
         "id": {
@@ -1266,15 +1522,6 @@
         },
         "until": {
           "type": "DATETIME"
-        },
-        "confirmed": {
-          "type": "TINYINT(1)"
-        },
-        "possible": {
-          "type": "JSON"
-        },
-        "impossible": {
-          "type": "JSON"
         }
       },
       "xml": {
@@ -1297,6 +1544,84 @@
       },
       "xml": {
         "name": "UserGroup"
+      }
+    },
+    "Post": {
+      "type": "object",
+      "required": [
+        "groupId",
+        "userId",
+        "title",
+        "author"
+      ],
+      "properties": {
+        "postId": {
+          "type": "BIGINT"
+        },
+        "groupId": {
+          "type": "BIGINT"
+        },
+        "userId": {
+          "type": "BIGINT"
+        },
+        "title": {
+          "type": "VARCHAR(45)"
+        },
+        "author": {
+          "type": "VARCHAR(45)"
+        }
+      },
+      "xml": {
+        "name": "Post"
+      }
+    },
+    "PostDetail": {
+      "type": "object",
+      "required": [
+        "postId",
+        "content"
+      ],
+      "properties": {
+        "postDetailId": {
+          "type": "BIGINT"
+        },
+        "postId": {
+          "type": "BIGINT"
+        },
+        "content": {
+          "type": "TEXT"
+        }
+      },
+      "xml": {
+        "name": "PostDetail"
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "required": [
+        "userId",
+        "postId",
+        "content"
+      ],
+      "properties": {
+        "commentId": {
+          "type": "BIGINT"
+        },
+        "userId": {
+          "type": "BIGINT"
+        },
+        "postId": {
+          "type": "BIGINT"
+        },
+        "content": {
+          "type": "TEXT"
+        },
+        "depth": {
+          "type": "integer"
+        }
+      },
+      "xml": {
+        "name": "Comment"
       }
     }
   }
