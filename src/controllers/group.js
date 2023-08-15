@@ -442,6 +442,16 @@ async function postGroupPost(req, res, next) {
     return next(new ApiError());
   }
 }
+async function getGroupList(req, res, next) {
+  const { page } = req.query;
+  const limit = 20;
+  const offset = (page - 1) * limit;
+  try {
+    return offset;
+  } catch {
+    return next(new ApiError());
+  }
+}
 
 module.exports = {
   createGroup,
@@ -458,4 +468,5 @@ module.exports = {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  getGroupList,
 };
