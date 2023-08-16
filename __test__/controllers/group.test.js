@@ -124,29 +124,29 @@ describe('Test /api/group endpoints', () => {
       const id = 1;
       const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
       const expectedGroups = {
-        "group": {
-          "groupId": 1,
-          "inviteCode": "inviteCode01",
-          "inviteExp": "2099-01-01T00:00:00.000Z",
-          "isPublicGroup": 0,
-          "leader": 1,
-          "member": 2,
-          "name": "test-group1",
+        group: {
+          groupId: 1,
+          inviteCode: 'inviteCode01',
+          inviteExp: '2099-01-01T00:00:00.000Z',
+          isPublicGroup: 0,
+          leader: 1,
+          member: 2,
+          name: 'test-group1',
         },
-        "leaderInfo": {
-          "nickname": "test-user1",
-          "userId": 1,
+        leaderInfo: {
+          nickname: 'test-user1',
+          userId: 1,
         },
-        "memberInfo": [
+        memberInfo: [
           {
-            "nickname": "test-user1",
-            "userId": 1,
+            nickname: 'test-user1',
+            userId: 1,
           },
           {
-            "nickname": "test-user2",
-            "userId": 2,
+            nickname: 'test-user2',
+            userId: 2,
           },
-        ]
+        ],
       };
 
       expect(res.status).toEqual(200);
@@ -643,18 +643,18 @@ describe('Test /api/group endpoints', () => {
       const scheduleId = 1;
       const res = await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie);
       const expectedResult = {
-        "byweekday": null,
-        "content": "test-content1",
-        "endDateTime": "2023-05-15T23:59:59.000Z",
-        "freq": null,
-        "groupId": 1,
-        "id": 1,
-        "interval": null,
-        "recurrence": 0,
-        "startDateTime": "2023-02-03T00:00:00.000Z",
-        "title": "test-title1",
-        "until": null,
-      }
+        byweekday: null,
+        content: 'test-content1',
+        endDateTime: '2023-05-15T23:59:59.000Z',
+        freq: null,
+        groupId: 1,
+        id: 1,
+        interval: null,
+        recurrence: 0,
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        title: 'test-title1',
+        until: null,
+      };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });
@@ -677,8 +677,8 @@ describe('Test /api/group endpoints', () => {
   describe('Test POST /api/group/:group_id/post', () => {
     it('Successfully created the post ', async () => {
       const groupId = 1;
-      const title = "testTitle";
-      const content = "testContent";
+      const title = 'testTitle';
+      const content = 'testContent';
       const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
         title,
         content,
@@ -690,8 +690,8 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to create the post (Group Not Found) ', async () => {
       const groupId = 10000;
-      const title = "testTitle";
-      const content = "testContent";
+      const title = 'testTitle';
+      const content = 'testContent';
       const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
         title,
         content,
@@ -717,8 +717,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully modified the post ', async () => {
       const groupId = 1;
       const postId = 1;
-      const title = "modified-title";
-      const content = "modified-content";
+      const title = 'modified-title';
+      const content = 'modified-content';
       const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
         title,
         content,
@@ -731,8 +731,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Group Not Found) ', async () => {
       const groupId = 10000;
       const postId = 1;
-      const title = "testTitle";
-      const content = "testContent";
+      const title = 'testTitle';
+      const content = 'testContent';
       const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
         title,
         content,
@@ -744,8 +744,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Post Not Found) ', async () => {
       const groupId = 1;
       const postId = 10000;
-      const title = "testTitle";
-      const content = "testContent";
+      const title = 'testTitle';
+      const content = 'testContent';
       const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
         title,
         content,
@@ -770,8 +770,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Edit Permission Error) ', async () => {
       const groupId = 1;
       const postId = 2;
-      const title = "modified-title";
-      const content = "modified-content";
+      const title = 'modified-title';
+      const content = 'modified-content';
       const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
         title,
         content,
@@ -830,9 +830,9 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       const expectedPost = {
-        "author": "test-user1",
-        "content": "test-content1",
-        "title": "test-title1",
+        author: 'test-user1',
+        content: 'test-content1',
+        title: 'test-title1',
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedPost);
@@ -875,25 +875,25 @@ describe('Test /api/group endpoints', () => {
           author: 'test-user1', title: 'test-title1', content: 'test-content1',
         },
         {
-          author: 'test-user2', title: 'test-title2', content: 'test-content2', 
+          author: 'test-user2', title: 'test-title2', content: 'test-content2',
         },
         {
-          author: 'test-user1', title: 'test-title3', content: 'test-content3', 
+          author: 'test-user1', title: 'test-title3', content: 'test-content3',
         },
         {
-          author: 'test-user1', title: 'test-title4', content: 'test-content4', 
+          author: 'test-user1', title: 'test-title4', content: 'test-content4',
         },
         {
-          author: 'test-user1', title: 'test-title5', content: 'test-content5',  
+          author: 'test-user1', title: 'test-title5', content: 'test-content5',
         },
         {
-          author: 'test-user2', title: 'test-title7', content: 'test-content7', 
+          author: 'test-user2', title: 'test-title7', content: 'test-content7',
         },
         {
-          author: 'test-user2', title: 'test-title8', content: 'test-content8', 
-        }, 
+          author: 'test-user2', title: 'test-title8', content: 'test-content8',
+        },
       ];
-      const result = res.body.map(post => ({
+      const result = res.body.map((post) => ({
         title: post.title,
         author: post.author,
         content: post.content,
@@ -920,6 +920,32 @@ describe('Test /api/group endpoints', () => {
       }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test GET /api/group', () => {
+    it('Successfully retrieved group lists. ', async () => {
+      const page = 1;
+      const res = (await request(app).get('/api/group').set('Cookie', cookie).query({
+        page,
+      }));
+      const expectedResult = [
+        {
+          name: 'test-group1', member: 2,
+        },
+        {
+          name: 'test-group2', member: 6,
+        },
+        {
+          name: 'test-group3', member: 1,
+        },
+      ];
+      const result = res.body.map((group) => ({
+        name: group.name,
+        member: group.member,
+      }));
+      expect(res.status).toEqual(200);
+      expect(result).toEqual(expectedResult);
     });
   });
 });

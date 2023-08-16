@@ -407,18 +407,18 @@ describe('Test /api/user endpoints', () => {
       const scheduleId = 1;
       const res = await request(app).get(`/api/user/calendar/${scheduleId}`).set('Cookie', cookie);
       const expectedResult = {
-        "byweekday": null,
-        "content": "test-content1",
-        "endDateTime": "2023-05-15T23:59:59.000Z",
-        "freq": null,
-        "id": 1,
-        "interval": null,
-        "recurrence": 0,
-        "startDateTime": "2023-02-03T00:00:00.000Z",
-        "title": "test-title1",
-        "until": null,
-        "userId": 1,
-      }
+        byweekday: null,
+        content: 'test-content1',
+        endDateTime: '2023-05-15T23:59:59.000Z',
+        freq: null,
+        id: 1,
+        interval: null,
+        recurrence: 0,
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        title: 'test-title1',
+        until: null,
+        userId: 1,
+      };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });

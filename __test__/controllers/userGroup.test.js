@@ -43,7 +43,7 @@ describe('Test /api/group endpoints', () => {
   describe('Test DELETE /api/user/group/:group_id', () => {
     it('Successfully delete a user from group', async () => {
       const groupId = 2;
-      let res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
+      const res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
       expect(res.status).toEqual(204);
     });
 

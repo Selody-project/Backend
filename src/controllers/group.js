@@ -39,7 +39,6 @@ async function createGroup(req, res, next) {
     }
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
@@ -604,6 +603,28 @@ async function deleteGroupPost(req, res, next) {
   }
 }
 
+async function getGroupList(req, res, next) {
+  try {
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { page } = req.query;
+    const pageSize = 9;
+    const startIndex = (page - 1) * pageSize;
+    const { rows } = await Group.findAndCountAll({
+      offset: startIndex,
+      limit: pageSize,
+    });
+    const result = rows.map((group) => ({
+      name: group.name,
+      member: group.member,
+    }));
+    return res.status(200).json(result);
+  } catch {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupDetail,
@@ -620,6 +641,7 @@ module.exports = {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  getGroupList,
   getSinglePost,
   getGroupPosts,
   putGroupPost,

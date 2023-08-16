@@ -15,6 +15,8 @@ const {
   postGroupJoin,
   getEventProposal,
   postGroupPost,
+  getGroupList,
+
   getSinglePost,
   getGroupPosts,
   putGroupPost,
@@ -24,6 +26,7 @@ const {
 const router = express.Router();
 
 router.post('/', createGroup);
+router.get('/', getGroupList);
 router.get('/:group_id', getGroupDetail);
 router.delete('/:group_id', deleteGroup);
 router.patch('/:group_id', patchGroup);

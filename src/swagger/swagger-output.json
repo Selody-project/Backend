@@ -304,6 +304,29 @@
             "description": "서버 에러"
           }
         }
+      },
+      "get": {
+        "description": "",
+        "summary": "그룹 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
       }
     },
     "/api/group/{group_id}": {

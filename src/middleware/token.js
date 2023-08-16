@@ -36,7 +36,7 @@ async function createToken(req, res, next) {
     const refreshToken = token().access(nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
-    const user = await User.findOne({  where: { nickname } });
+    const user = await User.findOne({ where: { nickname } });
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
       email: user.email,
