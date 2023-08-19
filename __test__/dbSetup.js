@@ -6,6 +6,7 @@ const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
 const Post = require('../src/models/post');
 const PostDetail = require('../src/models/postDetail');
+const Comment = require('../src/models/comment');
 
 const mockUser = {
   email: 'test-user1@email.com',
@@ -340,34 +341,49 @@ async function setUpGroupPostDB() {
 
   await PostDetail.bulkCreate([
     {
-      PostDetailId: 1, postId: 1, content: 'test-content1',
+      postDetailId: 1, postId: 1, content: 'test-content1',
     },
     {
-      PostDetailId: 2, postId: 2, content: 'test-content2',
+      postDetailId: 2, postId: 2, content: 'test-content2',
     },
     {
-      PostDetailId: 3, postId: 3, content: 'test-content3',
+      postDetailId: 3, postId: 3, content: 'test-content3',
     },
     {
-      PostDetailId: 4, postId: 4, content: 'test-content4',
+      postDetailId: 4, postId: 4, content: 'test-content4',
     },
     {
-      PostDetailId: 5, postId: 5, content: 'test-content5',
+      postDetailId: 5, postId: 5, content: 'test-content5',
     },
     {
-      PostDetailId: 6, postId: 6, content: 'test-content6',
+      postDetailId: 6, postId: 6, content: 'test-content6',
     },
     {
-      PostDetailId: 7, postId: 7, content: 'test-content7',
+      postDetailId: 7, postId: 7, content: 'test-content7',
     },
     {
-      PostDetailId: 8, postId: 8, content: 'test-content8',
+      postDetailId: 8, postId: 8, content: 'test-content8',
     },
     {
-      PostDetailId: 9, postId: 9, content: 'test-content9',
+      postDetailId: 9, postId: 9, content: 'test-content9',
     },
     {
-      PostDetailId: 10, postId: 10, content: 'test-content10',
+      postDetailId: 10, postId: 10, content: 'test-content10',
+    },
+  ]);
+
+  await Comment.bulkCreate([
+    {
+      commentId: 1, postId: 1, userId: 1, content: 'test-comment1',
+    },
+    {
+      commentId: 2, postId: 1, userId: 1, content: 'test-comment2',
+    },
+    {
+      commentId: 3, postId: 1, userId: 2, content: 'test-comment3',
+    },
+    {
+      commentId: 4, postId: 1, userId: 2, content: 'test-comment4',
     },
   ]);
 }
@@ -389,6 +405,7 @@ async function tearDownPersonalScheduleDB() {
 }
 
 async function tearDownGroupPostDB() {
+  await db.sequelize.query('DELETE FROM `comments`');
   await db.sequelize.query('DELETE FROM `posts`');
   await db.sequelize.query('DELETE FROM `postDetails`');
 }

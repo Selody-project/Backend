@@ -1044,6 +1044,62 @@
             "description": "서버 에러"
           }
         }
+      },
+      "put": {
+        "description": "포스트에 댓글을 작성합니다.",
+        "summary": "포스트 댓글 수정",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "example": "modified-comment"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트/댓글"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
       }
     },
     "/api/user/group": {
