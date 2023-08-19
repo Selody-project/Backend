@@ -22,6 +22,7 @@ const {
   deleteGroupPost,
   postPostComment,
   putPostComment,
+  deletePostComment,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -52,5 +53,6 @@ router.put('/:group_id/post/:post_id', putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);
 router.post('/:group_id/post/:post_id/comment', postPostComment);
 router.put('/:group_id/post/:post_id/comment/:comment_id', putPostComment);
+router.delete('/:group_id/post/:post_id/comment/:comment_id', deletePostComment);
 
 module.exports = router;

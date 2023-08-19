@@ -777,7 +777,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
+      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
     });
   });
 
@@ -820,7 +820,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 2;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify the post.' });
+      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
     });
   });
 
@@ -1053,6 +1053,61 @@ describe('Test /api/group endpoints', () => {
       }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test DELETE /api/group/:group_id/post/:post_id/comment/:comment_id', () => {
+    it('Successfully deleted the comment ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 1;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully failed to deleted the comment (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const commentId = 1;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to deleted the comment (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const commentId = 1;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to deleted the comment (Comment Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 10000;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Comment Not Found' });
+    });
+
+    it('Successfully failed to deleted the comment (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 'abc';
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to deleted the comment (Edit Permission Error) ', async () => {
+      const groupId = 1;
+      const postId = 2;
+      const commentId = 3;
+      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
     });
   });
 });
