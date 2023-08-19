@@ -995,4 +995,64 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
+
+  describe('Test PUT /api/group/:group_id/post/:post_id/comment/:comment_id', () => {
+    const content = 'testComment';
+
+    it('Successfully modified the comment ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 1;
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
+        content,
+      }));
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual({ message: 'Successfully modified the comment.' });
+    });
+
+    it('Successfully failed to modified the comment (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const commentId = 1;
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to modified the comment (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const commentId = 1;
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to modified the comment (Comment Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 10000;
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Comment Not Found' });
+    });
+
+    it('Successfully failed to modified the comment (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const commentId = 'abc';
+      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });

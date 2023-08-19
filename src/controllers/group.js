@@ -1,5 +1,7 @@
 const moment = require('moment');
-const { parseEventDates, eventProposal } = require('../utils/event');
+const {
+  parseEventDates, eventProposal,
+} = require('../utils/event');
 
 // Model
 const User = require('../models/user');
@@ -9,22 +11,22 @@ const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const Post = require('../models/post');
 const PostDetail = require('../models/postDetail');
+const Comment = require('../models/comment');
 
-const ApiError = require('../errors/apiError');
-const DataFormatError = require('../errors/DataFormatError');
-const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
-const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
+// Error
 const {
+  DataFormatError, ApiError,
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
-  GroupNotFoundError, PostNotFoundError, EditPermissionError, CommentNotFoundError,
+  GroupNotFoundError, PostNotFoundError, EditPermissionError,
+  CommentNotFoundError, ExpiredCodeError, InvalidGroupJoinError,
 } = require('../errors');
 
 // Validator
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-  validatePostSchema, validatePostIdSchema, validatePageSchema, validateCommentSchema,
-  validateCommentIdSchema,
+  validatePostSchema, validatePostIdSchema, validatePageSchema,
+  validateCommentSchema, validateCommentIdSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
