@@ -1,6 +1,7 @@
 const moment = require('moment');
 const { parseEventDates, eventProposal } = require('../utils/event');
 
+// Model
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const UserGroup = require('../models/userGroup');
@@ -15,13 +16,15 @@ const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
 const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
 const {
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
-  GroupNotFoundError, PostNotFoundError, EditPermissionError,
+  GroupNotFoundError, PostNotFoundError, EditPermissionError, CommentNotFoundError,
 } = require('../errors');
 
+// Validator
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema, validateCommentSchema,
+  validateCommentIdSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -661,6 +664,41 @@ async function postPostComment(req, res, next) {
   }
 }
 
+async function putPostComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    const { error: bodyError } = validateCommentSchema(req.body);
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const group = await Group.findByPk(groupId);
+    const post = await Post.findByPk(postId);
+    const comment = await Comment.findByPk(commentId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    const { content } = req.body;
+    await comment.update({ content });
+
+    return res.status(200).json({ message: 'Successfully modified the comment.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupDetail,
@@ -683,4 +721,5 @@ module.exports = {
   putGroupPost,
   deleteGroupPost,
   postPostComment,
+  putPostComment,
 };
