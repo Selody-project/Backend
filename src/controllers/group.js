@@ -640,9 +640,11 @@ async function postPostComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const group = await Group.findByPk(groupId);
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    const post = await Post.findByPk(postId);
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+    ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -676,9 +678,12 @@ async function putPostComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
-    const group = await Group.findByPk(groupId);
-    const post = await Post.findByPk(postId);
-    const comment = await Comment.findByPk(commentId);
+    const [group, user, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -692,10 +697,58 @@ async function putPostComment(req, res, next) {
       return next(new CommentNotFoundError());
     }
 
+    if (user.userId !== comment.userId) {
+      return next(new EditPermissionError());
+    }
+
     const { content } = req.body;
     await comment.update({ content });
 
     return res.status(200).json({ message: 'Successfully modified the comment.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deletePostComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    const { error: bodyError } = validateCommentSchema(req.body);
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const [group, user, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    if (user.userId !== comment.userId) {
+      return next(new EditPermissionError());
+    }
+    await comment.destroy();
+
+    return res.status(204).end();
   } catch (err) {
     return next(new ApiError());
   }
@@ -724,4 +777,5 @@ module.exports = {
   deleteGroupPost,
   postPostComment,
   putPostComment,
+  deletePostComment,
 };
