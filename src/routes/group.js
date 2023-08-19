@@ -20,9 +20,11 @@ const {
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
-  postPostComment,
-  putPostComment,
-  deletePostComment,
+  getPostComment,
+  getSingleComment,
+  postComment,
+  putComment,
+  deleteComment,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -47,12 +49,14 @@ router.get('/:group_id/proposal', getEventProposal);
 
 // Post
 router.post('/:group_id/post', postGroupPost);
-router.get('/:group_id/post/:post_id', getSinglePost);
 router.get('/:group_id/post', getGroupPosts);
+router.get('/:group_id/post/:post_id', getSinglePost);
 router.put('/:group_id/post/:post_id', putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);
-router.post('/:group_id/post/:post_id/comment', postPostComment);
-router.put('/:group_id/post/:post_id/comment/:comment_id', putPostComment);
-router.delete('/:group_id/post/:post_id/comment/:comment_id', deletePostComment);
+router.get('/:group_id/post/:post_id/comment', getPostComment);
+router.get('/:group_id/post/:post_id/comment/:comment_id', getSingleComment);
+router.post('/:group_id/post/:post_id/comment', postComment);
+router.put('/:group_id/post/:post_id/comment/:comment_id', putComment);
+router.delete('/:group_id/post/:post_id/comment/:comment_id', deleteComment);
 
 module.exports = router;

@@ -630,7 +630,68 @@ async function getGroupList(req, res, next) {
   }
 }
 
-async function postPostComment(req, res, next) {
+async function getPostComment(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, post] = await Promise.all([
+      Group.findByPk(groupId),
+      Post.findByPk(postId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const comments = await post.getComments();
+
+    return res.status(200).json(comments);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getSingleComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const [group, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    return res.status(200).json(comment);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postComment(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
     const { error: bodyError } = validateCommentSchema(req.body);
@@ -668,7 +729,7 @@ async function postPostComment(req, res, next) {
   }
 }
 
-async function putPostComment(req, res, next) {
+async function putComment(req, res, next) {
   try {
     const { error: paramError } = validateCommentIdSchema(req.params);
     const { error: bodyError } = validateCommentSchema(req.body);
@@ -710,7 +771,7 @@ async function putPostComment(req, res, next) {
   }
 }
 
-async function deletePostComment(req, res, next) {
+async function deleteComment(req, res, next) {
   try {
     const { error: paramError } = validateCommentIdSchema(req.params);
     if (paramError) {
@@ -773,7 +834,9 @@ module.exports = {
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
-  postPostComment,
-  putPostComment,
-  deletePostComment,
+  getPostComment,
+  getSingleComment,
+  postComment,
+  putComment,
+  deleteComment,
 };
