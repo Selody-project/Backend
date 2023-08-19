@@ -108,7 +108,7 @@ const pageSchema = Joi.object({
 });
 
 const commentSchema = Joi.object({
-  content: Joi.number().min(0).required(),
+  content: Joi.string().max(500).required(),
 });
 
 module.exports = {

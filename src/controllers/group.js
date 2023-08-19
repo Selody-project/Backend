@@ -627,7 +627,7 @@ async function getGroupList(req, res, next) {
 
 async function postPostComment(req, res, next) {
   try {
-    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: paramError } = validatePostIdSchema(req.params);
     const { error: bodyError } = validateCommentSchema(req.body);
 
     if (paramError || bodyError) {

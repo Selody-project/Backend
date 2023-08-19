@@ -948,4 +948,51 @@ describe('Test /api/group endpoints', () => {
       expect(result).toEqual(expectedResult);
     });
   });
+
+  describe('Test POST /api/group/:group_id/post/:post_id/comment', () => {
+    it('Successfully created the comment ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const content = 'testComment';
+      const res = (await request(app).post(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie).send({
+        content,
+      }));
+
+      expect(res.status).toEqual(201);
+      expect(res.body).toEqual({ message: 'Successfully created the comment.' });
+    });
+
+    it('Successfully failed to create the comment (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const content = 'testComment';
+      const res = (await request(app).post(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to create the comment (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const content = 'testComment';
+      const res = (await request(app).post(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to create the comment (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const content = 123;
+      const res = (await request(app).post(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie).send({
+        content,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });

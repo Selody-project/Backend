@@ -32,6 +32,9 @@ class Comment extends Sequelize.Model {
     db.Comment.belongsTo(db.Post, {
       foreignKey: 'postId',
     });
+    db.Comment.belongsTo(db.User, {
+      foreignKey: 'userId',
+    });
   }
 }
 
