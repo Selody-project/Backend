@@ -21,7 +21,7 @@ const {
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
-  validatePostSchema, validatePostIdSchema, validatePageSchema,
+  validatePostSchema, validatePostIdSchema, validatePageSchema, validateCommentSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -625,6 +625,42 @@ async function getGroupList(req, res, next) {
   }
 }
 
+async function postPostComment(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    const { error: bodyError } = validateCommentSchema(req.body);
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const group = await Group.findByPk(groupId);
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    const post = await Post.findByPk(postId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { content } = req.body;
+    const comment = await post.createComment({ content });
+    await user.addComments(comment);
+
+    return res.status(201).json({ message: 'Successfully created the comment.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupDetail,
@@ -646,4 +682,5 @@ module.exports = {
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
+  postPostComment,
 };
