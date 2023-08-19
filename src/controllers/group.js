@@ -713,9 +713,7 @@ async function putPostComment(req, res, next) {
 async function deletePostComment(req, res, next) {
   try {
     const { error: paramError } = validateCommentIdSchema(req.params);
-    const { error: bodyError } = validateCommentSchema(req.body);
-
-    if (paramError || bodyError) {
+    if (paramError) {
       return next(new DataFormatError());
     }
 
