@@ -23,8 +23,7 @@ const {
 
 async function getUserProfile(req, res, next) {
   try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     return res.status(200).json({ user });
   } catch (err) {
     return next(new ApiError());
@@ -33,8 +32,7 @@ async function getUserProfile(req, res, next) {
 
 async function getUserGroup(req, res, next) {
   try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     const groupList = await user.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
@@ -44,13 +42,17 @@ async function getUserGroup(req, res, next) {
 
 async function patchUserProfile(req, res, next) {
   try {
-    const { error } = validateJoinSchema(req.body);
-    if (error) return next(new DataFormatError());
+    const { error: bodyError } = validateJoinSchema(req.body);
+    if (bodyError) {
+      return next(new DataFormatError());
+    }
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
+
     if (!user) {
       return next(new UserNotFoundError());
     }
+
     const { nickname } = req.body;
     const duplicate = await User.findAll({
       where: {
@@ -75,12 +77,15 @@ async function patchUserProfile(req, res, next) {
 
 async function patchUserPassword(req, res, next) {
   try {
-    const { error } = validateJoinSchema(req.body);
-    if (error) return next(new DataFormatError());
+    const { error: bodyError } = validateJoinSchema(req.body);
+    if (bodyError) {
+      return next(new DataFormatError());
+    }
 
     const { password } = req.body;
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
+
     if (!user) {
       return next(new UserNotFoundError());
     }
@@ -97,13 +102,15 @@ async function patchUserPassword(req, res, next) {
 
 async function getUserPersonalSchedule(req, res, next) {
   try {
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (queryError) {
+      return next(new DataFormatError());
+    }
+
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
-
-    const { error: queryError } = validateScheduleDateScehma(req.query);
-    if (queryError) return next(new DataFormatError());
 
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
@@ -134,13 +141,14 @@ async function getUserPersonalSchedule(req, res, next) {
 async function putUserSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
-
     const { error: bodyError } = validateScheduleSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await PersonalSchedule.findOne({ where: { id: scheduleId } });
+    const schedule = await PersonalSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
@@ -156,13 +164,17 @@ async function putUserSchedule(req, res, next) {
 async function getSingleUserSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await PersonalSchedule.findOne({ where: { id: scheduleId } });
+    const schedule = await PersonalSchedule.findByPk(scheduleId);
+
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
+
     return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());

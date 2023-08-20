@@ -8,6 +8,7 @@ const PersonalSchedule = require('../models/personalSchedule');
 const {
   ApiError, DataFormatError,
   UserIsLeaderError,
+  UserNotFoundError,
 } = require('../errors');
 
 // Validator
@@ -16,23 +17,29 @@ const {
 } = require('../utils/validators');
 
 async function userWithdrawal(req, res, next) {
-  const { error } = validateUserIdSchema(req.params);
-  if (error) return next(new DataFormatError());
-
-  const { user_id: userId } = req.params;
   try {
-    const user = await User.findOne({ where: { userId } });
-    const leader = await Group.findOne({
-      where: {
-        leader: user.userId,
-      },
-    });
-    if (!leader) {
-      await PersonalSchedule.destroy({ where: { userId } });
-      await user.destroy();
-    } else {
+    const { error: paramError } = validateUserIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { user_id: userId } = req.params;
+    const [user, leader] = await Promise.all([
+      User.findByPk(userId),
+      Group.findOne({ where: { leader: userId } }),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (leader) {
       return next(new UserIsLeaderError());
     }
+
+    await PersonalSchedule.destroy({ where: { userId } });
+    await user.destroy();
+
     return res.status(204).json({ message: 'Successfully deleted' });
   } catch (err) {
     return next(new ApiError());
@@ -41,8 +48,7 @@ async function userWithdrawal(req, res, next) {
 
 async function getUserSetup(req, res, next) {
   try {
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     const groupList = await user.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
@@ -52,11 +58,12 @@ async function getUserSetup(req, res, next) {
 
 async function updateUserSetUp(req, res, next) {
   try {
-    const { error } = validateUserIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateUserIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     const { updatedSharePersonalEvent } = req.body;
 
     const updatePromises = updatedSharePersonalEvent.map(async (groupSetup) => {

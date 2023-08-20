@@ -31,17 +31,23 @@ const {
 
 async function createGroup(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.body);
-    if (error) return next(new DataFormatError());
-    const { nickname } = req;
+    const { error: bodyError } = validateGroupSchema(req.body);
+    if (bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+    if (!user) {
+      return (new UserNotFoundError());
+    }
+
     const { name } = req.body;
-    const user = await User.findOne({ where: { nickname } });
     const group = await Group.create({
       name, member: 1, leader: user.userId,
     });
-    if (user) {
-      await user.addGroup(group);
-    }
+
+    await user.addGroup(group);
+
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
     return next(new ApiError());
@@ -50,11 +56,12 @@ async function createGroup(req, res, next) {
 
 async function getGroupDetail(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-
     const group = await Group.findByPk(groupId);
     if (!group) {
       return next(new GroupNotFoundError());
@@ -78,17 +85,21 @@ async function getGroupDetail(req, res, next) {
 
 async function deleteGroup(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
@@ -106,16 +117,19 @@ async function deleteGroup(req, res, next) {
 
 async function patchGroup(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const { newLeaderId } = req.body;
     const group = await Group.findByPk(groupId);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
+    const { newLeaderId } = req.body;
     group.leader = newLeaderId;
     await group.save();
 
@@ -127,28 +141,32 @@ async function patchGroup(req, res, next) {
 
 async function deleteGroupUser(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
+    const { group_id: groupId } = req.params;
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
     if (!user) {
       return next(new UserNotFoundError());
     }
-    const { userId } = user;
-    const { group_id: groupId } = req.params;
 
-    const group = await Group.findByPk(groupId);
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (group.leader === userId) {
+    if (group.leader === user.userId) {
       return next(new UnathroizedError());
     }
 
     await UserGroup.destroy({
       where: {
-        userId, groupId,
+        userId: user.userId,
+        groupId,
       },
     });
 
@@ -162,17 +180,18 @@ async function deleteGroupUser(req, res, next) {
 
 async function getGroupSchedule(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: queryError } = validateScheduleDateScehma(req.query);
+    if (paramError || queryError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
-
-    const { error: queryError } = validateScheduleDateScehma(req.query);
-    if (queryError) return next(new DataFormatError());
 
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
@@ -198,10 +217,11 @@ async function getGroupSchedule(req, res, next) {
 async function postGroupSchedule(req, res, next) {
   try {
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
 
-    const { error: paramsError } = validateGroupIdSchema(req.params);
-    if (paramsError) return next(new DataFormatError());
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
 
@@ -240,19 +260,20 @@ async function postGroupSchedule(req, res, next) {
 async function putGroupSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
-
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
+    const schedule = await GroupSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
 
-    await GroupSchedule.update(req.body, { where: { id: scheduleId } });
+    await schedule.update(req.body);
     return res.status(201).json({ message: 'Successfully modify group schedule' });
   } catch (err) {
     return next(new ApiError());
@@ -261,11 +282,13 @@ async function putGroupSchedule(req, res, next) {
 
 async function deleteGroupSchedule(req, res, next) {
   try {
-    const { error } = validateScheduleIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateScheduleIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
+    const schedule = await GroupSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
@@ -282,13 +305,17 @@ async function deleteGroupSchedule(req, res, next) {
 async function getSingleGroupSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findOne({ where: { id: scheduleId } });
+    const schedule = await GroupSchedule.findByPk(scheduleId);
+
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
+
     return res.status(200).json(schedule);
   } catch (err) {
     return next(new ApiError());
@@ -297,11 +324,13 @@ async function getSingleGroupSchedule(req, res, next) {
 
 async function postInviteLink(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findOne({ where: { groupId } });
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -338,8 +367,10 @@ async function postInviteLink(req, res, next) {
 
 async function getInvitation(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
@@ -349,6 +380,7 @@ async function getInvitation(req, res, next) {
     if (group.inviteExp < new Date()) {
       return next(new ExpiredCodeError());
     }
+
     return res.status(200).json({ group });
   } catch (err) {
     return next(new ApiError());
@@ -357,11 +389,17 @@ async function getInvitation(req, res, next) {
 
 async function postGroupJoin(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { inviteCode } = req.params;
-    const group = await Group.findOne({ where: { inviteCode } });
+    const [group, user] = await Promise.all([
+      Group.findOne({ where: { inviteCode } }),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
@@ -369,8 +407,6 @@ async function postGroupJoin(req, res, next) {
       return next(new ExpiredCodeError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
     if (await user.hasGroup(group)) {
       return next(new InvalidGroupJoinError());
     }
@@ -386,14 +422,15 @@ async function postGroupJoin(req, res, next) {
 
 async function getEventProposal(req, res, next) {
   try {
-    const { error: queryError } = validateEventProposalSchema(req.query);
-    if (queryError) return next(new DataFormatError());
-
     const { error: paramError } = validateGroupIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    const { error: queryError } = validateEventProposalSchema(req.query);
+
+    if (paramError || queryError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findOne({ where: { groupId } });
+    const group = await Group.findByPk(groupId);
     const groupMembers = (await group.getUsers()).map((user) => user.userId);
     const proposal = {};
 
@@ -439,25 +476,28 @@ async function getEventProposal(req, res, next) {
 async function postGroupPost(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
-
     const { error: bodyError } = validatePostSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
     if (!user) {
       return next(new UserNotFoundError());
     }
 
     const { title, content } = req.body;
-    const post = await Post.create({ author: nickname, title });
+    const post = await Post.create({ author: req.nickname, title });
     await post.createPostDetail({ content });
 
     await user.addPosts(post);
@@ -472,22 +512,25 @@ async function postGroupPost(req, res, next) {
 async function getSinglePost(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
-    const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, post] = await Promise.all([
+      Group.findByPk(groupId),
+      Post.findByPk(postId),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    const { post_id: postId } = req.params;
-    const post = await Post.findByPk(postId);
     if (!post) {
       return next(new PostNotFoundError());
     }
 
-    const { title } = post;
-    const { author } = post;
+    const { title, author } = post;
     const { content } = (await post.getPostDetail()).dataValues;
 
     return res.status(200).json({ author, title, content });
@@ -499,13 +542,15 @@ async function getSinglePost(req, res, next) {
 async function getGroupPosts(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
-
     const { error: queryError } = validatePageSchema(req.query);
-    if (queryError) return next(new DataFormatError());
+
+    if (paramError || queryError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
@@ -534,6 +579,7 @@ async function getGroupPosts(req, res, next) {
       createdAt: post.createdAt,
       content: post.postDetail.content,
     }));
+
     return res.status(200).json(result);
   } catch (err) {
     return next(new ApiError());
@@ -543,31 +589,32 @@ async function getGroupPosts(req, res, next) {
 async function putGroupPost(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
-
     const { error: bodyError } = validatePostSchema(req.body);
-    if (bodyError) return next(new DataFormatError());
 
-    const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    const { post_id: postId } = req.params;
-    const post = await Post.findByPk(postId);
     if (!post) {
       return next(new PostNotFoundError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
-    if (!user || (user.userId !== post.userId)) {
+    if (user.userId !== post.userId) {
       return next(new EditPermissionError());
     }
 
     const { title, content } = req.body;
-
     await post.update({ title });
     await PostDetail.update({ content }, { where: { postId } });
 
@@ -580,23 +627,26 @@ async function putGroupPost(req, res, next) {
 async function deleteGroupPost(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
-    if (paramError) return next(new DataFormatError());
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
-    const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    const { post_id: postId } = req.params;
-    const post = await Post.findByPk(postId);
     if (!post) {
       return next(new PostNotFoundError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
-    if (!user || (user.userId !== post.userId)) {
+    if (user.userId !== post.userId) {
       return next(new EditPermissionError());
     }
 
@@ -611,7 +661,9 @@ async function deleteGroupPost(req, res, next) {
 async function getGroupList(req, res, next) {
   try {
     const { error: queryError } = validatePageSchema(req.query);
-    if (queryError) return next(new DataFormatError());
+    if (queryError) {
+      return next(new DataFormatError());
+    }
 
     const { page } = req.query;
     const pageSize = 9;

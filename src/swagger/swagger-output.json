@@ -129,11 +129,9 @@
         "tags": ["Auth"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object"
-            }
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -203,6 +201,11 @@
         "tags": ["Group"],
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -230,16 +233,86 @@
           }
         }
       },
+      "get": {
+        "description": "",
+        "summary": "그룹 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}": {
+      "get": {
+        "description": "단일 그룹 정보와 그룹 멤버의 id, nickname을 조회합니다.",
+        "summary": "단일 그룹 정보 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "patch": {
         "description": "",
         "summary": "그룹 리더 변경",
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "id",
+            "name": "group_id",
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           },
           {
             "name": "body",
@@ -282,6 +355,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -299,66 +377,6 @@
           },
           "404": {
             "description": "존재하지 않는 유저/그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
-      "get": {
-        "description": "",
-        "summary": "그룹 조회",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}": {
-      "get": {
-        "description": "단일 그룹 정보와 그룹 멤버의 id, nickname을 조회합니다.",
-        "summary": "단일 그룹 정보 조회",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"
@@ -487,15 +505,15 @@
         "tags": ["Group Schedule"],
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "schedule_id",
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -526,6 +544,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           },
           {
             "name": "body",
@@ -592,6 +615,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -624,6 +652,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           },
           {
             "name": "body",
@@ -702,6 +735,11 @@
             "name": "endDateTime",
             "in": "query",
             "type": "DATETIME"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -733,11 +771,6 @@
             "type": "integer"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "date1",
             "in": "query",
             "required": true,
@@ -752,6 +785,11 @@
             "name": "date3",
             "in": "query",
             "type": "DATETIME"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1268,6 +1306,11 @@
         "tags": ["User"],
         "parameters": [
           {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
             "name": "body",
             "in": "body",
             "schema": {
@@ -1308,6 +1351,11 @@
         "summary": "유저 비밀번호 수정",
         "tags": ["User"],
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -1353,11 +1401,6 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "startDateTime",
             "in": "query",
             "type": "DATETIME"
@@ -1366,6 +1409,11 @@
             "name": "endDateTime",
             "in": "query",
             "type": "DATETIME"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1388,6 +1436,11 @@
         "summary": "유저 일정 등록",
         "tags": ["User Schedule"],
         "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -1451,15 +1504,15 @@
         "tags": ["User Schedule"],
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "schedule_id",
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1490,6 +1543,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           },
           {
             "name": "body",
@@ -1556,6 +1614,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -1587,6 +1650,11 @@
             "name": "group_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
             "type": "string"
           }
         ],

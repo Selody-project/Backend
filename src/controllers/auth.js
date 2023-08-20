@@ -22,22 +22,26 @@ const {
 } = require('../utils/validators');
 
 async function getNaverUserInfo(req, res, next) {
-  const { accessToken } = req.body;
-  const header = `Bearer ${accessToken}`;
-  const apiUrl = 'https://openapi.naver.com/v1/nid/me';
-  const options = {
-    url: apiUrl,
-    headers: { Authorization: header },
-  };
-  // naver 사용자 정보 조회
-  request.get(options, async (error, response, body) => {
-    if (!error && response.statusCode == 200) {
-      req.body = JSON.parse(body).response;
-      next();
-    } else if (response != null) {
-      res.status(response.statusCode).end();
-    }
-  });
+  try {
+    const { accessToken } = req.body;
+    const header = `Bearer ${accessToken}`;
+    const apiUrl = 'https://openapi.naver.com/v1/nid/me';
+    const options = {
+      url: apiUrl,
+      headers: { Authorization: header },
+    };
+    // naver 사용자 정보 조회
+    request.get(options, async (error, response, body) => {
+      if (!error && response.statusCode == 200) {
+        req.body = JSON.parse(body).response;
+        next();
+      } else if (response != null) {
+        res.status(response.statusCode).end();
+      }
+    });
+  } catch (err) {
+    return next(new ApiError());
+  }
 }
 
 // Google 로그인 토큰 파싱
@@ -73,8 +77,8 @@ async function getGoogleUserInfo(req, res, next) {
       req.nickname = user.nickname;
       next();
     });
-  } catch (error) {
-    if (error.name === 'TokenExpireError') {
+  } catch (err) {
+    if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
     return next(new InvalidTokenError());
@@ -102,8 +106,10 @@ async function joinSocialUser(req, res, next) {
 }
 
 async function join(req, res, next) {
-  const { error } = validateJoinSchema(req.body);
-  if (error) return next(new DataFormatError());
+  const { error: bodyError } = validateJoinSchema(req.body);
+  if (bodyError) {
+    return next(new DataFormatError());
+  }
 
   const { email, nickname, password } = req.body;
   let options;
@@ -130,7 +136,6 @@ async function join(req, res, next) {
       req.nickname = nickname;
       return next();
     } catch (err) {
-      console.error(err);
       return next(new ApiError());
     }
   } else {
@@ -139,26 +144,25 @@ async function join(req, res, next) {
 }
 
 async function login(req, res, next) {
-  const { error } = validateLoginSchema(req.body);
-  if (error) return next(new DataFormatError());
-
-  const { email, password } = req.body;
-  let user;
   try {
-    user = await User.findOne({ where: { email } });
-  } catch (err) {
-    return new ApiError();
-  }
+    const { error: bodyError } = validateLoginSchema(req.body);
+    if (bodyError) {
+      return next(new DataFormatError());
+    }
 
-  if (!user) {
-    return next(new InvalidIdPasswordError());
-  }
-  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return next(new InvalidIdPasswordError());
+    }
+
     const result = await bcrypt.compare(password, user.password);
     if (result) {
       req.nickname = user.nickname;
       return next();
     }
+
     return next(new InvalidIdPasswordError());
   } catch (err) {
     return next(new ApiError());
