@@ -11,6 +11,7 @@ const GroupSchedule = require('../models/groupSchedule');
 const {
   ApiError, DataFormatError,
   UserNotFoundError, ScheduleNotFoundError, DuplicateUserError,
+  EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -148,10 +149,17 @@ async function putUserSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    const [user, schedule] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      PersonalSchedule.findByPk(scheduleId),
+    ]);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
+    }
+
+    if (user.userId !== schedule.userId) {
+      return next(new EditPermissionError());
     }
 
     await PersonalSchedule.update(req.body, { where: { id: scheduleId } });

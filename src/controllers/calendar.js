@@ -7,7 +7,7 @@ const User = require('../models/user');
 // Error
 const {
   ApiError, DataFormatError,
-  UserNotFoundError, NotFoundError,
+  UserNotFoundError, NotFoundError, EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -60,10 +60,17 @@ async function deletePersonalSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId } = req.params;
-    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    const [schedule, user] = await Promise.all([
+      PersonalSchedule.findByPk(scheduleId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
 
     if (!schedule) {
       return next(new NotFoundError());
+    }
+
+    if (user.userId !== schedule.userId) {
+      return next(new EditPermissionError());
     }
 
     await schedule.destroy();

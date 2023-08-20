@@ -24,9 +24,9 @@ const {
 // Validator
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
-  validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
+  validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
-  validateCommentSchema, validateCommentIdSchema,
+  validateCommentSchema, validateCommentIdSchema, validateGroupScheduleIdSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -123,10 +123,21 @@ async function patchGroup(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
 
     if (!group) {
       return next(new GroupNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new EditPermissionError());
     }
 
     const { newLeaderId } = req.body;
@@ -259,18 +270,30 @@ async function postGroupSchedule(req, res, next) {
 
 async function putGroupSchedule(req, res, next) {
   try {
-    const { error: paramError } = validateScheduleIdSchema(req.params);
+    const { error: paramError } = validateGroupScheduleIdSchema(req.params);
     const { error: bodyError } = validateGroupScheduleSchema(req.body);
 
     if (paramError || bodyError) {
       return next(new DataFormatError());
     }
 
-    const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findByPk(scheduleId);
+    const { schedule_id: scheduleId, group_id: groupId } = req.params;
+    const [user, group, schedule] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+      GroupSchedule.findByPk(scheduleId),
+    ]);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
+    }
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (user.userId !== group.leader) {
+      return next(new EditPermissionError());
     }
 
     await schedule.update(req.body);
@@ -282,16 +305,28 @@ async function putGroupSchedule(req, res, next) {
 
 async function deleteGroupSchedule(req, res, next) {
   try {
-    const { error: paramError } = validateScheduleIdSchema(req.params);
+    const { error: paramError } = validateGroupScheduleIdSchema(req.params);
     if (paramError) {
       return next(new DataFormatError());
     }
 
-    const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findByPk(scheduleId);
+    const { schedule_id: scheduleId, group_id: groupId } = req.params;
+    const [user, group, schedule] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+      GroupSchedule.findByPk(scheduleId),
+    ]);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
+    }
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (user.userId !== group.leader) {
+      return next(new EditPermissionError());
     }
 
     await schedule.destroy();
@@ -304,7 +339,7 @@ async function deleteGroupSchedule(req, res, next) {
 
 async function getSingleGroupSchedule(req, res, next) {
   try {
-    const { error: paramError } = validateScheduleIdSchema(req.params);
+    const { error: paramError } = validateGroupScheduleIdSchema(req.params);
     if (paramError) {
       return next(new DataFormatError());
     }

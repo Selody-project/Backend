@@ -87,6 +87,11 @@ const scheduleIdSchema = Joi.object({
   schedule_id: Joi.number().min(0).required(),
 });
 
+const groupScheduleIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  schedule_id: Joi.number().min(0).required(),
+});
+
 const eventPoroposalSchema = Joi.object({
   date1: Joi.date().required(),
   date2: Joi.date(),
@@ -125,6 +130,7 @@ module.exports = {
   validateGroupIdSchema: validator(groupIdSchema),
   validateScheduleSchema: validator(scheduleSchema),
   validateScheduleIdSchema: validator(scheduleIdSchema),
+  validateGroupScheduleIdSchema: validator(groupScheduleIdSchema),
   validateGroupScheduleSchema: validator(groupScheduleSchema),
   validateScheduleDateScehma: validator(scheduleDateScehma),
   validateUserScheduleSchema: validator(userScheduleSchema),

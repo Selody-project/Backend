@@ -2,7 +2,8 @@ const express = require('express');
 
 const {
   getGroupDetail, createGroup, patchGroup, deleteGroup,
-  getGroupSchedule, postGroupSchedule, putGroupSchedule, deleteGroupSchedule, getSingleGroupSchedule,
+  getGroupSchedule, getSingleGroupSchedule,
+  postGroupSchedule, putGroupSchedule, deleteGroupSchedule,
   postInviteLink, getInvitation, postGroupJoin,
   getEventProposal,
   getGroupList,
@@ -23,11 +24,11 @@ router.get('/invite-link/:inviteCode', getInvitation);
 router.post('/join/:inviteCode', postGroupJoin);
 
 // Schedule
-router.post('/:group_id/calendar', postGroupSchedule);
-router.get('/calendar/:schedule_id', getSingleGroupSchedule);
-router.put('/calendar/:schedule_id', putGroupSchedule);
-router.delete('/calendar/:schedule_id', deleteGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
+router.post('/:group_id/calendar', postGroupSchedule);
+router.get('/:group_id/calendar/:schedule_id', getSingleGroupSchedule);
+router.put('/:group_id/calendar/:schedule_id', putGroupSchedule);
+router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);
 router.get('/:group_id/proposal', getEventProposal);
 
 // Post
