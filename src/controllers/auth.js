@@ -5,14 +5,21 @@ const { Sequelize } = require('sequelize');
 const { Op } = Sequelize;
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
+
+// Model
 const User = require('../models/user');
-const ApiError = require('../errors/apiError');
-const DuplicateUserError = require('../errors/auth/DuplicateUserError');
-const InvalidIdPasswordError = require('../errors/auth/InvalidIdPasswordError');
-const InvalidTokenError = require('../errors/auth/InvalidTokenError');
-const TokenExpireError = require('../errors/auth/TokenExpireError');
-const DataFormatError = require('../errors/DataFormatError');
-const { validateLoginSchema, validateJoinSchema } = require('../utils/validators');
+
+// Error
+const {
+  ApiError, DataFormatError,
+  DuplicateUserError, InvalidIdPasswordError, InvalidTokenError,
+  TokenExpireError,
+} = require('../errors');
+
+// Validator
+const {
+  validateLoginSchema, validateJoinSchema,
+} = require('../utils/validators');
 
 async function getNaverUserInfo(req, res, next) {
   const { accessToken } = req.body;

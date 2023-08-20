@@ -1,21 +1,25 @@
 const moment = require('moment');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
+
+// Model
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
-const ApiError = require('../errors/apiError');
-const DuplicateUserError = require('../errors/auth/DuplicateUserError');
-const DataFormatError = require('../errors/DataFormatError');
-const ScheduleNotFoundError = require('../errors/schedule/ScheduleNotFoundError');
+const GroupSchedule = require('../models/groupSchedule');
 
+// Error
+const {
+  ApiError, DataFormatError,
+  UserNotFoundError, ScheduleNotFoundError, DuplicateUserError,
+} = require('../errors');
+
+// Validator
 const {
   validateJoinSchema,
   validateScheduleSchema,
   validateScheduleIdSchema,
   validateScheduleDateScehma,
 } = require('../utils/validators');
-const { UserNotFoundError } = require('../errors');
-const GroupSchedule = require('../models/groupSchedule');
 
 async function getUserProfile(req, res, next) {
   try {

@@ -1,30 +1,13 @@
 const express = require('express');
 
 const {
-  createGroup,
-  getGroupDetail,
-  deleteGroup,
-  patchGroup,
-  getGroupSchedule,
-  postGroupSchedule,
-  putGroupSchedule,
-  deleteGroupSchedule,
-  getSingleGroupSchedule,
-  postInviteLink,
-  getInvitation,
-  postGroupJoin,
+  getGroupDetail, createGroup, patchGroup, deleteGroup,
+  getGroupSchedule, postGroupSchedule, putGroupSchedule, deleteGroupSchedule, getSingleGroupSchedule,
+  postInviteLink, getInvitation, postGroupJoin,
   getEventProposal,
-  postGroupPost,
   getGroupList,
-  getSinglePost,
-  getGroupPosts,
-  putGroupPost,
-  deleteGroupPost,
-  getPostComment,
-  getSingleComment,
-  postComment,
-  putComment,
-  deleteComment,
+  getGroupPosts, getSinglePost, postGroupPost, putGroupPost, deleteGroupPost,
+  getPostComment, getSingleComment, postComment, putComment, deleteComment,
 } = require('../controllers/group');
 
 const router = express.Router();

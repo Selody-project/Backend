@@ -1,10 +1,19 @@
 const moment = require('moment');
-const personalSchedule = require('../models/personalSchedule');
+
+// Model
+const PersonalSchedule = require('../models/personalSchedule');
 const User = require('../models/user');
-const ApiError = require('../errors/apiError');
-const NotFoundError = require('../errors/calendar/NotFound');
-const { UserNotFoundError, DataFormatError } = require('../errors');
-const { validateUserScheduleSchema, validateScheduleIdSchema } = require('../utils/validators');
+
+// Error
+const {
+  ApiError, DataFormatError,
+  UserNotFoundError, NotFoundError,
+} = require('../errors');
+
+// Validator
+const {
+  validateUserScheduleSchema, validateScheduleIdSchema,
+} = require('../utils/validators');
 
 async function postPersonalSchedule(req, res, next) {
   try {
@@ -21,7 +30,7 @@ async function postPersonalSchedule(req, res, next) {
       return next(new UserNotFoundError());
     }
     const { userId } = user;
-    await personalSchedule.create({
+    await PersonalSchedule.create({
       userId,
       title,
       content,
@@ -47,13 +56,15 @@ async function deletePersonalSchedule(req, res, next) {
 
     const { schedule_id: scheduleId } = req.params;
 
-    const data = await personalSchedule.destroy({ where: { id: scheduleId } });
-    if (data === 0) {
+    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    if (!schedule) {
       return next(new NotFoundError());
     }
 
+    await schedule.destroy();
+
     return res.status(204).json({ message: 'successfully deleted' });
-  } catch (error) {
+  } catch (err) {
     return next(new ApiError());
   }
 }

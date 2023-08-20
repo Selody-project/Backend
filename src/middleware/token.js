@@ -1,9 +1,13 @@
 const jwt = require('jsonwebtoken');
-const ApiError = require('../errors/apiError');
-const TokenExpireError = require('../errors/auth/TokenExpireError');
-const InvalidTokenError = require('../errors/auth/InvalidTokenError');
 
+// Model
 const User = require('../models/user');
+
+// Error
+const { 
+  ApiError, 
+  TokenExpireError, InvalidTokenError
+} = require('../errors');
 
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
 const REFRESH_SECRET_KEY = process.env.JWT_SECRET;

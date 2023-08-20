@@ -1,13 +1,19 @@
+// Model
 const User = require('../models/user');
-const Group = require('../models/group');
-
-const PersonalSchedule = require('../models/personalSchedule');
-const ApiError = require('../errors/apiError');
-const { validateUserIdSchema } = require('../utils/validators');
-const UserIsLeaderError = require('../errors/user/UserIsLeaderError');
-
-const { DataFormatError } = require('../errors');
 const UserGroup = require('../models/userGroup');
+const Group = require('../models/group');
+const PersonalSchedule = require('../models/personalSchedule');
+
+// Error
+const {
+  ApiError, DataFormatError,
+  UserIsLeaderError,
+} = require('../errors');
+
+// Validator
+const {
+  validateUserIdSchema,
+} = require('../utils/validators');
 
 async function userWithdrawal(req, res, next) {
   const { error } = validateUserIdSchema(req.params);

@@ -1,10 +1,10 @@
-const InvalidPasswordError = require('./InvalidIdPasswordError');
+const InvalidIdPasswordError = require('./InvalidIdPasswordError');
 const DuplicateUserError = require('./DuplicateUserError');
 const InvalidTokenError = require('./InvalidTokenError');
 const TokenExpireError = require('./TokenExpireError');
 
 module.exports = {
-  InvalidPasswordError,
+  InvalidIdPasswordError,
   DuplicateUserError,
   InvalidTokenError,
   TokenExpireError,
