@@ -1,8 +1,8 @@
-const APIError = require('./apiError');
+const ApiError = require('./apiError');
 const DataFormatError = require('./DataFormatError');
 
 module.exports = {
-  APIError,
+  ApiError,
   DataFormatError,
   ...require('./auth'),
   ...require('./group'),
