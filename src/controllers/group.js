@@ -27,6 +27,7 @@ const {
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
   validateCommentSchema, validateCommentIdSchema,
+  validateGroupJoinParamSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -336,41 +337,23 @@ async function postInviteLink(req, res, next) {
   }
 }
 
-async function getInvitation(req, res, next) {
+async function postJoinGroupWithInviteCode(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.params);
+    const { error } = validateGroupJoinParamSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { inviteCode } = req.params;
+    const { group_id: groupId, inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if (!group) {
+
+    if (!group || group.groupId != groupId) {
       return next(new GroupNotFoundError());
     }
-    if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
-    }
-    return res.status(200).json({ group });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
 
-async function postGroupJoin(req, res, next) {
-  try {
-    const { error } = validateGroupSchema(req.params);
-    if (error) return next(new DataFormatError());
-
-    const { inviteCode } = req.params;
-    const group = await Group.findOne({ where: { inviteCode } });
-    if (!group) {
-      return next(new GroupNotFoundError());
-    }
     if (group.inviteExp < new Date()) {
       return next(new ExpiredCodeError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     if (await user.hasGroup(group)) {
       return next(new InvalidGroupJoinError());
     }
@@ -825,8 +808,7 @@ module.exports = {
   deleteGroupSchedule,
   getSingleGroupSchedule,
   postInviteLink,
-  getInvitation,
-  postGroupJoin,
+  postJoinGroupWithInviteCode,
   getEventProposal,
   postGroupPost,
   getGroupList,
