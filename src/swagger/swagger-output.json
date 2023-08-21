@@ -1698,6 +1698,46 @@
           }
         }
       }
+    },
+    "/api/withdrawal/{user_id}": {
+      "delete": {
+        "description": "",
+        "summary": "유저 회원 탈퇴",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 유저"
+          },
+          "499": {
+            "description": "정리되지 않은 그룹이 존재"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
     }
   },
   "definitions": {
