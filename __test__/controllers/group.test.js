@@ -511,6 +511,21 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test POST /api/group/:group_id/join/request', () => {
+    it('Successfully completed the application for registration.  ', async () => {
+      const groupId = 1;
+      const res = (await request(app).post(`/api/group/${groupId}/join/request`).set('Cookie', cookie));
+      expect(res.status).toEqual(200);
+    });
+
+    it('Successfully failed to complete the application for registration. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const res = (await request(app).post(`/api/group/${groupId}/join/request`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+  });
+
   describe('Test POST /api/group/:group_id/join/invite-link', () => {
     it('Successfully generated invitation code ', async () => {
       const groupId = 1;

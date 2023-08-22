@@ -320,7 +320,7 @@ async function postGroupJoinRequest(req, res, next) {
 
     await group.addUser(user, { through: { isPendingMember: 1 } });
 
-    return res.status(201).json({ message: 'Successfully completed the application for registration. ' });
+    return res.status(200).json({ message: 'Successfully completed the application for registration. ' });
   } catch (err) {
     return next(new ApiError());
   }

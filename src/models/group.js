@@ -13,10 +13,6 @@ class Group extends Sequelize.Model {
         type: Sequelize.STRING(45),
         allowNull: false,
       },
-      description: {
-        type: Sequelize.STRING(200),
-        allowNull: true,
-      },
       member: {
         type: Sequelize.INTEGER,
         allowNull: false,
