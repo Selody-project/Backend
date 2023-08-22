@@ -230,81 +230,6 @@
           }
         }
       },
-      "patch": {
-        "description": "",
-        "summary": "그룹 리더 변경",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "newLeaderId": {
-                  "example": "integer"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 유저/그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "summary": "그룹 삭제",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "403": {
-            "description": "허용되지 않은 유저"
-          },
-          "404": {
-            "description": "존재하지 않는 유저/그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
       "get": {
         "description": "",
         "summary": "그룹 조회",
@@ -336,15 +261,15 @@
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "group_id",
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -359,6 +284,100 @@
           },
           "404": {
             "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "summary": "그룹 정보 수정",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "example": "modified-name"
+                },
+                "description": {
+                  "example": "modified-description"
+                },
+                "leader": {
+                  "example": 2
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 삭제",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "허용되지 않은 유저"
+          },
+          "404": {
+            "description": "존재하지 않는 유저/그룹"
           },
           "500": {
             "description": "서버 에러"
