@@ -30,6 +30,7 @@ const yearMonthDayScehma = Joi.object({
 const groupSchema = Joi.object({
   groupId: Joi.number().min(0),
   name: Joi.string().max(45),
+  description: Joi.string().max(300),
   member: Joi.number().min(1),
   inviteCode: Joi.string(),
   inviteExp: Joi.date(),

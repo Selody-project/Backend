@@ -35,10 +35,10 @@ async function createGroup(req, res, next) {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
     const { nickname } = req;
-    const { name } = req.body;
+    const { name, description } = req.body;
     const user = await User.findOne({ where: { nickname } });
     const group = await Group.create({
-      name, member: 1, leader: user.userId,
+      name, description, member: 1, leader: user.userId,
     });
     if (user) {
       await user.addGroup(group);
@@ -105,22 +105,31 @@ async function deleteGroup(req, res, next) {
   }
 }
 
-async function patchGroup(req, res, next) {
+async function putGroup(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const { newLeaderId } = req.body;
-    const group = await Group.findByPk(groupId);
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    group.leader = newLeaderId;
-    await group.save();
+    if (group.leader != user.userId) {
+      return next(new UnathroizedError());
+    }
 
-    return res.status(200).json({ message: 'Successfully update group leader' });
+    const { name, description, leader } = req.body;
+    await group.update({ name, description, leader });
+
+    return res.status(200).json({ message: 'Successfully modified group info' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -830,7 +839,7 @@ module.exports = {
   createGroup,
   getGroupDetail,
   deleteGroup,
-  patchGroup,
+  putGroup,
   deleteGroupUser,
   getGroupSchedule,
   postGroupSchedule,
