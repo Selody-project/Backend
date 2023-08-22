@@ -10,6 +10,11 @@ class UserGroup extends Sequelize.Model {
         allowNull: true,
         defaultValue: 1,
       },
+      isPendingMember: {
+        type: Sequelize.TINYINT(1),
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       sequelize,
