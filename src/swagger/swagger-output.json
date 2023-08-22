@@ -366,6 +366,43 @@
         }
       }
     },
+    "/api/group/{group_id}/join/request": {
+      "post": {
+        "description": "",
+        "summary": "그룹 가입 신청",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/group/{group_id}/join/invite-link": {
       "post": {
         "description": "",
@@ -1751,6 +1788,12 @@
         },
         "userId": {
           "type": "BIGINT"
+        },
+        "sharePersonalEvent": {
+          "type": "TINYINT(1)"
+        },
+        "isPendingMember": {
+          "type": "TINYINT(1)"
         }
       },
       "xml": {
