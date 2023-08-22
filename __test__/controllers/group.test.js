@@ -95,25 +95,32 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test PATCH /api/group', () => {
-    it('Successfully update group leader', async () => {
-      const id = 1;
-      const newLeaderId = 2;
-      const res = await request(app).patch(`/api/group/${id}`).set('Cookie', cookie).send({
-        newLeaderId,
-      });
+  describe('Test PUT /api/group', () => {
+    it('Successfully modified group info ', async () => {
+      const groupId = 1;
+      const updateData = {
+        name: 'modified-group1',
+        description: 'modified-description1',
+        leader: 2,
+      }
+      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
 
-      const group = await Group.findByPk(id);
+      const group = await Group.findByPk(groupId);
+
       expect(res.status).toEqual(200);
+      expect(group.name).toEqual('modified-group1');
+      expect(group.description).toEqual('modified-description1');
       expect(group.leader).toEqual(2);
     });
 
-    it('Successfully fail to update group (group not found)', async () => {
-      const id = 100;
-      const newLeaderId = 2;
-      const res = await request(app).patch(`/api/group/${id}`).set('Cookie', cookie).send({
-        newLeaderId,
-      });
+    it('Successfully failed to modified group (group not found)', async () => {
+      const groupId = 100;
+      const updateData = {
+        name: 'modified-group1',
+        description: 'modified-description1',
+        leader: 2,
+      }
+      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
 
       expect(res.status).toEqual(404);
     });
@@ -129,6 +136,7 @@ describe('Test /api/group endpoints', () => {
           inviteCode: 'inviteCode01',
           inviteExp: '2099-01-01T00:00:00.000Z',
           isPublicGroup: 0,
+          description: 'test-description1',
           leader: 1,
           member: 2,
           name: 'test-group1',

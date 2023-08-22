@@ -33,8 +33,8 @@ const router = express.Router();
 router.post('/', createGroup);
 router.get('/', getGroupList);
 router.get('/:group_id', getGroupDetail);
-router.delete('/:group_id', deleteGroup);
 router.put('/:group_id', putGroup);
+router.delete('/:group_id', deleteGroup);
 // router.post('/:group_id/join', )
 router.post('/:group_id/join/request', postGroupJoinRequest);
 router.post('/:group_id/join/invite-link', postInviteLink);
