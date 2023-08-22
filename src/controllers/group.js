@@ -296,6 +296,36 @@ async function getSingleGroupSchedule(req, res, next) {
   }
 }
 
+async function postGroupJoinRequest(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    await group.addUser(user, { through: { isPendingMember: 1 } });
+
+    return res.status(201).json({ message: 'Successfully completed the application for registration. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postInviteLink(req, res, next) {
   try {
     const { error } = validateGroupIdSchema(req.params);
@@ -807,6 +837,7 @@ module.exports = {
   putGroupSchedule,
   deleteGroupSchedule,
   getSingleGroupSchedule,
+  postGroupJoinRequest,
   postInviteLink,
   postJoinGroupWithInviteCode,
   getEventProposal,
