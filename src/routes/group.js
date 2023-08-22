@@ -4,7 +4,7 @@ const {
   createGroup,
   getGroupDetail,
   deleteGroup,
-  patchGroup,
+  putGroup,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,
@@ -34,7 +34,7 @@ router.post('/', createGroup);
 router.get('/', getGroupList);
 router.get('/:group_id', getGroupDetail);
 router.delete('/:group_id', deleteGroup);
-router.patch('/:group_id', patchGroup);
+router.put('/:group_id', putGroup);
 // router.post('/:group_id/join', )
 router.post('/:group_id/join/request', postGroupJoinRequest);
 router.post('/:group_id/join/invite-link', postInviteLink);
