@@ -123,6 +123,11 @@ const groupJoinParamSchema = Joi.object({
   inviteCode: Joi.string().min(0).required(),
 });
 
+const groupJoinRequestSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  user_id: Joi.number().min(0).required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -143,4 +148,5 @@ module.exports = {
   validateCommentSchema: validator(commentSchema),
   validateCommentIdSchema: validator(commentIdSchema),
   validateGroupJoinParamSchema: validator(groupJoinParamSchema),
+  validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
 };
