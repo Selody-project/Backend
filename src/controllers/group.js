@@ -27,7 +27,7 @@ const {
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
   validateCommentSchema, validateCommentIdSchema,
-  validateGroupJoinParamSchema,
+  validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -305,6 +305,33 @@ async function getSingleGroupSchedule(req, res, next) {
   }
 }
 
+async function getGroupMembers(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const members = await group.getUsers();
+    const parsedMembers = members.map((member) => ({
+      nickname: member.nickname,
+      userId: member.userId,
+      isPendingMember: member.UserGroup.isPendingMember,
+    }));
+
+    return res.status(200).json(parsedMembers);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postGroupJoinRequest(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
@@ -330,6 +357,74 @@ async function postGroupJoinRequest(req, res, next) {
     await group.addUser(user, { through: { isPendingMember: 1 } });
 
     return res.status(200).json({ message: 'Successfully completed the application for registration. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupJoinApprove(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.update({ isPendingMember: 0 }, { where: { userId } });
+
+    return res.status(200).json({ message: 'Successfully approved the membership registration. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupJoinReject(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.destroy({ where: { userId } });
+
+    return res.status(200).json({ message: 'Successfully rejected the membership request. ' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -846,7 +941,10 @@ module.exports = {
   putGroupSchedule,
   deleteGroupSchedule,
   getSingleGroupSchedule,
+  getGroupMembers,
   postGroupJoinRequest,
+  postGroupJoinApprove,
+  postGroupJoinReject,
   postInviteLink,
   postJoinGroupWithInviteCode,
   getEventProposal,

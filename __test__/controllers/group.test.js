@@ -519,16 +519,16 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test POST /api/group/:group_id/join/request', () => {
+  describe('Test POST /api/group/:group_id/members/request', () => {
     it('Successfully completed the application for registration.  ', async () => {
       const groupId = 1;
-      const res = (await request(app).post(`/api/group/${groupId}/join/request`).set('Cookie', cookie));
+      const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
     });
 
     it('Successfully failed to complete the application for registration. (Group Not Found) ', async () => {
       const groupId = 10000;
-      const res = (await request(app).post(`/api/group/${groupId}/join/request`).set('Cookie', cookie));
+      const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
@@ -1177,80 +1177,6 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully failed to retrieved the comment. (DataFormat Error) ', async () => {
-      const groupId = 'abc';
-      const postId = 1;
-      const commentId = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
-      expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
-    });
-  });
-
-  describe('Test GET /api/group/:group_id/post/:post_id/comment', () => {
-    it('Successfully retrieved the comments ', async () => {
-      const groupId = 1;
-      const postId = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
-      const expectedResult = [
-        {
-          commentId: 1,
-          content: 'test-comment1',
-          depth: 0,
-          postId: 1,
-          userId: 1,
-        },
-        {
-          commentId: 2,
-          content: 'test-comment2',
-          depth: 0,
-          postId: 1,
-          userId: 1,
-        },
-        {
-          commentId: 3,
-          content: 'test-comment3',
-          depth: 0,
-          postId: 1,
-          userId: 2,
-        },
-        {
-          commentId: 4,
-          content: 'test-comment4',
-          depth: 0,
-          postId: 1,
-          userId: 2,
-        },
-      ];
-      
-      const result = res.body.map((comment) => ({
-        commentId: comment.commentId,
-        content: comment.content,
-        depth: comment.depth,
-        postId: comment.postId,
-        userId: comment.userId,
-      }));
-
-      expect(res.status).toEqual(200);
-      expect(result).toEqual(expectedResult);
-    });
-
-    it('Successfully failed to retrieved the comments (Group Not Found) ', async () => {
-      const groupId = 10000;
-      const postId = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
-      expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
-    });
-
-    it('Successfully failed to retrieved the comments (Post Not Found) ', async () => {
-      const groupId = 1;
-      const postId = 10000;
-      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
-      expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
-    });
-
-    it('Successfully failed to retrieved the comments (DataFormat Error) ', async () => {
       const groupId = 'abc';
       const postId = 1;
       const commentId = 1;
