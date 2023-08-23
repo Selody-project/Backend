@@ -1185,4 +1185,85 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
+
+  describe('Test GET /api/group/:group_id/members', () => {
+    it('Successfully retrieved the members ', async () => {
+      const groupId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
+      const expectedResult = [
+        {
+          isPendingMember: 0, nickname: 'test-user1', userId: 1,
+        },
+        {
+          isPendingMember: 0, nickname: 'test-user2', userId: 2,
+        },
+      ];
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieved the members (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to retrieved the comments (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/members/:user_id/approve', () => {
+    it('Successfully approved the membership registration. ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/approve`).set('Cookie', cookie));
+      expect(res.status).toEqual(200);
+    });
+
+    it('Successfully failed to approve the membership registration. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/approve`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to approve the membership registration. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/approve`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/members/:user_id/reject', () => {
+    it('Successfully rejected the membership request. ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/reject`).set('Cookie', cookie));
+      expect(res.status).toEqual(200);
+    });
+
+    it('Successfully failed to reject the membership request. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/reject`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to reject the membership request. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const userId = 2;
+      const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/reject`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });
