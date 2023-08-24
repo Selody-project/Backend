@@ -962,21 +962,32 @@ describe('Test /api/group endpoints', () => {
       }));
       const expectedResult = [
         {
-          name: 'test-group1', member: 2,
+          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2,
         },
         {
-          name: 'test-group2', member: 6,
+          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6,
         },
         {
-          name: 'test-group3', member: 1,
+          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1,
         },
       ];
       const result = res.body.map((group) => ({
+        groupId: group.groupId,
         name: group.name,
+        description: group.description,
         member: group.member,
       }));
       expect(res.status).toEqual(200);
       expect(result).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
+      const page = 'abc';
+      const res = (await request(app).get('/api/group').set('Cookie', cookie).query({
+        page,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 

@@ -765,7 +765,9 @@ async function getGroupList(req, res, next) {
       limit: pageSize,
     });
     const result = rows.map((group) => ({
+      groupId: group.groupId,
       name: group.name,
+      description: group.description,
       member: group.member,
     }));
     return res.status(200).json(result);
