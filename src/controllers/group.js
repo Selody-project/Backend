@@ -457,6 +457,41 @@ async function postGroupJoinReject(req, res, next) {
   }
 }
 
+async function deleteGroupMember(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user, leader] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findByPk(userId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (leader.userId != group.leader) {
+      return next(new UnathroizedError());
+    }
+
+    await group.removeUser(user);
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postInviteLink(req, res, next) {
   try {
     const { error } = validateGroupIdSchema(req.params);
@@ -973,6 +1008,7 @@ module.exports = {
   getSingleGroupSchedule,
   getGroupMembers,
   postGroupJoinRequest,
+  deleteGroupMember,
   postGroupJoinApprove,
   postGroupJoinReject,
   postInviteLink,
