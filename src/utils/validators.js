@@ -30,7 +30,8 @@ const yearMonthDayScehma = Joi.object({
 const groupSchema = Joi.object({
   groupId: Joi.number().min(0),
   name: Joi.string().max(45),
-  memeber: Joi.number().min(1),
+  description: Joi.string().max(300),
+  member: Joi.number().min(1),
   inviteCode: Joi.string(),
   inviteExp: Joi.date(),
 });
@@ -107,6 +108,26 @@ const pageSchema = Joi.object({
   page: Joi.number().min(0).required(),
 });
 
+const commentSchema = Joi.object({
+  content: Joi.string().max(500).required(),
+});
+
+const commentIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  post_id: Joi.number().min(0).required(),
+  comment_id: Joi.number().min(0).required(),
+});
+
+const groupJoinParamSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  inviteCode: Joi.string().min(0).required(),
+});
+
+const groupJoinRequestSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  user_id: Joi.number().min(0).required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -124,4 +145,8 @@ module.exports = {
   validatePostSchema: validator(postSchema),
   validatePostIdSchema: validator(postIdSchema),
   validatePageSchema: validator(pageSchema),
+  validateCommentSchema: validator(commentSchema),
+  validateCommentIdSchema: validator(commentIdSchema),
+  validateGroupJoinParamSchema: validator(groupJoinParamSchema),
+  validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
 };

@@ -1,6 +1,9 @@
 const moment = require('moment');
-const { parseEventDates, eventProposal } = require('../utils/event');
+const {
+  parseEventDates, eventProposal,
+} = require('../utils/event');
 
+// Model
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const UserGroup = require('../models/userGroup');
@@ -8,20 +11,23 @@ const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
 const Post = require('../models/post');
 const PostDetail = require('../models/postDetail');
+const Comment = require('../models/comment');
 
-const ApiError = require('../errors/apiError');
-const DataFormatError = require('../errors/DataFormatError');
-const ExpiredCodeError = require('../errors/group/ExpiredCodeError');
-const InvalidGroupJoinError = require('../errors/group/InvalidGroupJoinError');
+// Error
 const {
+  DataFormatError, ApiError,
   UserNotFoundError, UnathroizedError, ScheduleNotFoundError,
   GroupNotFoundError, PostNotFoundError, EditPermissionError,
+  CommentNotFoundError, ExpiredCodeError, InvalidGroupJoinError,
 } = require('../errors');
 
+// Validator
 const {
   validateGroupSchema, validateGroupIdSchema, validateEventProposalSchema,
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
+  validateCommentSchema, validateCommentIdSchema,
+  validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -29,17 +35,43 @@ async function createGroup(req, res, next) {
     const { error } = validateGroupSchema(req.body);
     if (error) return next(new DataFormatError());
     const { nickname } = req;
-    const { name } = req.body;
+    const { name, description } = req.body;
     const user = await User.findOne({ where: { nickname } });
     const group = await Group.create({
-      name, member: 1, leader: user.userId,
+      name, description, member: 1, leader: user.userId,
     });
     if (user) {
       await user.addGroup(group);
     }
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
-    console.log(err);
+    return next(new ApiError());
+  }
+}
+
+async function getGroupInfo(req, res, next) {
+  try {
+    const { error } = validateGroupIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const feedCount = await Post.count({ where: { groupId } });
+    const parsedGroupInfo = {
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      feed: feedCount,
+    };
+
+    return res.status(200).json(parsedGroupInfo);
+  } catch (err) {
     return next(new ApiError());
   }
 }
@@ -100,22 +132,31 @@ async function deleteGroup(req, res, next) {
   }
 }
 
-async function patchGroup(req, res, next) {
+async function putGroup(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
 
     const { group_id: groupId } = req.params;
-    const { newLeaderId } = req.body;
-    const group = await Group.findByPk(groupId);
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    group.leader = newLeaderId;
-    await group.save();
+    if (group.leader != user.userId) {
+      return next(new UnathroizedError());
+    }
 
-    return res.status(200).json({ message: 'Successfully update group leader' });
+    const { name, description, leader } = req.body;
+    await group.update({ name, description, leader });
+
+    return res.status(200).json({ message: 'Successfully modified group info' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -291,6 +332,131 @@ async function getSingleGroupSchedule(req, res, next) {
   }
 }
 
+async function getGroupMembers(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const members = await group.getUsers();
+    const parsedMembers = members.map((member) => ({
+      nickname: member.nickname,
+      userId: member.userId,
+      isPendingMember: member.UserGroup.isPendingMember,
+    }));
+
+    return res.status(200).json(parsedMembers);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupJoinRequest(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    await group.addUser(user, { through: { isPendingMember: 1 } });
+
+    return res.status(200).json({ message: 'Successfully completed the application for registration. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupJoinApprove(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.update({ isPendingMember: 0 }, { where: { userId } });
+
+    return res.status(200).json({ message: 'Successfully approved the membership registration. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupJoinReject(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (group.leader !== user.userId) {
+      return next(new UnathroizedError());
+    }
+
+    await UserGroup.destroy({ where: { userId } });
+
+    return res.status(200).json({ message: 'Successfully rejected the membership request. ' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postInviteLink(req, res, next) {
   try {
     const { error } = validateGroupIdSchema(req.params);
@@ -332,41 +498,23 @@ async function postInviteLink(req, res, next) {
   }
 }
 
-async function getInvitation(req, res, next) {
+async function postJoinGroupWithInviteCode(req, res, next) {
   try {
-    const { error } = validateGroupSchema(req.params);
+    const { error } = validateGroupJoinParamSchema(req.params);
     if (error) return next(new DataFormatError());
 
-    const { inviteCode } = req.params;
+    const { group_id: groupId, inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
-    if (!group) {
+
+    if (!group || group.groupId != groupId) {
       return next(new GroupNotFoundError());
     }
-    if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
-    }
-    return res.status(200).json({ group });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
 
-async function postGroupJoin(req, res, next) {
-  try {
-    const { error } = validateGroupSchema(req.params);
-    if (error) return next(new DataFormatError());
-
-    const { inviteCode } = req.params;
-    const group = await Group.findOne({ where: { inviteCode } });
-    if (!group) {
-      return next(new GroupNotFoundError());
-    }
     if (group.inviteExp < new Date()) {
       return next(new ExpiredCodeError());
     }
 
-    const { nickname } = req;
-    const user = await User.findOne({ where: { nickname } });
+    const user = await User.findOne({ where: { nickname: req.nickname } });
     if (await user.hasGroup(group)) {
       return next(new InvalidGroupJoinError());
     }
@@ -604,24 +752,241 @@ async function deleteGroupPost(req, res, next) {
   }
 }
 
+async function getGroupList(req, res, next) {
+  try {
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { page } = req.query;
+    const pageSize = 9;
+    const startIndex = (page - 1) * pageSize;
+    const { rows } = await Group.findAndCountAll({
+      offset: startIndex,
+      limit: pageSize,
+    });
+    const result = rows.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+    }));
+    return res.status(200).json(result);
+  } catch {
+    return next(new ApiError());
+  }
+}
+
+async function getPostComment(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, post] = await Promise.all([
+      Group.findByPk(groupId),
+      Post.findByPk(postId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const comments = await post.getComments();
+
+    return res.status(200).json(comments);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getSingleComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const [group, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    return res.status(200).json(comment);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postComment(req, res, next) {
+  try {
+    const { error: paramError } = validatePostIdSchema(req.params);
+    const { error: bodyError } = validateCommentSchema(req.body);
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const { content } = req.body;
+    const comment = await post.createComment({ content });
+    await user.addComments(comment);
+
+    return res.status(201).json({ message: 'Successfully created the comment.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function putComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    const { error: bodyError } = validateCommentSchema(req.body);
+
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const [group, user, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    if (user.userId !== comment.userId) {
+      return next(new EditPermissionError());
+    }
+
+    const { content } = req.body;
+    await comment.update({ content });
+
+    return res.status(200).json({ message: 'Successfully modified the comment.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function deleteComment(req, res, next) {
+  try {
+    const { error: paramError } = validateCommentIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
+    const [group, user, post, comment] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({ where: { nickname: req.nickname } }),
+      Post.findByPk(postId),
+      Comment.findByPk(commentId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    if (!comment) {
+      return next(new CommentNotFoundError());
+    }
+
+    if (user.userId !== comment.userId) {
+      return next(new EditPermissionError());
+    }
+    await comment.destroy();
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
+  getGroupInfo,
   getGroupDetail,
   deleteGroup,
-  patchGroup,
+  putGroup,
   deleteGroupUser,
   getGroupSchedule,
   postGroupSchedule,
   putGroupSchedule,
   deleteGroupSchedule,
   getSingleGroupSchedule,
+  getGroupMembers,
+  postGroupJoinRequest,
+  postGroupJoinApprove,
+  postGroupJoinReject,
   postInviteLink,
-  getInvitation,
-  postGroupJoin,
+  postJoinGroupWithInviteCode,
   getEventProposal,
   postGroupPost,
+  getGroupList,
   getSinglePost,
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
+  getPostComment,
+  getSingleComment,
+  postComment,
+  putComment,
+  deleteComment,
 };

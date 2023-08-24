@@ -230,16 +230,81 @@
           }
         }
       },
-      "patch": {
-        "description": "",
-        "summary": "그룹 리더 변경",
+      "get": {
+        "description": "한 페이지(9개의 group 정보) 단위로 그룹 리스트를 조회합니다. groupId, 그룹명, 소개, 멤버 수를 보여줍니다.",
+        "summary": "그룹 리스트 조회",
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "id",
+            "name": "page",
+            "in": "query",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}": {
+      "get": {
+        "description": "단일 그룹 정보와 그룹 멤버의 id, nickname을 조회합니다.",
+        "summary": "단일 그룹 정보 상세 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "summary": "그룹 정보 수정",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           },
           {
             "name": "body",
@@ -247,8 +312,14 @@
             "schema": {
               "type": "object",
               "properties": {
-                "newLeaderId": {
-                  "example": "integer"
+                "name": {
+                  "example": "modified-name"
+                },
+                "description": {
+                  "example": "modified-description"
+                },
+                "leader": {
+                  "example": 2
                 }
               }
             }
@@ -264,8 +335,11 @@
           "401": {
             "description": "권한 없음"
           },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
           "404": {
-            "description": "존재하지 않는 유저/그룹"
+            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"
@@ -282,6 +356,11 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
@@ -306,50 +385,13 @@
         }
       }
     },
-    "/api/group/{group_id}": {
+    "/api/group/{group_id}/info": {
       "get": {
-        "description": "단일 그룹 정보와 그룹 멤버의 id, nickname을 조회합니다.",
+        "description": "단일 그룹의 groupId, 그룹명, 소개, 멤버 수, 피드 갯수를 보여줍니다",
         "summary": "단일 그룹 정보 조회",
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}/invite-link": {
-      "post": {
-        "description": "",
-        "summary": "그룹 공유 코드 생성",
-        "tags": ["Group"],
-        "parameters": [
-          {
             "name": "group_id",
             "in": "path",
             "required": true,
@@ -380,17 +422,17 @@
         }
       }
     },
-    "/api/group/invite-link/{inviteCode}": {
+    "/api/group/{group_id}/members": {
       "get": {
-        "description": "",
-        "summary": "그룹 초대장 조회",
+        "description": "그룹의 멤버 리스트를 받아옵니다. { isPendingMember: 1 }는 가입 대기중인 유저를 뜻합니다.",
+        "summary": "그룹 멤버 리스트 조회",
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "inviteCode",
+            "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "authorization",
@@ -411,18 +453,190 @@
           "404": {
             "description": "존재하지 않는 그룹"
           },
-          "410": {
-            "description": "만료된 초대코드"
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
     },
-    "/api/group/join/{inviteCode}": {
+    "/api/group/{group_id}/members/request": {
       "post": {
         "description": "",
-        "summary": "그룹 초대 수락 및 가입",
+        "summary": "그룹 가입 신청",
         "tags": ["Group"],
         "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/members/{user_id}/approve": {
+      "post": {
+        "description": "가입 대기중인 유저를 가입 승인합니다.",
+        "summary": "그룹 가입 신청 수락",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/members/{user_id}/reject": {
+      "post": {
+        "description": "가입 대기중인 유저의 신청을 거절합니다.",
+        "summary": "그룹 가입 신청 거절",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/join/invite-link": {
+      "post": {
+        "description": "",
+        "summary": "그룹 초대 코드 생성",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/join/{inviteCode}": {
+      "post": {
+        "description": "",
+        "summary": "초대 코드로 그룹 가입",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
           {
             "name": "inviteCode",
             "in": "path",
@@ -964,6 +1178,248 @@
           },
           "404": {
             "description": "존재하지 않는 그룹/유저/포스트"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/post/{post_id}/comment": {
+      "get": {
+        "description": "하나의 글에 있는 모든 댓글을 조회합니다.",
+        "summary": "댓글 조회",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트/댓글"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "post": {
+        "description": "댓글을 작성합니다.",
+        "summary": "댓글 작성",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "example": "test-comment"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/post/{post_id}/comment/{comment_id}": {
+      "get": {
+        "description": "",
+        "summary": "댓글 단일 조회",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트/댓글"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "put": {
+        "description": "",
+        "summary": "댓글 수정",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "content": {
+                  "example": "modified-comment"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트/댓글"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "댓글 삭제",
+        "tags": ["Feed"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "post_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "comment_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/포스트/댓글"
           },
           "500": {
             "description": "서버 에러"
@@ -1517,6 +1973,12 @@
         },
         "userId": {
           "type": "BIGINT"
+        },
+        "sharePersonalEvent": {
+          "type": "TINYINT(1)"
+        },
+        "isPendingMember": {
+          "type": "TINYINT(1)"
         }
       },
       "xml": {

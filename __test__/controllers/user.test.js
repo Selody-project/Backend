@@ -61,9 +61,9 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).get('/api/user/group').set('Cookie', cookie);
       const expectedGroups = {
         groupList: [{
-          groupId: 1, leader: 1, name: 'test-group1', member: 2, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 1, userId: 1, sharePersonalEvent: 1 },
+          groupId: 1, leader: 1, description: 'test-description1', name: 'test-group1', member: 2, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0 },
         }, {
-          groupId: 2, leader: 2, name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 2, userId: 1, sharePersonalEvent: 1 },
+          groupId: 2, leader: 2, description: 'test-description2', name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0 },
         }],
       };
 
@@ -407,18 +407,18 @@ describe('Test /api/user endpoints', () => {
       const scheduleId = 1;
       const res = await request(app).get(`/api/user/calendar/${scheduleId}`).set('Cookie', cookie);
       const expectedResult = {
-        "byweekday": null,
-        "content": "test-content1",
-        "endDateTime": "2023-05-15T23:59:59.000Z",
-        "freq": null,
-        "id": 1,
-        "interval": null,
-        "recurrence": 0,
-        "startDateTime": "2023-02-03T00:00:00.000Z",
-        "title": "test-title1",
-        "until": null,
-        "userId": 1,
-      }
+        byweekday: null,
+        content: 'test-content1',
+        endDateTime: '2023-05-15T23:59:59.000Z',
+        freq: null,
+        id: 1,
+        interval: null,
+        recurrence: 0,
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        title: 'test-title1',
+        until: null,
+        userId: 1,
+      };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });

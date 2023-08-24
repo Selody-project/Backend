@@ -37,6 +37,9 @@ class Post extends Sequelize.Model {
       foreignKey: 'postId',
       onDelete: 'cascade',
     });
+    db.Post.belongsTo(db.User, {
+      foreignKey: 'userId',
+    });
   }
 }
 
