@@ -49,6 +49,33 @@ async function createGroup(req, res, next) {
   }
 }
 
+async function getGroupInfo(req, res, next) {
+  try {
+    const { error } = validateGroupIdSchema(req.params);
+    if (error) return next(new DataFormatError());
+
+    const { group_id: groupId } = req.params;
+
+    const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const feedCount = await Post.count({ where: { groupId } });
+    const parsedGroupInfo = {
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      feed: feedCount,
+    };
+
+    return res.status(200).json(parsedGroupInfo);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function getGroupDetail(req, res, next) {
   try {
     const { error } = validateGroupIdSchema(req.params);
@@ -738,7 +765,9 @@ async function getGroupList(req, res, next) {
       limit: pageSize,
     });
     const result = rows.map((group) => ({
+      groupId: group.groupId,
       name: group.name,
+      description: group.description,
       member: group.member,
     }));
     return res.status(200).json(result);
@@ -932,6 +961,7 @@ async function deleteComment(req, res, next) {
 
 module.exports = {
   createGroup,
+  getGroupInfo,
   getGroupDetail,
   deleteGroup,
   putGroup,

@@ -231,8 +231,8 @@
         }
       },
       "get": {
-        "description": "",
-        "summary": "그룹 조회",
+        "description": "한 페이지(9개의 group 정보) 단위로 그룹 리스트를 조회합니다. groupId, 그룹명, 소개, 멤버 수를 보여줍니다.",
+        "summary": "그룹 리스트 조회",
         "tags": ["Group"],
         "parameters": [
           {
@@ -257,7 +257,7 @@
     "/api/group/{group_id}": {
       "get": {
         "description": "단일 그룹 정보와 그룹 멤버의 id, nickname을 조회합니다.",
-        "summary": "단일 그룹 정보 조회",
+        "summary": "단일 그룹 정보 상세 조회",
         "tags": ["Group"],
         "parameters": [
           {
@@ -378,6 +378,43 @@
           },
           "404": {
             "description": "존재하지 않는 유저/그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/info": {
+      "get": {
+        "description": "단일 그룹의 groupId, 그룹명, 소개, 멤버 수, 피드 갯수를 보여줍니다",
+        "summary": "단일 그룹 정보 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"

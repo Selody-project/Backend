@@ -126,6 +126,36 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test GET /api/group/:group_id/info', () => {
+    it('Successfully get a group info', async () => {
+      const groupId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
+      const expectedGroups = {
+        groupId: 1,
+        name: 'test-group1',
+        description: 'test-description1',
+        member: 2,
+        feed: 8,
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+
+    it('Successfully failed to get an group info (Group Not Found)', async () => {
+      const groupId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+    
+    it('Successfully fail to get an group info (DataFormat Error)', async () => {
+      const groupId = 'abc';
+      const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+  });
+
   describe('Test GET /api/group/:group_id', () => {
     it('Successfully get a group detail', async () => {
       const id = 1;
@@ -932,21 +962,32 @@ describe('Test /api/group endpoints', () => {
       }));
       const expectedResult = [
         {
-          name: 'test-group1', member: 2,
+          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2,
         },
         {
-          name: 'test-group2', member: 6,
+          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6,
         },
         {
-          name: 'test-group3', member: 1,
+          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1,
         },
       ];
       const result = res.body.map((group) => ({
+        groupId: group.groupId,
         name: group.name,
+        description: group.description,
         member: group.member,
       }));
       expect(res.status).toEqual(200);
       expect(result).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
+      const page = 'abc';
+      const res = (await request(app).get('/api/group').set('Cookie', cookie).query({
+        page,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 
