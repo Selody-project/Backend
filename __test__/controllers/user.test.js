@@ -61,9 +61,29 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).get('/api/user/group').set('Cookie', cookie);
       const expectedGroups = {
         groupList: [{
-          groupId: 1, leader: 1, description: 'test-description1', name: 'test-group1', member: 2, inviteCode: 'inviteCode01', inviteExp: '2099-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0 },
+          groupId: 1,
+          leader: 1,
+          description: 'test-description1',
+          name: 'test-group1',
+          member: 2,
+          inviteCode: 'inviteCode01',
+          inviteExp: '2099-01-01T00:00:00.000Z',
+          isPublicGroup: 0,
+          UserGroup: {
+            groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0,
+          },
         }, {
-          groupId: 2, leader: 2, description: 'test-description2', name: 'test-group2', member: 6, inviteCode: 'expiredCode02', inviteExp: '2000-01-01T00:00:00.000Z', isPublicGroup: 0, UserGroup: { groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0 },
+          groupId: 2,
+          leader: 2,
+          description: 'test-description2',
+          name: 'test-group2',
+          member: 6,
+          inviteCode: 'expiredCode02',
+          inviteExp: '2000-01-01T00:00:00.000Z',
+          isPublicGroup: 0,
+          UserGroup: {
+            groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0,
+          },
         }],
       };
 
