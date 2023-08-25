@@ -496,6 +496,52 @@
         }
       }
     },
+    "/api/group/{group_id}/members/{user_id}": {
+      "delete": {
+        "description": "리더 권한을 가진 유저가 멤버를 내보냅니다.",
+        "summary": "그룹 멤버 추방하기",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/group/{group_id}/members/{user_id}/approve": {
       "post": {
         "description": "가입 대기중인 유저를 가입 승인합니다.",
