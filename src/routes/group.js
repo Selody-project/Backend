@@ -30,6 +30,7 @@ const {
   postComment,
   putComment,
   deleteComment,
+  searchGroup,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -48,6 +49,7 @@ router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
 router.delete('/:group_id/members/:user_id', deleteGroupMember);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
+router.get('/search/:group_id', searchGroup);
 
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
