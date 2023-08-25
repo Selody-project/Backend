@@ -1307,4 +1307,37 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
+
+  describe('Test DELETE /api/group/:group_id/members/:user_id', () => {
+    it('Successfully expelled a member. ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully failed to expell a member. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const userId = 2;
+      const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to expell a member. (User Not Found) ', async () => {
+      const groupId = 1;
+      const userId = 10000;
+      const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'User Not Found' });
+    });
+
+    it('Successfully failed to expell a member. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const userId = 2;
+      const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
 });

@@ -13,6 +13,7 @@ const {
   getSingleGroupSchedule,
   getGroupMembers,
   postGroupJoinRequest,
+  deleteGroupMember,
   postGroupJoinApprove,
   postGroupJoinReject,
   postInviteLink,
@@ -44,6 +45,7 @@ router.get('/:group_id/members', getGroupMembers);
 router.post('/:group_id/members/request', postGroupJoinRequest);
 router.post('/:group_id/members/:user_id/approve', postGroupJoinApprove);
 router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
+router.delete('/:group_id/members/:user_id', deleteGroupMember);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 
