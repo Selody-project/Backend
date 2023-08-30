@@ -1004,14 +1004,7 @@ async function searchGroup(req, res, next) {
     const group = await Group.findAll({
       where: {
         name: {
-          [Op.or]: [
-            {
-              [Op.like]: `${keyword}%`,
-            },
-            {
-              [Op.like]: `%${keyword}`,
-            },
-          ],
+          [Op.like]: `%${keyword}%`,
         },
       },
     });
