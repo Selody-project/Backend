@@ -1,8 +1,8 @@
 const moment = require('moment');
+const { Op } = require('sequelize');
 const {
   parseEventDates, eventProposal,
 } = require('../utils/event');
-
 // Model
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
@@ -27,7 +27,7 @@ const {
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
   validateCommentSchema, validateCommentIdSchema,
-  validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
+  validateGroupJoinParamSchema, validateGroupJoinRequestSchema, validateGroupdSearchKeyword,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -457,41 +457,6 @@ async function postGroupJoinReject(req, res, next) {
   }
 }
 
-async function deleteGroupMember(req, res, next) {
-  try {
-    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
-    if (paramError) {
-      return next(new DataFormatError());
-    }
-
-    const { group_id: groupId, user_id: userId } = req.params;
-
-    const [group, user, leader] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findByPk(userId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
-
-    if (!group) {
-      return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
-
-    if (leader.userId != group.leader) {
-      return next(new UnathroizedError());
-    }
-
-    await group.removeUser(user);
-
-    return res.status(204).end();
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
 async function postInviteLink(req, res, next) {
   try {
     const { error } = validateGroupIdSchema(req.params);
@@ -756,6 +721,41 @@ async function putGroupPost(req, res, next) {
   }
 }
 
+async function deleteGroupMember(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupJoinRequestSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+
+    const [group, user, leader] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findByPk(userId),
+      User.findOne({ where: { nickname: req.nickname } }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (leader.userId != group.leader) {
+      return next(new UnathroizedError());
+    }
+
+    await group.removeUser(user);
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function deleteGroupPost(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
@@ -994,6 +994,31 @@ async function deleteComment(req, res, next) {
   }
 }
 
+async function searchGroup(req, res, next) {
+  try {
+    const { error: queryError } = validateGroupdSearchKeyword(req.query);
+    if (queryError) return next(new DataFormatError());
+
+    const { keyword } = req.query;
+
+    const group = await Group.findAll({
+      where: {
+        name: {
+          [Op.like]: `%${keyword}%`,
+        },
+      },
+    });
+
+    if (!group || group.length == 0) {
+      return next(new GroupNotFoundError());
+    }
+
+    return res.status(200).json(group);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   createGroup,
   getGroupInfo,
@@ -1008,7 +1033,6 @@ module.exports = {
   getSingleGroupSchedule,
   getGroupMembers,
   postGroupJoinRequest,
-  deleteGroupMember,
   postGroupJoinApprove,
   postGroupJoinReject,
   postInviteLink,
@@ -1019,10 +1043,12 @@ module.exports = {
   getSinglePost,
   getGroupPosts,
   putGroupPost,
+  deleteGroupMember,
   deleteGroupPost,
   getPostComment,
   getSingleComment,
   postComment,
   putComment,
   deleteComment,
+  searchGroup,
 };

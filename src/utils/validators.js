@@ -128,6 +128,12 @@ const groupJoinRequestSchema = Joi.object({
   user_id: Joi.number().min(0).required(),
 });
 
+const groupSearchKeywordSchema = Joi.object({
+  keyword: Joi.alternatives().try(
+    Joi.string().min(1).required(), Joi.number().min(0).required(),
+  ),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -149,4 +155,5 @@ module.exports = {
   validateCommentIdSchema: validator(commentIdSchema),
   validateGroupJoinParamSchema: validator(groupJoinParamSchema),
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
+  validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
 };

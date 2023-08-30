@@ -30,6 +30,7 @@ const {
   postComment,
   putComment,
   deleteComment,
+  searchGroup,
 } = require('../controllers/group');
 
 const router = express.Router();
@@ -37,6 +38,7 @@ const router = express.Router();
 // Group
 router.post('/', createGroup);
 router.get('/', getGroupList);
+router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', putGroup);
