@@ -1006,10 +1006,10 @@ async function searchGroup(req, res, next) {
         name: {
           [Op.or]: [
             {
-              [Op.startsWith]: keyword.toString(),
+              [Op.like]: `${keyword}%`,
             },
             {
-              [Op.endsWith]: keyword.toString(),
+              [Op.like]: `%${keyword}`,
             },
           ],
         },

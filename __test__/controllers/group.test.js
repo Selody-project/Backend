@@ -1344,7 +1344,7 @@ describe('Test /api/group endpoints', () => {
   describe('Test GET /api/group/search', () => {
     it('Successfully retrieved the group. ', async () => {
       const keyword = 'test';
-      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
       }));
 
@@ -1386,7 +1386,7 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully retrieved the group. ', async () => {
       const keyword = 1;
-      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
       }));
 
@@ -1407,7 +1407,7 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
       const keyword = 'abcd';
-      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
       }));
       expect(res.status).toEqual(404);

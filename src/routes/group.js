@@ -38,6 +38,7 @@ const router = express.Router();
 // Group
 router.post('/', createGroup);
 router.get('/', getGroupList);
+router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', putGroup);
@@ -49,7 +50,6 @@ router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
 router.delete('/:group_id/members/:user_id', deleteGroupMember);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
-router.post('/search', searchGroup);
 
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
