@@ -1,8 +1,8 @@
 const moment = require('moment');
+const { Op } = require('sequelize');
 const {
   parseEventDates, eventProposal,
 } = require('../utils/event');
-
 // Model
 const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
@@ -27,7 +27,7 @@ const {
   validateScheduleIdSchema, validateGroupScheduleSchema, validateScheduleDateScehma,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
   validateCommentSchema, validateCommentIdSchema,
-  validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
+  validateGroupJoinParamSchema, validateGroupJoinRequestSchema, validateGroupdSearchKeyword,
 } = require('../utils/validators');
 
 async function createGroup(req, res, next) {
@@ -996,13 +996,27 @@ async function deleteComment(req, res, next) {
 
 async function searchGroup(req, res, next) {
   try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
+    const { error: queryError } = validateGroupdSearchKeyword(req.query);
+    if (queryError) return next(new DataFormatError());
 
-    const { group_id: groupId } = req.params;
-    const group = await Group.findOne({ where: { groupId } });
+    const { keyword } = req.query;
 
-    if (!group) {
+    const group = await Group.findAll({
+      where: {
+        name: {
+          [Op.or]: [
+            {
+              [Op.startsWith]: keyword.toString(),
+            },
+            {
+              [Op.endsWith]: keyword.toString(),
+            },
+          ],
+        },
+      },
+    });
+
+    if (!group || group.length == 0) {
       return next(new GroupNotFoundError());
     }
 
@@ -1011,6 +1025,7 @@ async function searchGroup(req, res, next) {
     return next(new ApiError());
   }
 }
+
 module.exports = {
   createGroup,
   getGroupInfo,

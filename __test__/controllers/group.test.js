@@ -1341,11 +1341,14 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group/search/:group_id', () => {
+  describe('Test GET /api/group/search', () => {
     it('Successfully retrieved the group. ', async () => {
-      const groupId = 1;
-      const res = (await request(app).get(`/api/group/search/${groupId}`).set('Cookie', cookie));
-      const expectedResult = {
+      const keyword = 'test';
+      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+
+      const expectedResult = [{
         groupId: 1,
         name: 'test-group1',
         description: 'test-description1',
@@ -1354,15 +1357,59 @@ describe('Test /api/group endpoints', () => {
         inviteCode: 'inviteCode01',
         isPublicGroup: 0,
         inviteExp: '2099-01-01T00:00:00.000Z',
-      };
+      },
+      {
+        groupId: 2,
+        name: 'test-group2',
+        description: 'test-description2',
+        member: 6,
+        leader: 2,
+        inviteCode: 'expiredCode02',
+        isPublicGroup: 0,
+        inviteExp: '2000-01-01T00:00:00.000Z',
+      },
+      {
+        groupId: 3,
+        name: 'test-group3',
+        description: 'test-description3',
+        member: 1,
+        leader: 3,
+        inviteCode: 'inviteCode03',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      },
+      ];
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully retrieved the group. ', async () => {
+      const keyword = 1;
+      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+
+      const expectedResult = [{
+        groupId: 1,
+        name: 'test-group1',
+        description: 'test-description1',
+        member: 2,
+        leader: 1,
+        inviteCode: 'inviteCode01',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      }];
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
-      const groupId = 10000;
-      const res = (await request(app).get(`/api/group/search/${groupId}`).set('Cookie', cookie));
+      const keyword = 'abcd';
+      const res = (await request(app).post('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
