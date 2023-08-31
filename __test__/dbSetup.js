@@ -73,6 +73,7 @@ async function setUpGroupDB() {
   const group1 = await Group.create({
     groupId: 1,
     name: 'test-group1',
+    description: 'test-description1',
     member: 2,
     leader: 1,
     inviteCode: 'inviteCode01',
@@ -81,6 +82,7 @@ async function setUpGroupDB() {
   const group2 = await Group.create({
     groupId: 2,
     name: 'test-group2',
+    description: 'test-description2',
     member: 6,
     leader: 2,
     inviteCode: 'expiredCode02',
@@ -89,6 +91,7 @@ async function setUpGroupDB() {
   const group3 = await Group.create({
     groupId: 3,
     name: 'test-group3',
+    description: 'test-description3',
     member: 1,
     leader: 3,
     inviteCode: 'inviteCode03',

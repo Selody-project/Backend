@@ -2,8 +2,14 @@ const express = require('express');
 
 // Group
 const {
-  postGroup, getGroupDetail, getGroupList, patchGroup, deleteGroup,
-  postInviteLink, getInvitation, postGroupJoin,
+  postGroup,
+  getGroupInfo, getGroupDetail, getGroupList,
+  putGroup, deleteGroup,
+  getGroupMembers,
+  postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
+  postInviteLink, postJoinGroupWithInviteCode,
+  deleteGroupMember,
+  searchGroup,
 } = require('../controllers/group');
 
 // Schedule
@@ -24,12 +30,18 @@ const router = express.Router();
 // Group
 router.post('/', postGroup);
 router.get('/', getGroupList);
+router.get('/search', searchGroup);
+router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
-router.patch('/:group_id', patchGroup);
+router.put('/:group_id', putGroup);
 router.delete('/:group_id', deleteGroup);
-router.post('/:group_id/invite-link', postInviteLink);
-router.get('/invite-link/:inviteCode', getInvitation);
-router.post('/join/:inviteCode', postGroupJoin);
+router.get('/:group_id/members', getGroupMembers);
+router.post('/:group_id/members/request', postGroupJoinRequest);
+router.post('/:group_id/members/:user_id/approve', postGroupJoinApprove);
+router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
+router.delete('/:group_id/members/:user_id', deleteGroupMember);
+router.post('/:group_id/join/invite-link', postInviteLink);
+router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
