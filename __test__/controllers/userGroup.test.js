@@ -50,7 +50,7 @@ describe('Test /api/group endpoints', () => {
     it('Successfully fail to delete a user from group (group leader cannot leave)', async () => {
       const groupId = 1;
       const res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
-      expect(res.status).toEqual(403);
+      expect(res.status).toEqual(499);
     });
 
     it('Successfully failed to delete user from group', async () => {

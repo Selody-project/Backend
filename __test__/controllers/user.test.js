@@ -14,16 +14,7 @@ describe('Test /api/user endpoints', () => {
   beforeAll(async () => {
     await dropDB();
     await syncDB();
-
-    await tearDownPersonalScheduleDB();
-    await tearDownGroupScheduleDB();
-    await tearDownUserDB();
-    await tearDownGroupDB();
-
     await setUpUserDB();
-    await setUpGroupDB();
-    await setUpPersonalScheduleDB();
-    await setUpGroupScheduleDB2();
 
     const res = await request(app).post('/api/auth/login').send({
       email: 'test-user1@email.com',
@@ -34,10 +25,7 @@ describe('Test /api/user endpoints', () => {
   });
 
   beforeEach(async () => {
-    await tearDownPersonalScheduleDB();
-    await tearDownGroupScheduleDB();
     await tearDownUserDB();
-    await tearDownGroupDB();
 
     await setUpUserDB();
     await setUpGroupDB();
@@ -48,6 +36,7 @@ describe('Test /api/user endpoints', () => {
   afterEach(async () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    await tearDownGroupDB();
     await tearDownUserDB();
   });
 
@@ -524,28 +513,34 @@ describe('Test /api/user endpoints', () => {
   });
 
   describe('Test DELETE /api/user/calendar', () => {
-    it('Successfully delete a User schedule from the database ', async () => {
+    it('Successfully deleted a User schedule from the database ', async () => {
       const id = 9;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(204);
     });
 
-    it('Successfully fail to delete a User schedule from the database (non-existent schedule)', async () => {
+    it('Successfully failed to delete a User schedule from the database (non-existent schedule)', async () => {
       const id = 10000;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: 'Not Found data' });
     });
+
+    it('Successfully failed to delete a User schedule from the database (Edit Permission Error)', async () => {
+      const id = 24;
+      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
+      expect(res.statusCode).toEqual(403);
+    });
   });
 
   describe('Test DELETE /api/withdrawal', () => {
-    it('Successfully delete a user from user table', async () => {
+    it('Successfully deleted a user from user table', async () => {
       const id = 4;
       const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(204);
     });
 
-    it('Successfully fail to delete a user from user table (UserIsLeader Error)', async () => {
+    it('Successfully failed to delete a user from user table (UserIsLeader Error)', async () => {
       const id = 1;
       const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(499);

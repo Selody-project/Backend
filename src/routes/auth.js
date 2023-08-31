@@ -1,10 +1,17 @@
 const express = require('express');
 
 const {
-  getNaverUserInfo, getGoogleUserInfo, joinSocialUser, join, login, logout,
+  getNaverUserInfo, getGoogleUserInfo, joinSocialUser, 
+  join, login, logout,
 } = require('../controllers/auth');
-const { createToken, verifyToken, renewToken } = require('../middleware/token');
-const { getUserProfile } = require('../controllers/user');
+
+const { 
+  createToken, verifyToken, renewToken 
+} = require('../middleware/token');
+
+const { 
+  getUserProfile 
+} = require('../controllers/user');
 
 const router = express.Router();
 

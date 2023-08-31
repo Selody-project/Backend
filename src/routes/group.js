@@ -1,42 +1,34 @@
 const express = require('express');
 
+// Group
 const {
-  createGroup,
-  getGroupInfo,
-  getGroupDetail,
-  deleteGroup,
-  putGroup,
-  getGroupSchedule,
-  postGroupSchedule,
-  putGroupSchedule,
-  deleteGroupSchedule,
-  getSingleGroupSchedule,
+  postGroup,
+  getGroupInfo, getGroupDetail, getGroupList,
+  putGroup, deleteGroup,
   getGroupMembers,
-  postGroupJoinRequest,
+  postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
+  postInviteLink, postJoinGroupWithInviteCode,
   deleteGroupMember,
-  postGroupJoinApprove,
-  postGroupJoinReject,
-  postInviteLink,
-  postJoinGroupWithInviteCode,
-  getEventProposal,
-  postGroupPost,
-  getGroupList,
-  getSinglePost,
-  getGroupPosts,
-  putGroupPost,
-  deleteGroupPost,
-  getPostComment,
-  getSingleComment,
-  postComment,
-  putComment,
-  deleteComment,
   searchGroup,
 } = require('../controllers/group');
+
+// Schedule
+const {
+  getGroupSchedule, getSingleGroupSchedule,
+  postGroupSchedule, putGroupSchedule, deleteGroupSchedule,
+  getEventProposal,
+} = require('../controllers/groupSchedule');
+
+// Feed
+const {
+  postGroupPost, getGroupPosts, getSinglePost, putGroupPost, deleteGroupPost,
+  postComment, getPostComment, getSingleComment, putComment, deleteComment,
+} = require('../controllers/feed');
 
 const router = express.Router();
 
 // Group
-router.post('/', createGroup);
+router.post('/', postGroup);
 router.get('/', getGroupList);
 router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
@@ -53,13 +45,13 @@ router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
-router.get('/calendar/:schedule_id', getSingleGroupSchedule);
-router.put('/calendar/:schedule_id', putGroupSchedule);
-router.delete('/calendar/:schedule_id', deleteGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
+router.get('/:group_id/calendar/:schedule_id', getSingleGroupSchedule);
+router.put('/:group_id/calendar/:schedule_id', putGroupSchedule);
+router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);
 router.get('/:group_id/proposal', getEventProposal);
 
-// Post
+// Feed
 router.post('/:group_id/post', postGroupPost);
 router.get('/:group_id/post', getGroupPosts);
 router.get('/:group_id/post/:post_id', getSinglePost);

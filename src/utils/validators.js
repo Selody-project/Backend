@@ -40,7 +40,7 @@ const groupIdSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
 });
 
-const scheduleDateScehma = Joi.object({
+const scheduleDateSchema = Joi.object({
   startDateTime: Joi.date(),
   endDateTime: Joi.date(),
 });
@@ -85,6 +85,11 @@ const userScheduleSchema = Joi.object({
 });
 
 const scheduleIdSchema = Joi.object({
+  schedule_id: Joi.number().min(0).required(),
+});
+
+const groupScheduleIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
   schedule_id: Joi.number().min(0).required(),
 });
 
@@ -142,8 +147,9 @@ module.exports = {
   validateGroupIdSchema: validator(groupIdSchema),
   validateScheduleSchema: validator(scheduleSchema),
   validateScheduleIdSchema: validator(scheduleIdSchema),
+  validateGroupScheduleIdSchema: validator(groupScheduleIdSchema),
   validateGroupScheduleSchema: validator(groupScheduleSchema),
-  validateScheduleDateScehma: validator(scheduleDateScehma),
+  validateScheduleDateSchema: validator(scheduleDateSchema),
   validateUserScheduleSchema: validator(userScheduleSchema),
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
