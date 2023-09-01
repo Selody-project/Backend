@@ -1,7 +1,7 @@
-const UnathroizedError = require('./UnauthorizedError');
+const UnauthorizedError = require('./UnauthorizedError');
 const ScheduleNotFoundError = require('./ScheduleNotFoundError');
 
 module.exports = {
-  UnathroizedError,
+  UnauthorizedError,
   ScheduleNotFoundError,
 };

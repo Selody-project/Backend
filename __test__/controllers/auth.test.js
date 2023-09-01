@@ -8,10 +8,10 @@ describe('Test /auth endpoints', () => {
   let cookie;
   beforeAll(async () => {
     await syncDB();
+    await tearDownUserDB();
   });
 
   beforeEach(async () => {
-    await tearDownUserDB();
     await setUpUserDB();
 
     const res = await request(app).post('/api/auth/login').send({

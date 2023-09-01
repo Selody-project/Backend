@@ -250,6 +250,9 @@ async function setUpPersonalScheduleDB() {
     {
       id: 23, userId: 1, title: 'test-title23', content: 'test-content23', startDateTime: '2020-03-15T00:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
+    {
+      id: 24, userId: 2, title: 'test-title24', content: 'test-content24', startDateTime: '3000-03-15T00:00:00.000Z', endDateTime: '3000-04-01T00:00:00.000Z', recurrence: 0,
+    },
   ]);
 }
 

@@ -15,17 +15,7 @@ describe('Test /api/group endpoints', () => {
     await dropDB();
     await syncDB();
 
-    await tearDownPersonalScheduleDB();
-    await tearDownGroupScheduleDB();
-    await tearDownGroupPostDB();
-    await tearDownUserDB();
-    await tearDownGroupDB();
-
     await setUpUserDB();
-    await setUpGroupDB();
-    await setUpGroupScheduleDB();
-    await setUpGroupPostDB();
-    await setUpPersonalScheduleDB2();
 
     const res = await request(app).post('/api/auth/login').send({
       email: 'test-user1@email.com',
@@ -36,11 +26,6 @@ describe('Test /api/group endpoints', () => {
   });
 
   beforeEach(async () => {
-    await tearDownPersonalScheduleDB();
-    await tearDownGroupScheduleDB();
-    await tearDownGroupPostDB();
-    await tearDownGroupDB();
-
     await setUpPersonalScheduleDB2();
     await setUpGroupDB();
     await setUpGroupScheduleDB();
@@ -51,6 +36,7 @@ describe('Test /api/group endpoints', () => {
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
     await tearDownGroupPostDB();
+    await tearDownGroupDB();
   });
 
   afterAll(async () => {
@@ -102,7 +88,7 @@ describe('Test /api/group endpoints', () => {
         name: 'modified-group1',
         description: 'modified-description1',
         leader: 2,
-      }
+      };
       const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
 
       const group = await Group.findByPk(groupId);
@@ -119,7 +105,7 @@ describe('Test /api/group endpoints', () => {
         name: 'modified-group1',
         description: 'modified-description1',
         leader: 2,
-      }
+      };
       const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
 
       expect(res.status).toEqual(404);
@@ -148,7 +134,7 @@ describe('Test /api/group endpoints', () => {
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
-    
+
     it('Successfully fail to get an group info (DataFormat Error)', async () => {
       const groupId = 'abc';
       const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
@@ -224,10 +210,11 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test PUT /api/group/calendar', () => {
+  describe('Test PUT /api/group/:group_id/calendar/:schedule_id', () => {
     it('Group Schedule Modification Successful ', async () => {
-      const id = 1;
-      const res = await request(app).put(`/api/group/calendar/${id}`).set('Cookie', cookie).send({
+      const groupId = 1;
+      const scheduleId = 1;
+      const res = await request(app).put(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie).send({
         groupId: 1,
         title: 'modified-title',
         content: 'modified-contnent',
@@ -242,16 +229,18 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test DELETE /api/group/calendar', () => {
+  describe('Test DELETE /api/group/:group_id/calendar', () => {
     it('Group schedule deleted successfully ', async () => {
-      const id = 4;
-      const res = await request(app).delete(`/api/group/calendar/${id}`).set('Cookie', cookie);
+      const groupId = 1;
+      const scheduleId = 4;
+      const res = await request(app).delete(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie);
       expect(res.status).toEqual(204);
     });
 
     it('Successfully fail to delete group (DataFormat Error)', async () => {
-      const id = 'abc';
-      const res = await request(app).delete(`/api/group/calendar/${id}`).set('Cookie', cookie);
+      const groupId = 1;
+      const scheduleId = 'abc';
+      const res = await request(app).delete(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie);
       expect(res.status).toEqual(400);
     });
   });
@@ -669,10 +658,11 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group/calendar/:schedule_id', () => {
+  describe('Test GET /api/group/:group_id/calendar/:schedule_id', () => {
     it('Successfully retrieved a schedule', async () => {
+      const groupId = 1;
       const scheduleId = 1;
-      const res = await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie);
+      const res = await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie);
       const expectedResult = {
         byweekday: null,
         content: 'test-content1',
@@ -691,15 +681,17 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully failed to retrieved a schedule. (Schedule Not Found) ', async () => {
+      const groupId = 1;
       const scheduleId = 10000;
-      const res = (await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Schedule Not Found' });
     });
 
     it('Successfully failed to retrieved a schedule. (DataFormat Error) ', async () => {
+      const groupId = 1;
       const scheduleId = 'abc';
-      const res = (await request(app).get(`/api/group/calendar/${scheduleId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
@@ -1171,13 +1163,13 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       const expectedResult = {
-        commentId: 1, 
-        content: 'test-comment1', 
-        depth: 0, 
-        postId: 1, 
+        commentId: 1,
+        content: 'test-comment1',
+        depth: 0,
+        postId: 1,
         userId: 1,
       };
-      
+
       const result = {
         commentId: res.body.commentId,
         postId: res.body.postId,
@@ -1185,7 +1177,7 @@ describe('Test /api/group endpoints', () => {
         content: res.body.content,
         depth: res.body.depth,
       };
-      
+
       expect(res.status).toEqual(200);
       expect(result).toEqual(expectedResult);
     });
@@ -1338,6 +1330,80 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+  });
+
+  describe('Test GET /api/group/search', () => {
+    it('Successfully retrieved the group. ', async () => {
+      const keyword = 'test';
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+
+      const expectedResult = [{
+        groupId: 1,
+        name: 'test-group1',
+        description: 'test-description1',
+        member: 2,
+        leader: 1,
+        inviteCode: 'inviteCode01',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      },
+      {
+        groupId: 2,
+        name: 'test-group2',
+        description: 'test-description2',
+        member: 6,
+        leader: 2,
+        inviteCode: 'expiredCode02',
+        isPublicGroup: 0,
+        inviteExp: '2000-01-01T00:00:00.000Z',
+      },
+      {
+        groupId: 3,
+        name: 'test-group3',
+        description: 'test-description3',
+        member: 1,
+        leader: 3,
+        inviteCode: 'inviteCode03',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      },
+      ];
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully retrieved the group. ', async () => {
+      const keyword = 1;
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+
+      const expectedResult = [{
+        groupId: 1,
+        name: 'test-group1',
+        description: 'test-description1',
+        member: 2,
+        leader: 1,
+        inviteCode: 'inviteCode01',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      }];
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
+      const keyword = 'abcd';
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
     });
   });
 });

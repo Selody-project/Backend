@@ -40,7 +40,7 @@ const groupIdSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
 });
 
-const scheduleDateScehma = Joi.object({
+const scheduleDateSchema = Joi.object({
   startDateTime: Joi.date(),
   endDateTime: Joi.date(),
 });
@@ -88,6 +88,11 @@ const scheduleIdSchema = Joi.object({
   schedule_id: Joi.number().min(0).required(),
 });
 
+const groupScheduleIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  schedule_id: Joi.number().min(0).required(),
+});
+
 const eventPoroposalSchema = Joi.object({
   date1: Joi.date().required(),
   date2: Joi.date(),
@@ -128,6 +133,12 @@ const groupJoinRequestSchema = Joi.object({
   user_id: Joi.number().min(0).required(),
 });
 
+const groupSearchKeywordSchema = Joi.object({
+  keyword: Joi.alternatives().try(
+    Joi.string().min(1).required(), Joi.number().min(0).required(),
+  ),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -136,8 +147,9 @@ module.exports = {
   validateGroupIdSchema: validator(groupIdSchema),
   validateScheduleSchema: validator(scheduleSchema),
   validateScheduleIdSchema: validator(scheduleIdSchema),
+  validateGroupScheduleIdSchema: validator(groupScheduleIdSchema),
   validateGroupScheduleSchema: validator(groupScheduleSchema),
-  validateScheduleDateScehma: validator(scheduleDateScehma),
+  validateScheduleDateSchema: validator(scheduleDateSchema),
   validateUserScheduleSchema: validator(userScheduleSchema),
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
@@ -149,4 +161,5 @@ module.exports = {
   validateCommentIdSchema: validator(commentIdSchema),
   validateGroupJoinParamSchema: validator(groupJoinParamSchema),
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
+  validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
 };

@@ -1,29 +1,35 @@
 const express = require('express');
 const { createToken } = require('../middleware/token');
+
+// User
 const {
   getUserGroup,
-  patchUserProfile,
-  patchUserPassword,
-  putUserSchedule,
-  getUserPersonalSchedule,
-  getSingleUserSchedule,
+  patchUserProfile, patchUserPassword,
+  getUserSetup, updateUserSetUp,
 } = require('../controllers/user');
-const { getUserSetup, updateUserSetUp } = require('../controllers/userSetup');
 
-const { postPersonalSchedule, deletePersonalSchedule } = require('../controllers/calendar');
+// Schedule
+const {
+  getUserPersonalSchedule, getSingleUserSchedule,
+  postPersonalSchedule, putPersonalSchedule, deletePersonalSchedule,
+} = require('../controllers/personalSchedule');
+
 const { deleteGroupUser } = require('../controllers/group');
 
 const router = express.Router();
 
+// User
 router.get('/group', getUserGroup);
 router.delete('/group/:group_id', deleteGroupUser);
 router.patch('/profile', patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);
 router.patch('/userSetup/:user_id', updateUserSetUp);
 router.get('/userSetup', getUserSetup);
+
+// Schedule
 router.get('/calendar', getUserPersonalSchedule);
-router.post('/calendar', postPersonalSchedule);
 router.get('/calendar/:schedule_id', getSingleUserSchedule);
-router.put('/calendar/:schedule_id', putUserSchedule);
+router.post('/calendar', postPersonalSchedule);
+router.put('/calendar/:schedule_id', putPersonalSchedule);
 router.delete('/calendar/:schedule_id', deletePersonalSchedule);
 module.exports = router;
