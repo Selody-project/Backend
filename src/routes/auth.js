@@ -1,16 +1,16 @@
 const express = require('express');
 
 const {
-  getNaverUserInfo, getGoogleUserInfo, joinSocialUser, 
+  getNaverUserInfo, getGoogleUserInfo, joinSocialUser,
   join, login, logout,
 } = require('../controllers/auth');
 
-const { 
-  createToken, verifyToken, renewToken 
+const {
+  createToken, verifyToken, renewToken,
 } = require('../middleware/token');
 
-const { 
-  getUserProfile 
+const {
+  getUserProfile, withdrawal,
 } = require('../controllers/user');
 
 const router = express.Router();
@@ -22,5 +22,6 @@ router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
 router.post('/google', getGoogleUserInfo, createToken);
 router.get('/token/refresh', renewToken);
 router.get('/token/verify', verifyToken, getUserProfile);
+router.delete('/withdrawal/:user_id', withdrawal);
 
 module.exports = router;
