@@ -10,7 +10,7 @@ const PersonalSchedule = require('../models/personalSchedule');
 // Error
 const {
   ApiError, DataFormatError,
-  UserNotFoundError, DuplicateUserError, UserIsLeaderError,
+  UserNotFoundError, DuplicateUserError, UserIsLeaderError, BelongToGroupError,
 } = require('../errors');
 
 // Validator
@@ -116,6 +116,11 @@ async function withdrawal(req, res, next) {
 
     if (leader) {
       return next(new UserIsLeaderError());
+    }
+
+    const groupList = await user.getGroups();
+    if (groupList != 0) {
+      return next(new BelongToGroupError());
     }
 
     await PersonalSchedule.destroy({ where: { userId } });

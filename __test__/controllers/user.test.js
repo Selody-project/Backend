@@ -545,6 +545,12 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(499);
     });
+
+    it('Successfully failed to delete a user from user table (BelongToGroup Error)', async () => {
+      const id = 5;
+      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      expect(res.status).toEqual(403);
+    });
   });
 
   describe('Test PATCH /api/user/updateUserSetup', () => {
