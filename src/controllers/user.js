@@ -109,7 +109,6 @@ async function withdrawal(req, res, next) {
       User.findByPk(userId),
       Group.findOne({ where: { leader: userId } }),
     ]);
-
     if (!user) {
       return next(new UserNotFoundError());
     }

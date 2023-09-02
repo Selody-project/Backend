@@ -533,22 +533,22 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test DELETE /api/withdrawal', () => {
+  describe('Test DELETE /api/auth/withdrawal', () => {
     it('Successfully deleted a user from user table', async () => {
       const id = 4;
-      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(204);
     });
 
     it('Successfully failed to delete a user from user table (UserIsLeader Error)', async () => {
       const id = 1;
-      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(499);
     });
 
     it('Successfully failed to delete a user from user table (BelongToGroup Error)', async () => {
       const id = 5;
-      const res = await request(app).delete(`/api/withdrawal/${id}`).set('Cookie', cookie);
+      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(403);
     });
   });
