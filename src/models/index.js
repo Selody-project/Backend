@@ -11,6 +11,7 @@ const sequelize = new Sequelize(
     host: dbConfig.host,
     dialect: 'mysql',
     port: dbConfig.port,
+    migrationStorageTableName: 'sequelize_meta',
     options: {
       database: dbConfig.database,
     },

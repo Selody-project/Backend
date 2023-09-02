@@ -23,7 +23,7 @@ const {
 
 async function getNaverUserInfo(req, res, next) {
   try {
-    const { accessToken } = req.body;
+    const { access_token: accessToken } = req.body;
     const header = `Bearer ${accessToken}`;
     const apiUrl = 'https://openapi.naver.com/v1/nid/me';
     const options = {
@@ -87,18 +87,23 @@ async function getGoogleUserInfo(req, res, next) {
 
 async function joinSocialUser(req, res, next) {
   try {
-    const user = await User.findOne({ where: { snsId: req.body.id } });
+    const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) {
+      const nickname = `selody-${req.body.id}`.slice(0, 15);
       await User.create({
-        nickname: req.body.nickname,
+        email: req.body.email,
+        nickname: nickname,
         provider: 'NAVER',
         snsId: req.body.id,
       });
+      req.nickname = nickname;
     }
-    req.nickname = user.nickname;
+    else {
+      req.nickname = user.nickname;
+    }
     next();
-  } catch (error) {
-    if (error.name === 'TokenExpireError') {
+  } catch (err) {
+    if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
     return next(new InvalidTokenError());
