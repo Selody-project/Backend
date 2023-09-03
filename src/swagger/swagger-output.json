@@ -157,17 +157,28 @@
             "in": "path",
             "required": true,
             "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
           }
         ],
         "responses": {
           "204": {
             "description": "성공"
           },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "탈퇴하지 않은 그룹이 존재"
           },
           "404": {
             "description": "존재하지 않는 유저"
+          },
+          "499": {
+            "description": "리더를 위임하지 않은 그룹이 존재"
           },
           "500": {
             "description": "서버 에러"
@@ -218,46 +229,6 @@
           },
           "401": {
             "description": "권한 없음"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/withdrawal/{user_id}": {
-      "delete": {
-        "description": "",
-        "summary": "유저 계정 탈퇴",
-        "tags": ["User"],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "성공"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "403": {
-            "description": "유저가 그룹에 속함"
-          },
-          "404": {
-            "description": "유저 없음"
-          },
-          "499": {
-            "description": "유저가 그룹리더 역할"
           },
           "500": {
             "description": "서버 에러"
