@@ -104,12 +104,6 @@
               "properties": {
                 "access_token": {
                   "example": "string"
-                },
-                "id": {
-                  "example": "integer"
-                },
-                "nickname": {
-                  "example": "string"
                 }
               }
             }
