@@ -61,12 +61,22 @@ async function setUpUserDB() {
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
     },
+    {
+      userId: 5,
+      email: 'test-user5@email.com',
+      nickname: 'test-user5',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    },
   ];
 
   await User.create(mockUserData[0]);
   await User.create(mockUserData[1]);
   await User.create(mockUserData[2]);
   await User.create(mockUserData[3]);
+  await User.create(mockUserData[4]);
 }
 
 async function setUpGroupDB() {
@@ -103,6 +113,7 @@ async function setUpGroupDB() {
   await user[1].addGroup(group1, { through: { accessLevel: 'admin' } });
   await user[1].addGroup(group2, { through: { accessLevel: 'owner' } });
   await user[2].addGroup(group3, { through: { accessLevel: 'owner' } });
+  await user[4].addGroup(group3, { through: { accessLevel: 'admin' } });
 }
 
 async function setUpGroupScheduleDB() {

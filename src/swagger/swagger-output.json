@@ -146,6 +146,35 @@
         }
       }
     },
+    "/api/auth/withdrawal/{user_id}": {
+      "delete": {
+        "description": "회원 탈퇴",
+        "summary": "유저 회원 탈퇴",
+        "tags": ["Auth"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "404": {
+            "description": "존재하지 않는 유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/auth/token/refresh": {
       "get": {
         "description": "",
@@ -189,6 +218,46 @@
           },
           "401": {
             "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/withdrawal/{user_id}": {
+      "delete": {
+        "description": "",
+        "summary": "유저 계정 탈퇴",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "유저가 그룹에 속함"
+          },
+          "404": {
+            "description": "유저 없음"
+          },
+          "499": {
+            "description": "유저가 그룹리더 역할"
           },
           "500": {
             "description": "서버 에러"
@@ -247,6 +316,44 @@
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/search": {
+      "get": {
+        "description": "그룹명 검색했을 때 검색키워드에 포험되는 그룹명 서치 ",
+        "summary": "그룹명 검색",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "The search keyword (can be either an integer or a string)"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"
