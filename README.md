@@ -1,6 +1,6 @@
 # Backend
 
-xERN Project
+Selody Project
 
 # Getting Started
 
