@@ -117,11 +117,14 @@ describe('Test /api/group endpoints', () => {
       const groupId = 1;
       const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
       const expectedGroups = {
-        groupId: 1,
-        name: 'test-group1',
-        description: 'test-description1',
-        member: 2,
-        feed: 8,
+        accessLevel: 'owner',
+        information: {
+          groupId: 1,
+          name: 'test-group1',
+          description: 'test-description1',
+          member: 2,
+          feed: 8,
+        },
       };
 
       expect(res.status).toEqual(200);
@@ -147,30 +150,33 @@ describe('Test /api/group endpoints', () => {
       const id = 1;
       const res = await request(app).get(`/api/group/${id}`).set('Cookie', cookie);
       const expectedGroups = {
-        group: {
-          groupId: 1,
-          inviteCode: 'inviteCode01',
-          inviteExp: '2099-01-01T00:00:00.000Z',
-          isPublicGroup: 0,
-          description: 'test-description1',
-          leader: 1,
-          member: 2,
-          name: 'test-group1',
-        },
-        leaderInfo: {
-          nickname: 'test-user1',
-          userId: 1,
-        },
-        memberInfo: [
-          {
+        accessLevel: 'owner',
+        information: {
+          group: {
+            groupId: 1,
+            inviteCode: 'inviteCode01',
+            inviteExp: '2099-01-01T00:00:00.000Z',
+            isPublicGroup: 0,
+            description: 'test-description1',
+            leader: 1,
+            member: 2,
+            name: 'test-group1',
+          },
+          leaderInfo: {
             nickname: 'test-user1',
             userId: 1,
           },
-          {
-            nickname: 'test-user2',
-            userId: 2,
-          },
-        ],
+          memberInfo: [
+            {
+              nickname: 'test-user1',
+              userId: 1,
+            },
+            {
+              nickname: 'test-user2',
+              userId: 2,
+            },
+          ],
+        },
       };
 
       expect(res.status).toEqual(200);
@@ -251,282 +257,285 @@ describe('Test /api/group endpoints', () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
       const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
-        nonRecurrenceSchedule: [
-          {
-            id: 1,
-            isGroup: 0,
-            content: 'test-content1',
-            endDateTime: '2023-05-15T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-02-03T00:00:00.000Z',
-            title: 'test-title1',
-          },
-          {
-            id: 2,
-            isGroup: 0,
-            content: 'test-content2',
-            endDateTime: '2023-04-30T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-15T00:00:00.000Z',
-            title: 'test-title2',
-          },
-          {
-            id: 3,
-            isGroup: 0,
-            content: 'test-content3',
-            endDateTime: '2023-04-15T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-10T00:00:00.000Z',
-            title: 'test-title3',
-          },
-          {
-            id: 4,
-            isGroup: 0,
-            content: 'test-content4',
-            endDateTime: '2023-04-30T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-01T00:00:00.000Z',
-            title: 'test-title4',
-          },
-          {
-            id: 1,
-            isGroup: 1,
-            content: 'test-content1',
-            endDateTime: '2023-05-15T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-02-03T00:00:00.000Z',
-            title: 'test-title1',
-          },
-          {
-            id: 2,
-            isGroup: 1,
-            content: 'test-content2',
-            endDateTime: '2023-04-30T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-15T00:00:00.000Z',
-            title: 'test-title2',
-          },
-          {
-            id: 4,
-            isGroup: 1,
-            content: 'test-content4',
-            endDateTime: '2023-04-30T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-01T00:00:00.000Z',
-            title: 'test-title4',
-          },
-          {
-            id: 5,
-            isGroup: 1,
-            content: 'test-content5',
-            endDateTime: '2023-04-30T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-03-15T00:00:00.000Z',
-            title: 'test-title5',
-          },
-          {
-            id: 6,
-            isGroup: 1,
-            content: 'test-content6',
-            endDateTime: '2023-05-15T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-15T00:00:00.000Z',
-            title: 'test-title6',
-          },
-          {
-            id: 9,
-            isGroup: 1,
-            content: 'test-content9',
-            endDateTime: '2023-04-01T08:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-03-15T00:00:00.000Z',
-            title: 'test-title9',
-          },
-          {
-            id: 10,
-            isGroup: 1,
-            content: 'test-content10',
-            endDateTime: '2023-05-15T23:59:59.000Z',
-            recurrence: 0,
-            startDateTime: '2023-04-30T23:59:59.000Z',
-            title: 'test-title10',
-          },
-        ],
-        recurrenceSchedule: [
-          {
-            byweekday: '',
-            content: 'test-content11',
-            freq: 'DAILY',
-            groupId: 1,
-            id: 11,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-01T13:00:00.000Z', startDateTime: '2023-04-01T12:00:00.000Z' },
-              { endDateTime: '2023-04-02T13:00:00.000Z', startDateTime: '2023-04-02T12:00:00.000Z' },
-              { endDateTime: '2023-04-03T13:00:00.000Z', startDateTime: '2023-04-03T12:00:00.000Z' },
-              { endDateTime: '2023-04-04T13:00:00.000Z', startDateTime: '2023-04-04T12:00:00.000Z' },
-              { endDateTime: '2023-04-05T13:00:00.000Z', startDateTime: '2023-04-05T12:00:00.000Z' },
-            ],
-            title: 'test-title11',
-            until: '2023-04-05T14:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content12',
-            freq: 'MONTHLY',
-            groupId: 1,
-            id: 12,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
-            ],
-            title: 'test-title12',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content13',
-            freq: 'WEEKLY',
-            groupId: 1,
-            id: 13,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-05T13:00:00.000Z', startDateTime: '2023-04-05T12:00:00.000Z' },
-              { endDateTime: '2023-04-12T13:00:00.000Z', startDateTime: '2023-04-12T12:00:00.000Z' },
-              { endDateTime: '2023-04-19T13:00:00.000Z', startDateTime: '2023-04-19T12:00:00.000Z' },
-              { endDateTime: '2023-04-26T13:00:00.000Z', startDateTime: '2023-04-26T12:00:00.000Z' },
-            ],
-            title: 'test-title13',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content14',
-            freq: 'YEARLY',
-            groupId: 1,
-            id: 14,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
-            ],
-            title: 'test-title14',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: 'MO,TU',
-            content: 'test-content15',
-            freq: 'DAILY',
-            groupId: 1,
-            id: 15,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-03T13:00:00.000Z', startDateTime: '2023-04-03T12:00:00.000Z' },
-              { endDateTime: '2023-04-04T13:00:00.000Z', startDateTime: '2023-04-04T12:00:00.000Z' },
-              { endDateTime: '2023-04-10T13:00:00.000Z', startDateTime: '2023-04-10T12:00:00.000Z' },
-              { endDateTime: '2023-04-11T13:00:00.000Z', startDateTime: '2023-04-11T12:00:00.000Z' },
-              { endDateTime: '2023-04-17T13:00:00.000Z', startDateTime: '2023-04-17T12:00:00.000Z' },
-              { endDateTime: '2023-04-18T13:00:00.000Z', startDateTime: '2023-04-18T12:00:00.000Z' },
-              { endDateTime: '2023-04-24T13:00:00.000Z', startDateTime: '2023-04-24T12:00:00.000Z' },
-              { endDateTime: '2023-04-25T13:00:00.000Z', startDateTime: '2023-04-25T12:00:00.000Z' },
-            ],
-            title: 'test-title15',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content16',
-            freq: 'DAILY',
-            groupId: 1,
-            id: 16,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-03-16T12:00:00.000Z' },
-              { endDateTime: '2023-04-03T00:00:00.000Z', startDateTime: '2023-03-17T12:00:00.000Z' },
-              { endDateTime: '2023-04-04T00:00:00.000Z', startDateTime: '2023-03-18T12:00:00.000Z' },
-              { endDateTime: '2023-04-05T00:00:00.000Z', startDateTime: '2023-03-19T12:00:00.000Z' },
-            ],
-            title: 'test-title16',
-            until: '2023-03-20T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content17',
-            freq: 'WEEKLY',
-            groupId: 1,
-            id: 17,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-05T00:00:00.000Z', startDateTime: '2023-03-19T12:00:00.000Z' },
-              { endDateTime: '2023-04-12T00:00:00.000Z', startDateTime: '2023-03-26T12:00:00.000Z' },
-              { endDateTime: '2023-04-19T00:00:00.000Z', startDateTime: '2023-04-02T12:00:00.000Z' },
-              { endDateTime: '2023-04-26T00:00:00.000Z', startDateTime: '2023-04-09T12:00:00.000Z' },
-              { endDateTime: '2023-05-03T00:00:00.000Z', startDateTime: '2023-04-16T12:00:00.000Z' },
-              { endDateTime: '2023-05-10T00:00:00.000Z', startDateTime: '2023-04-23T12:00:00.000Z' },
-              { endDateTime: '2023-05-17T00:00:00.000Z', startDateTime: '2023-04-30T12:00:00.000Z' },
-            ],
-            title: 'test-title17',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content18',
-            freq: 'MONTHLY',
-            groupId: 1,
-            id: 18,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-05-02T00:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
-            ],
-            title: 'test-title18',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content19',
-            freq: 'YEARLY',
-            groupId: 1,
-            id: 19,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-01-15T12:00:00.000Z' },
-            ],
-            title: 'test-title19',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-          {
-            byweekday: '',
-            content: 'test-content21',
-            freq: 'MONTHLY',
-            groupId: 1,
-            id: 21,
-            isGroup: 1,
-            interval: 1,
-            recurrence: 1,
-            recurrenceDateList: [
-              { endDateTime: '2023-05-01T23:59:59.000Z', startDateTime: '2023-04-30T23:59:59.000Z' },
-            ],
-            title: 'test-title21',
-            until: '2025-01-01T00:00:00.000Z',
-          },
-        ],
+        accessLevel: 'owner',
+        schedule: {
+          nonRecurrenceSchedule: [
+            {
+              id: 1,
+              isGroup: 0,
+              content: 'test-content1',
+              endDateTime: '2023-05-15T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-02-03T00:00:00.000Z',
+              title: 'test-title1',
+            },
+            {
+              id: 2,
+              isGroup: 0,
+              content: 'test-content2',
+              endDateTime: '2023-04-30T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-15T00:00:00.000Z',
+              title: 'test-title2',
+            },
+            {
+              id: 3,
+              isGroup: 0,
+              content: 'test-content3',
+              endDateTime: '2023-04-15T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-10T00:00:00.000Z',
+              title: 'test-title3',
+            },
+            {
+              id: 4,
+              isGroup: 0,
+              content: 'test-content4',
+              endDateTime: '2023-04-30T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-01T00:00:00.000Z',
+              title: 'test-title4',
+            },
+            {
+              id: 1,
+              isGroup: 1,
+              content: 'test-content1',
+              endDateTime: '2023-05-15T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-02-03T00:00:00.000Z',
+              title: 'test-title1',
+            },
+            {
+              id: 2,
+              isGroup: 1,
+              content: 'test-content2',
+              endDateTime: '2023-04-30T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-15T00:00:00.000Z',
+              title: 'test-title2',
+            },
+            {
+              id: 4,
+              isGroup: 1,
+              content: 'test-content4',
+              endDateTime: '2023-04-30T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-01T00:00:00.000Z',
+              title: 'test-title4',
+            },
+            {
+              id: 5,
+              isGroup: 1,
+              content: 'test-content5',
+              endDateTime: '2023-04-30T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-03-15T00:00:00.000Z',
+              title: 'test-title5',
+            },
+            {
+              id: 6,
+              isGroup: 1,
+              content: 'test-content6',
+              endDateTime: '2023-05-15T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-15T00:00:00.000Z',
+              title: 'test-title6',
+            },
+            {
+              id: 9,
+              isGroup: 1,
+              content: 'test-content9',
+              endDateTime: '2023-04-01T08:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-03-15T00:00:00.000Z',
+              title: 'test-title9',
+            },
+            {
+              id: 10,
+              isGroup: 1,
+              content: 'test-content10',
+              endDateTime: '2023-05-15T23:59:59.000Z',
+              recurrence: 0,
+              startDateTime: '2023-04-30T23:59:59.000Z',
+              title: 'test-title10',
+            },
+          ],
+          recurrenceSchedule: [
+            {
+              byweekday: '',
+              content: 'test-content11',
+              freq: 'DAILY',
+              groupId: 1,
+              id: 11,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-01T13:00:00.000Z', startDateTime: '2023-04-01T12:00:00.000Z' },
+                { endDateTime: '2023-04-02T13:00:00.000Z', startDateTime: '2023-04-02T12:00:00.000Z' },
+                { endDateTime: '2023-04-03T13:00:00.000Z', startDateTime: '2023-04-03T12:00:00.000Z' },
+                { endDateTime: '2023-04-04T13:00:00.000Z', startDateTime: '2023-04-04T12:00:00.000Z' },
+                { endDateTime: '2023-04-05T13:00:00.000Z', startDateTime: '2023-04-05T12:00:00.000Z' },
+              ],
+              title: 'test-title11',
+              until: '2023-04-05T14:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content12',
+              freq: 'MONTHLY',
+              groupId: 1,
+              id: 12,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
+              ],
+              title: 'test-title12',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content13',
+              freq: 'WEEKLY',
+              groupId: 1,
+              id: 13,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-05T13:00:00.000Z', startDateTime: '2023-04-05T12:00:00.000Z' },
+                { endDateTime: '2023-04-12T13:00:00.000Z', startDateTime: '2023-04-12T12:00:00.000Z' },
+                { endDateTime: '2023-04-19T13:00:00.000Z', startDateTime: '2023-04-19T12:00:00.000Z' },
+                { endDateTime: '2023-04-26T13:00:00.000Z', startDateTime: '2023-04-26T12:00:00.000Z' },
+              ],
+              title: 'test-title13',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content14',
+              freq: 'YEARLY',
+              groupId: 1,
+              id: 14,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
+              ],
+              title: 'test-title14',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: 'MO,TU',
+              content: 'test-content15',
+              freq: 'DAILY',
+              groupId: 1,
+              id: 15,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-03T13:00:00.000Z', startDateTime: '2023-04-03T12:00:00.000Z' },
+                { endDateTime: '2023-04-04T13:00:00.000Z', startDateTime: '2023-04-04T12:00:00.000Z' },
+                { endDateTime: '2023-04-10T13:00:00.000Z', startDateTime: '2023-04-10T12:00:00.000Z' },
+                { endDateTime: '2023-04-11T13:00:00.000Z', startDateTime: '2023-04-11T12:00:00.000Z' },
+                { endDateTime: '2023-04-17T13:00:00.000Z', startDateTime: '2023-04-17T12:00:00.000Z' },
+                { endDateTime: '2023-04-18T13:00:00.000Z', startDateTime: '2023-04-18T12:00:00.000Z' },
+                { endDateTime: '2023-04-24T13:00:00.000Z', startDateTime: '2023-04-24T12:00:00.000Z' },
+                { endDateTime: '2023-04-25T13:00:00.000Z', startDateTime: '2023-04-25T12:00:00.000Z' },
+              ],
+              title: 'test-title15',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content16',
+              freq: 'DAILY',
+              groupId: 1,
+              id: 16,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-03-16T12:00:00.000Z' },
+                { endDateTime: '2023-04-03T00:00:00.000Z', startDateTime: '2023-03-17T12:00:00.000Z' },
+                { endDateTime: '2023-04-04T00:00:00.000Z', startDateTime: '2023-03-18T12:00:00.000Z' },
+                { endDateTime: '2023-04-05T00:00:00.000Z', startDateTime: '2023-03-19T12:00:00.000Z' },
+              ],
+              title: 'test-title16',
+              until: '2023-03-20T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content17',
+              freq: 'WEEKLY',
+              groupId: 1,
+              id: 17,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-05T00:00:00.000Z', startDateTime: '2023-03-19T12:00:00.000Z' },
+                { endDateTime: '2023-04-12T00:00:00.000Z', startDateTime: '2023-03-26T12:00:00.000Z' },
+                { endDateTime: '2023-04-19T00:00:00.000Z', startDateTime: '2023-04-02T12:00:00.000Z' },
+                { endDateTime: '2023-04-26T00:00:00.000Z', startDateTime: '2023-04-09T12:00:00.000Z' },
+                { endDateTime: '2023-05-03T00:00:00.000Z', startDateTime: '2023-04-16T12:00:00.000Z' },
+                { endDateTime: '2023-05-10T00:00:00.000Z', startDateTime: '2023-04-23T12:00:00.000Z' },
+                { endDateTime: '2023-05-17T00:00:00.000Z', startDateTime: '2023-04-30T12:00:00.000Z' },
+              ],
+              title: 'test-title17',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content18',
+              freq: 'MONTHLY',
+              groupId: 1,
+              id: 18,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-05-02T00:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
+              ],
+              title: 'test-title18',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content19',
+              freq: 'YEARLY',
+              groupId: 1,
+              id: 19,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-01-15T12:00:00.000Z' },
+              ],
+              title: 'test-title19',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+            {
+              byweekday: '',
+              content: 'test-content21',
+              freq: 'MONTHLY',
+              groupId: 1,
+              id: 21,
+              isGroup: 1,
+              interval: 1,
+              recurrence: 1,
+              recurrenceDateList: [
+                { endDateTime: '2023-05-01T23:59:59.000Z', startDateTime: '2023-04-30T23:59:59.000Z' },
+              ],
+              title: 'test-title21',
+              until: '2025-01-01T00:00:00.000Z',
+            },
+          ],
+        },
       };
       const res = await request(app).get(`/api/group/${groupID}/calendar`).set('Cookie', cookie).query({
         startDateTime,
@@ -664,17 +673,20 @@ describe('Test /api/group endpoints', () => {
       const scheduleId = 1;
       const res = await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie);
       const expectedResult = {
-        byweekday: null,
-        content: 'test-content1',
-        endDateTime: '2023-05-15T23:59:59.000Z',
-        freq: null,
-        groupId: 1,
-        id: 1,
-        interval: null,
-        recurrence: 0,
-        startDateTime: '2023-02-03T00:00:00.000Z',
-        title: 'test-title1',
-        until: null,
+        accessLevel: 'owner',
+        schedule: {
+          byweekday: null,
+          content: 'test-content1',
+          endDateTime: '2023-05-15T23:59:59.000Z',
+          freq: null,
+          groupId: 1,
+          id: 1,
+          interval: null,
+          recurrence: 0,
+          startDateTime: '2023-02-03T00:00:00.000Z',
+          title: 'test-title1',
+          until: null,
+        },
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
@@ -837,14 +849,6 @@ describe('Test /api/group endpoints', () => {
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
-
-    it('Successfully failed to deleted the post (Edit Permission Error) ', async () => {
-      const groupId = 1;
-      const postId = 2;
-      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
-      expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
-    });
   });
 
   describe('Test GET /api/group/:group_id/post/:post_id', () => {
@@ -853,9 +857,14 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       const expectedPost = {
-        author: 'test-user1',
-        content: 'test-content1',
-        title: 'test-title1',
+        accessLevel: 'owner',
+        post: {
+          author: 'test-user1',
+          content: 'test-content1',
+          title: 'test-title1',
+          isMine: true,
+          postId: 1,
+        },
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedPost);
@@ -893,36 +902,42 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
         page,
       }));
-      const expectedResult = [
-        {
-          author: 'test-user1', title: 'test-title1', content: 'test-content1',
-        },
-        {
-          author: 'test-user2', title: 'test-title2', content: 'test-content2',
-        },
-        {
-          author: 'test-user1', title: 'test-title3', content: 'test-content3',
-        },
-        {
-          author: 'test-user1', title: 'test-title4', content: 'test-content4',
-        },
-        {
-          author: 'test-user1', title: 'test-title5', content: 'test-content5',
-        },
-        {
-          author: 'test-user2', title: 'test-title7', content: 'test-content7',
-        },
-        {
-          author: 'test-user2', title: 'test-title8', content: 'test-content8',
-        },
-      ];
-      const result = res.body.map((post) => ({
+      const expectedResult = {
+        accessLevel: 'owner',
+        feed: [
+          {
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true,
+          },
+          {
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false,
+          },
+          {
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true,
+          },
+          {
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true,
+          },
+          {
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true,
+          },
+          {
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false,
+          },
+          {
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false,
+          },
+        ],
+      };
+      const accessLevel = res.body.accessLevel;
+      const feed = res.body.feed.map((post) => ({
+        postId: post.postId,
+        isMine: post.isMine,
         title: post.title,
         author: post.author,
         content: post.content,
       }));
       expect(res.status).toEqual(200);
-      expect(result).toEqual(expectedResult);
+      expect({ accessLevel, feed }).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the posts. (Group Not Found) ', async () => {
@@ -1088,17 +1103,6 @@ describe('Test /api/group endpoints', () => {
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
-
-    it('Successfully failed to modified the comment (Edit Permission Error) ', async () => {
-      const groupId = 1;
-      const postId = 1;
-      const commentId = 3;
-      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
-        content,
-      }));
-      expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
-    });
   });
 
   describe('Test DELETE /api/group/:group_id/post/:post_id/comment/:comment_id', () => {
@@ -1145,15 +1149,6 @@ describe('Test /api/group endpoints', () => {
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
-
-    it('Successfully failed to deleted the comment (Edit Permission Error) ', async () => {
-      const groupId = 1;
-      const postId = 2;
-      const commentId = 3;
-      const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
-      expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
-    });
   });
 
   describe('Test GET /api/group/:group_id/post/:post_id/comment/:comment_id', () => {
@@ -1163,23 +1158,29 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       const expectedResult = {
-        commentId: 1,
-        content: 'test-comment1',
-        depth: 0,
-        postId: 1,
-        userId: 1,
+        accessLevel: 'owner',
+        comment: {
+          commentId: 1,
+          content: 'test-comment1',
+          depth: 0,
+          postId: 1,
+          userId: 1,
+          isMine: true,
+        },
       };
 
-      const result = {
-        commentId: res.body.commentId,
-        postId: res.body.postId,
-        userId: res.body.userId,
-        content: res.body.content,
-        depth: res.body.depth,
+      const accessLevel = res.body.accessLevel;
+      const comment = {
+        commentId: res.body.comment.commentId,
+        postId: res.body.comment.postId,
+        userId: res.body.comment.userId,
+        content: res.body.comment.content,
+        depth: res.body.comment.depth,
+        isMine: res.body.comment.isMine,
       };
 
       expect(res.status).toEqual(200);
-      expect(result).toEqual(expectedResult);
+      expect({ accessLevel, comment }).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the comment (Group Not Found) ', async () => {
@@ -1225,10 +1226,16 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
       const expectedResult = [
         {
-          isPendingMember: 0, nickname: 'test-user1', userId: 1,
+          accessLevel: 'owner',
+          member: {
+            isPendingMember: 0, nickname: 'test-user1', userId: 1,
+          },
         },
         {
-          isPendingMember: 0, nickname: 'test-user2', userId: 2,
+          accessLevel: 'admin',
+          member: {
+            isPendingMember: 0, nickname: 'test-user2', userId: 2,
+          },
         },
       ];
       expect(res.status).toEqual(200);

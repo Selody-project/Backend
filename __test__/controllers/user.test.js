@@ -59,7 +59,7 @@ describe('Test /api/user endpoints', () => {
           inviteExp: '2099-01-01T00:00:00.000Z',
           isPublicGroup: 0,
           UserGroup: {
-            groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0,
+            groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0, accessLevel: 'owner',
           },
         }, {
           groupId: 2,
@@ -71,7 +71,7 @@ describe('Test /api/user endpoints', () => {
           inviteExp: '2000-01-01T00:00:00.000Z',
           isPublicGroup: 0,
           UserGroup: {
-            groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0,
+            groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0, accessLevel: 'regular',
           },
         }],
       };
