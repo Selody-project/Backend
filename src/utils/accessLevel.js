@@ -3,7 +3,7 @@ const UserGroup = require('../models/userGroup');
 
 // Error
 const {
-  UnauthorizedError, ApiError,
+  ApiError,
 } = require('../errors');
 
 function isMine(user, content) {
@@ -22,7 +22,7 @@ async function getAccessLevel(user, group) {
       },
     });
     if (!association) {
-      throw new UnauthorizedError();
+      return 'viewer';
     }
     return association.accessLevel;
   } catch (err) {
