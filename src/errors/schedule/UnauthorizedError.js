@@ -1,9 +1,9 @@
 const ApiError = require('../apiError');
 
-class UnathroizedError extends ApiError {
+class UnauthroizedError extends ApiError {
   constructor(message) {
-    super(message || 'Unathorized access', 403);
+    super(message || 'Unauthorized access', 403);
   }
 }
 
-module.exports = UnathroizedError;
+module.exports = UnauthroizedError;

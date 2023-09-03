@@ -1,3 +1,8 @@
+const {
+  isMine,
+  getAccessLevel,
+} = require('../utils/accessLevel');
+
 // Model
 const User = require('../models/user');
 const Group = require('../models/group');
@@ -42,6 +47,11 @@ async function postGroupPost(req, res, next) {
       return next(new UserNotFoundError());
     }
 
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      return next(new EditPermissionError());
+    }
+
     const { title, content } = req.body;
     const post = await Post.create({ author: req.nickname, title });
     await post.createPostDetail({ content });
@@ -63,10 +73,15 @@ async function getSinglePost(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, post] = await Promise.all([
+    const [user, group, post] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
       Group.findByPk(groupId),
       Post.findByPk(postId),
     ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -79,7 +94,17 @@ async function getSinglePost(req, res, next) {
     const { title, author } = post;
     const { content } = (await post.getPostDetail()).dataValues;
 
-    return res.status(200).json({ author, title, content });
+    const accessLevel = await getAccessLevel(user, group);
+    return res.status(200).json({
+      accessLevel,
+      post: {
+        postId: post.postId,
+        isMine: isMine(user, post),
+        author,
+        title,
+        content,
+      },
+    });
   } catch (err) {
     return next(new ApiError());
   }
@@ -95,7 +120,14 @@ async function getGroupPosts(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -119,14 +151,16 @@ async function getGroupPosts(req, res, next) {
       limit: pageSize,
     });
 
-    const result = rows.map((post) => ({
+    const feed = rows.map((post) => ({
+      postId: post.postId,
+      isMine: isMine(user, post),
       title: post.title,
       author: post.author,
       createdAt: post.createdAt,
       content: post.postDetail.content,
     }));
-
-    return res.status(200).json(result);
+    const accessLevel = await getAccessLevel(user, group);
+    return res.status(200).json({ accessLevel, feed });
   } catch (err) {
     return next(new ApiError());
   }
@@ -156,7 +190,7 @@ async function putGroupPost(req, res, next) {
       return next(new PostNotFoundError());
     }
 
-    if (user.userId !== post.userId) {
+    if (!isMine(user, post)) {
       return next(new EditPermissionError());
     }
 
@@ -192,7 +226,8 @@ async function deleteGroupPost(req, res, next) {
       return next(new PostNotFoundError());
     }
 
-    if (user.userId !== post.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, post))) {
       return next(new EditPermissionError());
     }
 
@@ -232,6 +267,11 @@ async function postComment(req, res, next) {
       return next(new PostNotFoundError());
     }
 
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      return next(new EditPermissionError());
+    }
+
     const { content } = req.body;
     const comment = await post.createComment({ content });
     await user.addComments(comment);
@@ -250,7 +290,8 @@ async function getSingleComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
-    const [group, post, comment] = await Promise.all([
+    const [user, group, post, comment] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
       Group.findByPk(groupId),
       Post.findByPk(postId),
       Comment.findByPk(commentId),
@@ -268,7 +309,10 @@ async function getSingleComment(req, res, next) {
       return next(new CommentNotFoundError());
     }
 
-    return res.status(200).json(comment);
+    const accessLevel = await getAccessLevel(user, group);
+    comment.dataValues.isMine = isMine(user, comment);
+
+    return res.status(200).json({ accessLevel, comment });
   } catch (err) {
     return next(new ApiError());
   }
@@ -282,7 +326,8 @@ async function getPostComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, post] = await Promise.all([
+    const [user, group, post] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
       Group.findByPk(groupId),
       Post.findByPk(postId),
     ]);
@@ -295,9 +340,19 @@ async function getPostComment(req, res, next) {
       return next(new PostNotFoundError());
     }
 
-    const comments = await post.getComments();
+    const accessLevel = await getAccessLevel(user, group);
+    const comments = (await post.getComments()).map((comment) => ({
+      commentId: comment.commentId,
+      content: comment.content,
+      depth: comment.depth,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      postId: comment.postId,
+      userId: comment.userId,
+      isMine: isMine(user, comment),
+    }));
 
-    return res.status(200).json(comments);
+    return res.status(200).json({ accessLevel, comments });
   } catch (err) {
     return next(new ApiError());
   }
@@ -332,7 +387,7 @@ async function putComment(req, res, next) {
       return next(new CommentNotFoundError());
     }
 
-    if (user.userId !== comment.userId) {
+    if (!isMine(user, comment)) {
       return next(new EditPermissionError());
     }
 
@@ -376,9 +431,11 @@ async function deleteComment(req, res, next) {
       return next(new CommentNotFoundError());
     }
 
-    if (user.userId !== comment.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, comment))) {
       return next(new EditPermissionError());
     }
+
     await comment.destroy();
 
     return res.status(204).end();

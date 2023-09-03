@@ -92,12 +92,13 @@ async function joinSocialUser(req, res, next) {
       const nickname = `selody-${req.body.id}`.slice(0, 15);
       await User.create({
         email: req.body.email,
-        nickname,
+        nickname: nickname,
         provider: 'NAVER',
         snsId: req.body.id,
       });
       req.nickname = nickname;
-    } else {
+    }
+    else {
       req.nickname = user.nickname;
     }
     next();

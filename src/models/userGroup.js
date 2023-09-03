@@ -15,6 +15,11 @@ class UserGroup extends Sequelize.Model {
         allowNull: false,
         defaultValue: 0,
       },
+      accessLevel: {
+        type: Sequelize.ENUM('viewer', 'regular', 'admin', 'owner'),
+        allowNull: false,
+        defaultValue: 'viewer',
+      },
     },
     {
       sequelize,

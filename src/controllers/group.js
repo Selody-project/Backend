@@ -20,6 +20,7 @@ const {
   validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword,
 } = require('../utils/validators');
+const { getAccessLevel } = require('../utils/accessLevel');
 
 async function postGroup(req, res, next) {
   try {
@@ -30,7 +31,7 @@ async function postGroup(req, res, next) {
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
     if (!user) {
-      return (new UserNotFoundError());
+      return next(new UserNotFoundError());
     }
 
     const { name, description } = req.body;
@@ -38,7 +39,7 @@ async function postGroup(req, res, next) {
       name, description, member: 1, leader: user.userId,
     });
 
-    await user.addGroup(group);
+    await user.addGroup(group, { through: { accessLevel: 'owner' } });
 
     return res.status(200).json({ message: 'Successfully create group' });
   } catch (err) {
@@ -53,13 +54,18 @@ async function getGroupInfo(req, res, next) {
 
     const { group_id: groupId } = req.params;
 
-    const group = await Group.findByPk(groupId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
     const feedCount = await Post.count({ where: { groupId } });
-    const parsedGroupInfo = {
+    const accessLevel = await getAccessLevel(user, group);
+    const information = {
       groupId: group.groupId,
       name: group.name,
       description: group.description,
@@ -67,7 +73,7 @@ async function getGroupInfo(req, res, next) {
       feed: feedCount,
     };
 
-    return res.status(200).json(parsedGroupInfo);
+    return res.status(200).json({ accessLevel, information });
   } catch (err) {
     return next(new ApiError());
   }
@@ -81,22 +87,28 @@ async function getGroupDetail(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
+    const accessLevel = await getAccessLevel(user, group);
+
     const memberInfo = [];
     let leaderInfo;
-    (await group.getUsers()).forEach((user) => {
-      const { userId, nickname } = user.dataValues;
+    (await group.getUsers()).forEach((member) => {
+      const { userId, nickname } = member.dataValues;
       if (userId === group.leader) {
         leaderInfo = { userId, nickname };
       }
       memberInfo.push({ userId, nickname });
     });
 
-    return res.status(200).json({ group, leaderInfo, memberInfo });
+    return res.status(200).json({ accessLevel, information: { group, leaderInfo, memberInfo } });
   } catch (err) {
     return next(new ApiError());
   }
@@ -145,7 +157,8 @@ async function putGroup(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    if (group.leader != user.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
     }
 
@@ -179,7 +192,8 @@ async function deleteGroup(req, res, next) {
       return next(new UserNotFoundError());
     }
 
-    if (group.leader !== user.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
     }
 
@@ -210,7 +224,8 @@ async function deleteGroupUser(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    if (group.leader === user.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'owner') {
       return next(new UserIsLeaderError());
     }
 
@@ -244,11 +259,18 @@ async function getGroupMembers(req, res, next) {
     }
 
     const members = await group.getUsers();
-    const parsedMembers = members.map((member) => ({
-      nickname: member.nickname,
-      userId: member.userId,
-      isPendingMember: member.UserGroup.isPendingMember,
-    }));
+    const promises = members.map(async (member) => {
+      const accessLevel = await getAccessLevel(member, group);
+      return {
+        accessLevel,
+        member: {
+          nickname: member.nickname,
+          userId: member.userId,
+          isPendingMember: member.UserGroup.isPendingMember,
+        },
+      };
+    });
+    const parsedMembers = await Promise.all(promises);
 
     return res.status(200).json(parsedMembers);
   } catch (err) {
@@ -308,7 +330,8 @@ async function postGroupJoinApprove(req, res, next) {
       return next(new UserNotFoundError());
     }
 
-    if (group.leader !== user.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
     }
 
@@ -343,7 +366,8 @@ async function postGroupJoinReject(req, res, next) {
       return next(new UserNotFoundError());
     }
 
-    if (group.leader !== user.userId) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
     }
 
@@ -363,10 +387,18 @@ async function postInviteLink(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel == 'viewer') {
+      return next(new UnauthorizedError());
     }
 
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -386,6 +418,7 @@ async function postInviteLink(req, res, next) {
         break;
       }
     }
+
     const inviteExp = new Date();
     inviteExp.setDate(new Date().getDate() + 1);
     await group.update({ inviteCode, inviteExp });
@@ -440,7 +473,7 @@ async function deleteGroupMember(req, res, next) {
 
     const { group_id: groupId, user_id: userId } = req.params;
 
-    const [group, user, leader] = await Promise.all([
+    const [group, member, user] = await Promise.all([
       Group.findByPk(groupId),
       User.findByPk(userId),
       User.findOne({ where: { nickname: req.nickname } }),
@@ -450,15 +483,16 @@ async function deleteGroupMember(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    if (!user) {
+    if (!user || !member) {
       return next(new UserNotFoundError());
     }
 
-    if (leader.userId != group.leader) {
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
     }
 
-    await group.removeUser(user);
+    await group.removeUser(member);
     await group.update({ member: (group.member - 1) });
 
     return res.status(204).end();

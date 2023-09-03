@@ -2,6 +2,9 @@ const moment = require('moment');
 const {
   parseEventDates, eventProposal,
 } = require('../utils/event');
+const {
+  getAccessLevel,
+} = require('../utils/accessLevel');
 
 // Model
 const User = require('../models/user');
@@ -12,7 +15,7 @@ const GroupSchedule = require('../models/groupSchedule');
 // Error
 const {
   DataFormatError, ApiError,
-  ScheduleNotFoundError, GroupNotFoundError, EditPermissionError,
+  UserNotFoundError, ScheduleNotFoundError, GroupNotFoundError, EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -32,6 +35,15 @@ async function postGroupSchedule(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || accessLevel === 'regular') {
+      return next(new EditPermissionError());
+    }
 
     const {
       title,
@@ -72,14 +84,27 @@ async function getSingleGroupSchedule(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const { schedule_id: scheduleId } = req.params;
-    const schedule = await GroupSchedule.findByPk(scheduleId);
+    const { schedule_id: scheduleId, group_id: groupId } = req.params;
+
+    const [user, group, schedule] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+      GroupSchedule.findByPk(scheduleId),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
-
-    return res.status(200).json(schedule);
+    const accessLevel = await getAccessLevel(user, group);
+    return res.status(200).json({ accessLevel, schedule });
   } catch (err) {
     return next(new ApiError());
   }
@@ -94,7 +119,14 @@ async function getGroupSchedule(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -104,18 +136,20 @@ async function getGroupSchedule(req, res, next) {
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
     const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
-    const users = (await group.getUsers()).map((user) => user.userId);
+    const users = (await group.getUsers()).map((member) => member.userId);
     const userEvent = await PersonalSchedule.getSchedule(users, start, end);
-    const event = {};
-    event.nonRecurrenceSchedule = [
+    const schedule = {};
+    schedule.nonRecurrenceSchedule = [
       ...userEvent.nonRecurrenceSchedule,
       ...groupEvent.nonRecurrenceSchedule,
     ];
-    event.recurrenceSchedule = [
+    schedule.recurrenceSchedule = [
       ...userEvent.recurrenceSchedule,
       ...groupEvent.recurrenceSchedule,
     ];
-    return res.status(200).json(event);
+
+    const accessLevel = await getAccessLevel(user, group);
+    return res.status(200).json({ accessLevel, schedule });
   } catch (err) {
     return next(new ApiError());
   }
@@ -137,15 +171,20 @@ async function putGroupSchedule(req, res, next) {
       GroupSchedule.findByPk(scheduleId),
     ]);
 
-    if (!schedule) {
-      return next(new ScheduleNotFoundError());
+    if (!user) {
+      return next(new UserNotFoundError());
     }
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (user.userId !== group.leader) {
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || accessLevel === 'regular') {
       return next(new EditPermissionError());
     }
 
@@ -170,15 +209,20 @@ async function deleteGroupSchedule(req, res, next) {
       GroupSchedule.findByPk(scheduleId),
     ]);
 
-    if (!schedule) {
-      return next(new ScheduleNotFoundError());
+    if (!user) {
+      return next(new UserNotFoundError());
     }
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (user.userId !== group.leader) {
+    if (!schedule) {
+      return next(new ScheduleNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || accessLevel === 'regular') {
       return next(new EditPermissionError());
     }
 
@@ -200,8 +244,25 @@ async function getEventProposal(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const group = await Group.findByPk(groupId);
-    const groupMembers = (await group.getUsers()).map((user) => user.userId);
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer' || accessLevel === 'regular') {
+      return next(new EditPermissionError());
+    }
+
+    const groupMembers = (await group.getUsers()).map((member) => member.userId);
     const proposal = {};
 
     /* eslint-disable no-restricted-syntax */
@@ -237,6 +298,7 @@ async function getEventProposal(req, res, next) {
       const sortedResult = filteredTimes.concat(remainingTimes);
       proposal[date] = sortedResult;
     }
+
     return res.status(200).json(proposal);
   } catch (err) {
     return next(new ApiError());

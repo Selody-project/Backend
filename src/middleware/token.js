@@ -18,7 +18,7 @@ const token = () => ({
       nickname,
     }, ACCESS_SECRET_KEY, {
       expiresIn: '60m',
-      issuer: 'xernserver',
+      issuer: 'selody',
     });
   },
   refresh(nickname) {
@@ -26,7 +26,7 @@ const token = () => ({
       nickname,
     }, REFRESH_SECRET_KEY, {
       expiresIn: '180 days',
-      issuer: 'xernserver',
+      issuer: 'selody',
     });
   },
 });
@@ -43,6 +43,7 @@ async function createToken(req, res, next) {
     const user = await User.findOne({ where: { nickname } });
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
+      userId: user.userId,
       email: user.email,
       nickname,
       provider: user.provider,
@@ -57,7 +58,9 @@ async function createToken(req, res, next) {
 function verifyToken(req, res, next) {
   try {
     const authToken = req.cookies.accessToken;
-    if (!authToken) throw new InvalidTokenError();
+    if (!authToken) {
+      return next(new InvalidTokenError());
+    }
     req.nickname = jwt.verify(authToken, ACCESS_SECRET_KEY).nickname;
     return next();
   } catch (err) {
