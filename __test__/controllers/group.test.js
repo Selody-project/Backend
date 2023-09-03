@@ -3,7 +3,7 @@ const app = require('../../src/app');
 const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, dropDB,
-  tearDownGroupDB, tearDownGroupScheduleDB, tearDownUserDB,
+  tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
   setUpPersonalScheduleDB2, setUpGroupPostDB, tearDownGroupPostDB,
 } = require('../dbSetup');
