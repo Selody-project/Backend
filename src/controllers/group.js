@@ -379,6 +379,37 @@ async function postGroupJoinReject(req, res, next) {
   }
 }
 
+async function getInviteLink(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const [user, group] = await Promise.all([
+      User.findOne({ where: { nickname: req.nickname } }),
+      Group.findByPk(groupId),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel == 'viewer') {
+      return next(new UnauthorizedError());
+    }
+
+    return res.status(200).json({
+      inviteCode: group.inviteCode,
+      exp: group.inviteExp,
+    });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postInviteLink(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
@@ -540,6 +571,7 @@ module.exports = {
   postGroupJoinRequest,
   postGroupJoinApprove,
   postGroupJoinReject,
+  getInviteLink,
   postInviteLink,
   postJoinGroupWithInviteCode,
   deleteGroupMember,

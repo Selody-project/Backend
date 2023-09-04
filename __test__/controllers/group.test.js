@@ -1413,4 +1413,31 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
   });
+
+  describe('Test GET /api/group/:group_id/join/invite-link', () => {
+    it('Successfully retrieved invite code', async () => {
+      const groupId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie);
+      const expectedResult = {
+        inviteCode: 'inviteCode01',
+        exp: '2099-01-01T00:00:00.000Z',
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve invite code (DataFormat Error)', async () => {
+      const groupId = 'abc';
+      const res = await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+
+    it('Successfully failed to retrieve invite code (Group Not Found)', async () => {
+      const groupId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+  });
 });
