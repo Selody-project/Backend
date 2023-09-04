@@ -707,6 +707,41 @@
       }
     },
     "/api/group/{group_id}/join/invite-link": {
+      "get": {
+        "description": "생성되어 있는 초대 코드를 불러옵니다.",
+        "summary": "그룹 초대 코드 조회",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
       "post": {
         "description": "",
         "summary": "그룹 초대 코드 생성",
