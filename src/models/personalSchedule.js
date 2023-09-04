@@ -78,6 +78,7 @@ class PersonalSchedule extends Sequelize.Model {
       const nonRecurrenceStatement = `
         SELECT 
           id,
+          userId,
           title, 
           content, 
           startDateTime, 
@@ -156,6 +157,7 @@ class PersonalSchedule extends Sequelize.Model {
         if (possibleDateList.length !== 0) {
           recurrenceSchedule.push({
             id: schedule.id,
+            userId: schedule.userId,
             groupId: schedule.groupId,
             title: schedule.title,
             content: schedule.content,

@@ -108,12 +108,12 @@ async function setUpGroupDB() {
     inviteExp: '2099-01-01T00:00:00.000Z',
   });
   const user = await User.findAll();
-  await user[0].addGroup(group1, { through: { accessLevel: 'owner' } });
-  await user[0].addGroup(group2, { through: { accessLevel: 'regular' } });
-  await user[1].addGroup(group1, { through: { accessLevel: 'admin' } });
-  await user[1].addGroup(group2, { through: { accessLevel: 'owner' } });
-  await user[2].addGroup(group3, { through: { accessLevel: 'owner' } });
-  await user[4].addGroup(group3, { through: { accessLevel: 'admin' } });
+  await user[0].addGroup(group1, { through: { accessLevel: 'owner', sharePersonalEvent: 1 } });
+  await user[0].addGroup(group2, { through: { accessLevel: 'regular', sharePersonalEvent: 1 } });
+  await user[1].addGroup(group1, { through: { accessLevel: 'admin', sharePersonalEvent: 0 } });
+  await user[1].addGroup(group2, { through: { accessLevel: 'owner', sharePersonalEvent: 1 } });
+  await user[2].addGroup(group3, { through: { accessLevel: 'owner', sharePersonalEvent: 1 } });
+  await user[4].addGroup(group3, { through: { accessLevel: 'admin', sharePersonalEvent: 1 } });
 }
 
 async function setUpGroupScheduleDB() {

@@ -262,6 +262,7 @@ describe('Test /api/group endpoints', () => {
           nonRecurrenceSchedule: [
             {
               id: 1,
+              userId: 1,
               isGroup: 0,
               content: 'test-content1',
               endDateTime: '2023-05-15T23:59:59.000Z',
@@ -271,30 +272,13 @@ describe('Test /api/group endpoints', () => {
             },
             {
               id: 2,
+              userId: 1,
               isGroup: 0,
               content: 'test-content2',
               endDateTime: '2023-04-30T23:59:59.000Z',
               recurrence: 0,
               startDateTime: '2023-04-15T00:00:00.000Z',
               title: 'test-title2',
-            },
-            {
-              id: 3,
-              isGroup: 0,
-              content: 'test-content3',
-              endDateTime: '2023-04-15T23:59:59.000Z',
-              recurrence: 0,
-              startDateTime: '2023-04-10T00:00:00.000Z',
-              title: 'test-title3',
-            },
-            {
-              id: 4,
-              isGroup: 0,
-              content: 'test-content4',
-              endDateTime: '2023-04-30T23:59:59.000Z',
-              recurrence: 0,
-              startDateTime: '2023-04-01T00:00:00.000Z',
-              title: 'test-title4',
             },
             {
               id: 1,
@@ -541,7 +525,6 @@ describe('Test /api/group endpoints', () => {
         startDateTime,
         endDateTime,
       });
-
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
     });
@@ -631,36 +614,31 @@ describe('Test /api/group endpoints', () => {
         date3,
       });
       const expectedProposal = {
-        '2000-04-01T00:00:00.000Z': [
-          {
-            duration: 210,
-            endDateTime: '2000-04-01T13:00:00.000Z',
-            startDateTime: '2000-04-01T09:30:00.000Z',
-          },
-          {
-            duration: 150,
-            endDateTime: '2000-04-01T20:30:00.000Z',
-            startDateTime: '2000-04-01T18:00:00.000Z',
-          },
-          {
-            duration: 120,
-            endDateTime: '2000-04-01T08:00:00.000Z',
-            startDateTime: '2000-04-01T06:00:00.000Z',
-          },
-          {
-            duration: 50,
-            endDateTime: '2000-04-01T23:30:00.000Z',
-            startDateTime: '2000-04-01T22:40:00.000Z',
-          },
-        ],
         '2023-04-15T00:00:00.000Z': [],
         '2030-04-16T00:00:00.000Z': [
           {
-            duration: 1440,
-            endDateTime: '2030-04-16T23:59:59.000Z',
             startDateTime: '2030-04-16T00:00:00.000Z',
-          },
+            endDateTime: '2030-04-16T23:59:59.000Z',
+            duration: 1440
+          }
         ],
+        '2000-04-01T00:00:00.000Z': [
+          {
+            startDateTime: '2000-04-01T09:30:00.000Z',
+            endDateTime: '2000-04-01T13:00:00.000Z',
+            duration: 210
+          },
+          {
+            startDateTime: '2000-04-01T18:00:00.000Z',
+            endDateTime: '2000-04-01T23:59:59.000Z',
+            duration: 360
+          },
+          {
+            startDateTime: '2000-04-01T00:00:00.000Z',
+            endDateTime: '2000-04-01T08:00:00.000Z',
+            duration: 480
+          }
+        ]
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProposal);
@@ -1409,6 +1387,33 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
       }));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+  });
+
+  describe('Test GET /api/group/:group_id/join/invite-link', () => {
+    it('Successfully retrieved invite code', async () => {
+      const groupId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie);
+      const expectedResult = {
+        inviteCode: 'inviteCode01',
+        exp: '2099-01-01T00:00:00.000Z',
+      };
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve invite code (DataFormat Error)', async () => {
+      const groupId = 'abc';
+      const res = await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+    });
+
+    it('Successfully failed to retrieve invite code (Group Not Found)', async () => {
+      const groupId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
