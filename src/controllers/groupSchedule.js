@@ -11,6 +11,7 @@ const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
+const UserGroup = require('../models/userGroup');
 
 // Error
 const {
@@ -136,7 +137,13 @@ async function getGroupSchedule(req, res, next) {
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
     const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
-    const users = (await group.getUsers()).map((member) => member.userId);
+    const users = (await UserGroup.findAll({
+      where: {
+        groupId,
+        sharePersonalEvent: 1,
+      },
+      attributes: ['userId'],
+    })).map((member) => member.userId);
     const userEvent = await PersonalSchedule.getSchedule(users, start, end);
     const schedule = {};
     schedule.nonRecurrenceSchedule = [
@@ -262,7 +269,13 @@ async function getEventProposal(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    const groupMembers = (await group.getUsers()).map((member) => member.userId);
+    const groupMembers = (await UserGroup.findAll({
+      where: {
+        groupId,
+        sharePersonalEvent: 1,
+      },
+      attributes: ['userId'],
+    })).map((member) => member.userId);
     const proposal = {};
 
     /* eslint-disable no-restricted-syntax */
