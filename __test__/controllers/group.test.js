@@ -1246,7 +1246,7 @@ describe('Test /api/group endpoints', () => {
             isPendingMember: 1, nickname: 'test-user5', userId: 5,
           },
         },
-      ];
+      ]; 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });
