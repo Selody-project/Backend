@@ -135,6 +135,7 @@ describe('Test /api/user endpoints', () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
       const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
+        earliestDate : '2023-01-15T12:00:00.000Z',
         nonRecurrenceSchedule: [
           {
             id: 1,

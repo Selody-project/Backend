@@ -259,6 +259,7 @@ describe('Test /api/group endpoints', () => {
       const expectedSchedule = {
         accessLevel: 'owner',
         schedule: {
+          earliestDate: '2023-01-15T12:00:00.000Z',
           nonRecurrenceSchedule: [
             {
               id: 1,
