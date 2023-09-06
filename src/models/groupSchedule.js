@@ -74,6 +74,7 @@ class GroupSchedule extends Sequelize.Model {
   static async getSchedule(groupID, start, end) {
     try {
       const db = require('.');
+      let earliestDate = Number.MAX_SAFE_INTEGER;
       const nonRecurrenceStatement = `
       SELECT 
         id,
@@ -114,6 +115,12 @@ class GroupSchedule extends Sequelize.Model {
         },
         type: Sequelize.QueryTypes.SELECT,
       });
+      nonRecurrenceSchedule.forEach((schedule) => {
+        const scheduleDate = new Date(schedule.startDateTime);
+        if (earliestDate > scheduleDate) {
+          earliestDate = scheduleDate;
+        }
+      });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
@@ -150,6 +157,9 @@ class GroupSchedule extends Sequelize.Model {
         scheduleDateList.forEach((scheduleDate) => {
           const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
           if (endDateTime >= start) {
+            if (earliestDate > scheduleDate) {
+              earliestDate = scheduleDate;
+            }
             possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
           }
         });
@@ -169,7 +179,7 @@ class GroupSchedule extends Sequelize.Model {
           });
         }
       });
-      return { nonRecurrenceSchedule, recurrenceSchedule };
+      return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
       throw new ApiError();
     }

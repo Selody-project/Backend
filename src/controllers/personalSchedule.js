@@ -95,7 +95,12 @@ async function getUserPersonalSchedule(req, res, next) {
     const groups = (await user.getGroups()).map((group) => group.groupId);
     if (groups.length) {
       const groupEvent = await GroupSchedule.getSchedule(groups, start, end);
-      const event = {};
+      let event;
+      if (userEvent.earliestDate > groupEvent.earliestDate) {
+        event = { earliestDate: groupEvent.earliestDate };
+      } else {
+        event = { earliestDate: userEvent.earliestDate };
+      }
       event.nonRecurrenceSchedule = [
         ...userEvent.nonRecurrenceSchedule,
         ...groupEvent.nonRecurrenceSchedule,

@@ -244,6 +244,9 @@
               "properties": {
                 "name": {
                   "example": "string"
+                },
+                "description": {
+                  "example": "test-description"
                 }
               }
             }
