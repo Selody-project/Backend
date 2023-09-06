@@ -100,7 +100,13 @@ async function getGroupDetail(req, res, next) {
 
     const memberInfo = [];
     let leaderInfo;
-    (await group.getUsers()).forEach((member) => {
+    (await group.getUsers(({
+      through: {
+        where: {
+          isPendingMember: 0,
+        },
+      },
+    }))).forEach((member) => {
       const { userId, nickname } = member.dataValues;
       if (userId === group.leader) {
         leaderInfo = { userId, nickname };
@@ -258,7 +264,13 @@ async function getGroupMembers(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const members = await group.getUsers();
+    const members = await group.getUsers(({
+      through: {
+        where: {
+          isPendingMember: 0,
+        },
+      },
+    }));
     const promises = members.map(async (member) => {
       const accessLevel = await getAccessLevel(member, group);
       return {
@@ -272,6 +284,45 @@ async function getGroupMembers(req, res, next) {
     });
     const parsedMembers = await Promise.all(promises);
 
+    return res.status(200).json(parsedMembers);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getPendingMembers(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const members = await group.getUsers(({
+      through: {
+        where: {
+          isPendingMember: 1,
+        },
+      },
+    }));
+    const promises = members.map(async (member) => {
+      const accessLevel = await getAccessLevel(member, group);
+      return {
+        accessLevel,
+        member: {
+          nickname: member.nickname,
+          userId: member.userId,
+          isPendingMember: member.UserGroup.isPendingMember,
+        },
+      };
+    });
+    const parsedMembers = await Promise.all(promises);
     return res.status(200).json(parsedMembers);
   } catch (err) {
     return next(new ApiError());
@@ -568,6 +619,7 @@ module.exports = {
   putGroup,
   deleteGroupUser,
   getGroupMembers,
+  getPendingMembers,
   postGroupJoinRequest,
   postGroupJoinApprove,
   postGroupJoinReject,
