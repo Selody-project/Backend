@@ -5,7 +5,7 @@ const {
   postGroup,
   getGroupInfo, getGroupDetail, getGroupList,
   putGroup, deleteGroup,
-  getGroupMembers,
+  getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
   getInviteLink, postInviteLink, postJoinGroupWithInviteCode,
   deleteGroupMember,
@@ -36,6 +36,7 @@ router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', putGroup);
 router.delete('/:group_id', deleteGroup);
 router.get('/:group_id/members', getGroupMembers);
+router.get('/:group_id/members/request', getPendingMembers);
 router.post('/:group_id/members/request', postGroupJoinRequest);
 router.post('/:group_id/members/:user_id/approve', postGroupJoinApprove);
 router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
