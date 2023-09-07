@@ -65,23 +65,31 @@ async function getGoogleUserInfo(req, res, next) {
       if (err) {
         return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
       }
-      const userEmail = decoded.email.split('@')[0];
+      const userEmail = decoded.email;
+      const nickname = decoded.email.split('@')[0];
 
-      const user = await User.findOne({ where: { nickname: userEmail } });
+      const user = await User.findOne({ where: { email: userEmail } });
       if (!user) {
         await User.create({
-          nickname: userEmail,
+          email: userEmail,
+          nickname,
           provider: 'GOOGLE',
         });
-      }
-      req.nickname = user.nickname;
+        req.nickname = nickname;
+      } else {
+        req.nickname = user.nickname;
+      } 
       next();
     });
   } catch (err) {
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());
     }
-    return next(new InvalidTokenError());
+    if (err.name === 'InvalidTokenError') {
+      return next(new InvalidTokenError());
+    }
+
+    return next(new ApiError());
   }
 }
 
@@ -89,16 +97,15 @@ async function joinSocialUser(req, res, next) {
   try {
     const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) {
-      const nickname = `selody-${req.body.id}`.slice(0, 15);
+      const nickname = `naver-${req.body.id}`.slice(0, 15);
       await User.create({
         email: req.body.email,
-        nickname: nickname,
+        nickname,
         provider: 'NAVER',
         snsId: req.body.id,
       });
       req.nickname = nickname;
-    }
-    else {
+    } else {
       req.nickname = user.nickname;
     }
     next();
