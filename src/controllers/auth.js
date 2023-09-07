@@ -78,7 +78,7 @@ async function getGoogleUserInfo(req, res, next) {
         req.nickname = nickname;
       } else {
         req.nickname = user.nickname;
-      }
+      } 
       next();
     });
   } catch (err) {
