@@ -16,6 +16,11 @@ const {
 
 const { deleteGroupUser } = require('../controllers/group');
 
+// Feed
+const {
+  getUserFeed,
+} = require('../controllers/feed');
+
 const router = express.Router();
 
 // User
@@ -32,4 +37,8 @@ router.get('/calendar/:schedule_id', getSingleUserSchedule);
 router.post('/calendar', postPersonalSchedule);
 router.put('/calendar/:schedule_id', putPersonalSchedule);
 router.delete('/calendar/:schedule_id', deletePersonalSchedule);
+
+// Feed
+router.get('/feed', getUserFeed);
+
 module.exports = router;
