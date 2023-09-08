@@ -5,7 +5,7 @@ const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
   tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB,
-  tearDownGroupDB, setUpGroupDB,
+  tearDownGroupDB, setUpGroupDB, setUpGroupPostDB, tearDownGroupPostDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -31,9 +31,11 @@ describe('Test /api/user endpoints', () => {
     await setUpGroupDB();
     await setUpPersonalScheduleDB();
     await setUpGroupScheduleDB2();
+    await setUpGroupPostDB();
   });
 
   afterEach(async () => {
+    await tearDownGroupPostDB();
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
     await tearDownGroupDB();
@@ -594,6 +596,116 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).patch(`/api/user/userSetup/${id}`).set('Cookie', cookie).send(result);
 
       expect(res.status).toEqual(200);
+    });
+  });
+
+  describe('Test GET /api/user/feed', () => {
+    it('Successfully retrieved feed', async () => {
+      const page = 1;
+      const res = await request(app).get('/api/user/feed').set('Cookie', cookie).query({
+        page,
+      });
+      const expectedResult = [
+        {
+          postId: 1,
+          groupId: 1,
+          isMine: true,
+          title: 'test-title1',
+          author: 'test-user1',
+          content: 'test-content1'
+        },
+        {
+          postId: 2,
+          groupId: 1,
+          isMine: false,
+          title: 'test-title2',
+          author: 'test-user2',
+          content: 'test-content2'
+        },
+        {
+          postId: 3,
+          groupId: 1,
+          isMine: true,
+          title: 'test-title3',
+          author: 'test-user1',
+          content: 'test-content3'
+        },
+        {
+          postId: 4,
+          groupId: 1,
+          isMine: true,
+          title: 'test-title4',
+          author: 'test-user1',
+          content: 'test-content4'
+        },
+        {
+          postId: 5,
+          groupId: 1,
+          isMine: true,
+          title: 'test-title5',
+          author: 'test-user1',
+          content: 'test-content5'
+        },
+        {
+          postId: 6,
+          groupId: 2,
+          isMine: false,
+          title: 'test-title6',
+          author: 'test-user2',
+          content: 'test-content6'
+        },
+        {
+          postId: 7,
+          groupId: 1,
+          isMine: false,
+          title: 'test-title7',
+          author: 'test-user2',
+          content: 'test-content7'
+        },
+        {
+          postId: 8,
+          groupId: 1,
+          isMine: false,
+          title: 'test-title8',
+          author: 'test-user2',
+          content: 'test-content8'
+        },
+        {
+          postId: 9,
+          groupId: 2,
+          isMine: true,
+          title: 'test-title9',
+          author: 'test-user1',
+          content: 'test-content9'
+        },
+        {
+          postId: 10,
+          groupId: 1,
+          isMine: true,
+          title: 'test-title10',
+          author: 'test-user1',
+          content: 'test-content10'
+        }
+      ];
+
+      const result = res.body.feed.map((post) => ({
+        postId: post.postId,
+        groupId: post.groupId,
+        title: post.title,
+        author: post.author,
+        content: post.content,
+        isMine: post.isMine,
+      }));
+      expect(res.status).toEqual(200);
+      expect(result).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve feed (DataFormat Error)', async () => {
+      const page = 'abc';
+      const res = await request(app).get('/api/user/feed').set('Cookie', cookie).query({
+        page,
+      });
+      expect(res.status).toEqual(400);
     });
   });
 });
