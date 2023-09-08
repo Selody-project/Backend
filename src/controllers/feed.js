@@ -1,7 +1,10 @@
+const { Sequelize } = require('sequelize');
 const {
   isMine,
   getAccessLevel,
 } = require('../utils/accessLevel');
+
+const { Op } = Sequelize;
 
 // Model
 const User = require('../models/user');
@@ -444,6 +447,58 @@ async function deleteComment(req, res, next) {
   }
 }
 
+async function getUserFeed(req, res, next) {
+  try {
+    const { error: queryError } = validatePageSchema(req.query);
+    if (queryError) {
+      return next(new DataFormatError());
+    }
+
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    const groups = (await user.getGroups()).map((group) => group.groupId);
+
+    const { page } = req.query;
+    const pageSize = 12;
+
+    const startIndex = (page - 1) * pageSize;
+    const posts = await Post.findAll({
+      where: {
+        groupId: {
+          [Op.in]: groups,
+        },
+      },
+      include: [
+        {
+          model: PostDetail,
+          as: 'postDetail',
+        },
+      ],
+      order: [['createdAt', 'DESC']],
+      offset: startIndex,
+      limit: pageSize,
+    });
+
+    const feed = posts.map((post) => ({
+      postId: post.postId,
+      groupId: post.groupId,
+      isMine: isMine(user, post),
+      title: post.title,
+      author: post.author,
+      createdAt: post.createdAt,
+      content: post.postDetail.content,
+    }));
+
+    return res.status(200).json({ feed });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   postGroupPost,
   getSinglePost,
@@ -455,4 +510,5 @@ module.exports = {
   getPostComment,
   putComment,
   deleteComment,
+  getUserFeed,
 };
