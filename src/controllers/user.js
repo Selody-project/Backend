@@ -15,7 +15,7 @@ const {
 
 // Validator
 const {
-  validateJoinSchema, validateUserIdSchema,
+  validateJoinSchema, validateUserIdSchema, validatePasswordSchema,
 } = require('../utils/validators');
 
 async function getUserProfile(req, res, next) {
@@ -74,7 +74,7 @@ async function patchUserProfile(req, res, next) {
 
 async function patchUserPassword(req, res, next) {
   try {
-    const { error: bodyError } = validateJoinSchema(req.body);
+    const { error: bodyError } = validatePasswordSchema(req.body);
     if (bodyError) {
       return next(new DataFormatError());
     }

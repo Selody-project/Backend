@@ -21,7 +21,7 @@ const sequelize = new Sequelize(
       idle: 10000,
     },
     // eslint-disable-next-line no-console
-    logging: process.env.NODE_ENV == 'test' ? false : console.log(),
+    logging: process.env.NODE_ENV == 'test' ? false : false,
   },
 );
 

@@ -250,7 +250,7 @@ async function postGroupPostLike(req, res, next) {
     transaction = await sequelize.transaction();
     const { error: paramError } = validatePostIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
@@ -261,15 +261,15 @@ async function postGroupPostLike(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!user) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const existingLike = await Like.findOne({
@@ -281,12 +281,12 @@ async function postGroupPostLike(req, res, next) {
     });
 
     if (existingLike) {
-      return next(new DuplicateLikeError());
+      throw (new DuplicateLikeError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const like = await Like.create({}, { transaction });
@@ -296,10 +296,12 @@ async function postGroupPostLike(req, res, next) {
     await transaction.commit();
     return res.status(201).json({ message: 'Successfully created a Like.' });
   } catch (err) {
-    if (transaction) {
-      await transaction.rollback();
-    }
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    };
+    return next(err)
   }
 }
 
@@ -309,7 +311,7 @@ async function deleteGroupPostLike(req, res, next) {
     transaction = await sequelize.transaction();
     const { error: paramError } = validatePostIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw new DataFormatError();
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
@@ -320,20 +322,20 @@ async function deleteGroupPostLike(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!user) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer') {
-      return next(new EditPermissionError());
+      throw new EditPermissionError();
     }
 
     const like = await Like.findOne({
@@ -344,17 +346,20 @@ async function deleteGroupPostLike(req, res, next) {
       transaction,
     });
     if (!like) {
-      return next(new DuplicateLikeError());
+      throw next(new DuplicateLikeError());
     }
     await like.destroy({ transaction });
 
     await transaction.commit();
+
     return res.status(204).end();
   } catch (err) {
-    if (transaction) {
-      await transaction.rollback();
-    }
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    };
+    return next(err)
   }
 }
 
