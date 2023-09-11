@@ -16,7 +16,7 @@ const sequelize = new Sequelize(
       database: dbConfig.database,
     },
     pool: {
-      max: 5,
+      max: 100,
       min: 0,
       idle: 10000,
     },

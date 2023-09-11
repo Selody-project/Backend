@@ -22,6 +22,7 @@ const {
 // Feed
 const {
   postGroupPost, getGroupPosts, getSinglePost, putGroupPost, deleteGroupPost,
+  postGroupPostLike, deleteGroupPostLike,
   postComment, getPostComment, getSingleComment, putComment, deleteComment,
 } = require('../controllers/feed');
 
@@ -59,6 +60,10 @@ router.get('/:group_id/post', getGroupPosts);
 router.get('/:group_id/post/:post_id', getSinglePost);
 router.put('/:group_id/post/:post_id', putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);
+
+router.post('/:group_id/post/:post_id/like', postGroupPostLike);
+router.delete('/:group_id/post/:post_id/like', deleteGroupPostLike);
+
 router.get('/:group_id/post/:post_id/comment', getPostComment);
 router.get('/:group_id/post/:post_id/comment/:comment_id', getSingleComment);
 router.post('/:group_id/post/:post_id/comment', postComment);

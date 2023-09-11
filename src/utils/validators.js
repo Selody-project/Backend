@@ -8,7 +8,7 @@ const joinSchema = Joi.object({
   email: Joi.string().email(),
   nickname: Joi.string().max(15),
   password: Joi.string().min(10).max(100),
-});
+}).or('email', 'nickname');
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),

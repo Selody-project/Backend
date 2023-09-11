@@ -32,6 +32,10 @@ class Post extends Sequelize.Model {
       foreignKey: 'postId',
       onDelete: 'cascade',
     });
+    db.Post.hasMany(db.Like, {
+      foreignKey: 'postId',
+      onDelete: 'cascade',
+    });
     db.Post.hasOne(db.PostDetail, {
       as: 'postDetail',
       foreignKey: 'postId',

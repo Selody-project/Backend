@@ -1,10 +1,11 @@
 const { Sequelize } = require('sequelize');
+
+const { Op } = Sequelize;
+const { sequelize } = require('../models/index');
 const {
   isMine,
   getAccessLevel,
 } = require('../utils/accessLevel');
-
-const { Op } = Sequelize;
 
 // Model
 const User = require('../models/user');
@@ -12,12 +13,13 @@ const Group = require('../models/group');
 const Post = require('../models/post');
 const PostDetail = require('../models/postDetail');
 const Comment = require('../models/comment');
+const Like = require('../models/like');
 
 // Error
 const {
   DataFormatError, ApiError,
   UserNotFoundError, GroupNotFoundError, PostNotFoundError, CommentNotFoundError,
-  EditPermissionError,
+  EditPermissionError, DuplicateLikeError,
 } = require('../errors');
 
 // Validator
@@ -238,6 +240,120 @@ async function deleteGroupPost(req, res, next) {
 
     return res.status(204).end();
   } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function postGroupPostLike(req, res, next) {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId, { transaction }),
+      User.findOne({ where: { nickname: req.nickname }, transaction }),
+      Post.findByPk(postId, { transaction }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const existingLike = await Like.findOne({
+      where: {
+        userId: user.userId,
+        postId: post.postId,
+      },
+      transaction,
+    });
+
+    if (existingLike) {
+      return next(new DuplicateLikeError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      return next(new EditPermissionError());
+    }
+
+    const like = await Like.create({}, { transaction });
+    await user.addLike(like, { transaction });
+    await post.addLikes(like, { transaction });
+
+    await transaction.commit();
+    return res.status(201).json({ message: 'Successfully created a Like.' });
+  } catch (err) {
+    if (transaction) {
+      await transaction.rollback();
+    }
+    return next(new ApiError());
+  }
+}
+
+async function deleteGroupPostLike(req, res, next) {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId, { transaction }),
+      User.findOne({ where: { nickname: req.nickname }, transaction }),
+      Post.findByPk(postId, { transaction }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+
+    if (!post) {
+      return next(new PostNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      return next(new EditPermissionError());
+    }
+
+    const like = await Like.findOne({
+      where: {
+        userId: user.userId,
+        postId: post.postId,
+      },
+      transaction,
+    });
+    if (!like) {
+      return next(new DuplicateLikeError());
+    }
+    await like.destroy({ transaction });
+
+    await transaction.commit();
+    return res.status(204).end();
+  } catch (err) {
+    if (transaction) {
+      await transaction.rollback();
+    }
     return next(new ApiError());
   }
 }
@@ -505,6 +621,8 @@ module.exports = {
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
+  postGroupPostLike,
+  deleteGroupPostLike,
   postComment,
   getSingleComment,
   getPostComment,
