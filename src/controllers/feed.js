@@ -101,12 +101,15 @@ async function getSinglePost(req, res, next) {
     const { content } = (await post.getPostDetail()).dataValues;
 
     const accessLevel = await getAccessLevel(user, group);
+    const isMineValue = isMine(user, post);
+    const { likesCount, isLikedValue } = (await isLike(user, post));
     return res.status(200).json({
       accessLevel,
       post: {
         postId: post.postId,
-        isMine: isMine(user, post),
-        isLike: (await isLike(user, post)),
+        isMine: isMineValue,
+        isLiked: isLikedValue,
+        likesCount,
         author,
         title,
         content,
@@ -161,11 +164,12 @@ async function getGroupPosts(req, res, next) {
     const feed = await Promise.all(
       rows.map(async (post) => {
         const isMineValue = isMine(user, post);
-        const isLikeValue = await isLike(user, post);
+        const { likesCount, isLikedValue } = (await isLike(user, post));
         return {
           postId: post.postId,
           isMine: isMineValue,
-          isLike: isLikeValue,
+          isLiked: isLikedValue,
+          likesCount,
           title: post.title,
           author: post.author,
           createdAt: post.createdAt,
@@ -612,16 +616,16 @@ async function getUserFeed(req, res, next) {
       offset: startIndex,
       limit: pageSize,
     });
-
     const feed = await Promise.all(
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
-        const isLikeValue = await isLike(user, post);
+        const { likesCount, isLikedValue } = (await isLike(user, post));
         return {
           postId: post.postId,
           groupId: post.groupId,
           isMine: isMineValue,
-          isLike: isLikeValue,
+          isLiked: isLikedValue,
+          likesCount,
           title: post.title,
           author: post.author,
           createdAt: post.createdAt,

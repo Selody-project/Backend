@@ -416,6 +416,9 @@ async function setUpLikeDB() {
     {
       id: 2, postId: 3, userId: 1, 
     },
+    {
+      id: 3, postId: 2, userId: 2,
+    },
   ]);
 }
 
