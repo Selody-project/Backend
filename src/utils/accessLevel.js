@@ -16,16 +16,24 @@ function isMine(user, content) {
 
 async function isLike(user, post) {
   try {
+    let isLikedValue;
     const association = await Like.findOne({
       where: {
         userId: user.userId,
         postId: post.postId,
       },
     });
-    if (!association) {
-      return false;
+    if (association) {
+      isLikedValue = true;
+    } else {
+      isLikedValue = false;
     }
-    return true;
+    const { count } = await Like.findAndCountAll({
+      where: {
+        postId: post.postId,
+      },
+    });
+    return { likesCount: count, isLikedValue };
   } catch (err) {
     throw (new ApiError());
   }

@@ -612,7 +612,8 @@ describe('Test /api/user endpoints', () => {
           postId: 1,
           groupId: 1,
           isMine: true,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title1',
           author: 'test-user1',
           content: 'test-content1'
@@ -621,7 +622,8 @@ describe('Test /api/user endpoints', () => {
           postId: 2,
           groupId: 1,
           isMine: false,
-          isLike: true,
+          isLiked: true,
+          likesCount: 2,
           title: 'test-title2',
           author: 'test-user2',
           content: 'test-content2'
@@ -630,7 +632,8 @@ describe('Test /api/user endpoints', () => {
           postId: 3,
           groupId: 1,
           isMine: true,
-          isLike: true,
+          isLiked: true,
+          likesCount: 1,
           title: 'test-title3',
           author: 'test-user1',
           content: 'test-content3'
@@ -639,7 +642,8 @@ describe('Test /api/user endpoints', () => {
           postId: 4,
           groupId: 1,
           isMine: true,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title4',
           author: 'test-user1',
           content: 'test-content4'
@@ -648,7 +652,8 @@ describe('Test /api/user endpoints', () => {
           postId: 5,
           groupId: 1,
           isMine: true,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title5',
           author: 'test-user1',
           content: 'test-content5'
@@ -657,7 +662,8 @@ describe('Test /api/user endpoints', () => {
           postId: 6,
           groupId: 2,
           isMine: false,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title6',
           author: 'test-user2',
           content: 'test-content6'
@@ -666,7 +672,8 @@ describe('Test /api/user endpoints', () => {
           postId: 7,
           groupId: 1,
           isMine: false,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title7',
           author: 'test-user2',
           content: 'test-content7'
@@ -675,7 +682,8 @@ describe('Test /api/user endpoints', () => {
           postId: 8,
           groupId: 1,
           isMine: false,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title8',
           author: 'test-user2',
           content: 'test-content8'
@@ -684,7 +692,8 @@ describe('Test /api/user endpoints', () => {
           postId: 9,
           groupId: 2,
           isMine: true,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title9',
           author: 'test-user1',
           content: 'test-content9'
@@ -693,7 +702,8 @@ describe('Test /api/user endpoints', () => {
           postId: 10,
           groupId: 1,
           isMine: true,
-          isLike: false,
+          isLiked: false,
+          likesCount: 0,
           title: 'test-title10',
           author: 'test-user1',
           content: 'test-content10'
@@ -707,7 +717,8 @@ describe('Test /api/user endpoints', () => {
         author: post.author,
         content: post.content,
         isMine: post.isMine,
-        isLike: post.isLike,
+        isLiked: post.isLiked,
+        likesCount: post.likesCount,
       }));
       expect(res.status).toEqual(200);
       expect(result).toEqual(expectedResult);
