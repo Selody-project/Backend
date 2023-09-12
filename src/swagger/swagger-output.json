@@ -641,7 +641,7 @@
             "description": "권한 없음"
           },
           "403": {
-            "description": "수정할 권한이 없음"
+            "description": "수정할 권한이 없음 & 리더 또는 관리자는 추방될 수 없음"
           },
           "404": {
             "description": "존재하지 않는 그룹"
