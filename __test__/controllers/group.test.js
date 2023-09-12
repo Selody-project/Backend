@@ -6,6 +6,7 @@ const {
   tearDownGroupDB, tearDownGroupScheduleDB,
   setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
   setUpPersonalScheduleDB2, setUpGroupPostDB, tearDownGroupPostDB,
+  setUpLikeDB, tearDownLikeDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 
@@ -30,9 +31,11 @@ describe('Test /api/group endpoints', () => {
     await setUpGroupDB();
     await setUpGroupScheduleDB();
     await setUpGroupPostDB();
+    await setUpLikeDB();
   });
 
   afterEach(async () => {
+    await tearDownLikeDB();
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
     await tearDownGroupPostDB();
@@ -842,6 +845,7 @@ describe('Test /api/group endpoints', () => {
           content: 'test-content1',
           title: 'test-title1',
           isMine: true,
+          isLike: false,
           postId: 1,
         },
       };
@@ -885,25 +889,25 @@ describe('Test /api/group endpoints', () => {
         accessLevel: 'owner',
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true,
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLike: false,
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false,
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLike: true,
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true,
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLike: true,
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true,
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLike: false,
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true,
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLike: false,
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false,
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLike: false,
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false,
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLike: false,
           },
         ],
       };
@@ -911,6 +915,7 @@ describe('Test /api/group endpoints', () => {
       const feed = res.body.feed.map((post) => ({
         postId: post.postId,
         isMine: post.isMine,
+        isLike: post.isLike,
         title: post.title,
         author: post.author,
         content: post.content,
@@ -1448,6 +1453,117 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/post/:post_id/like', () => {
+    it('Successfully created a Like ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(201);
+      expect(res.body).toEqual({ message: 'Successfully created a Like.' });
+    });
+
+    it('Successfully failed to create a Like (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to create a Like (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to create a Like (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 'abc';
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to create a Like (Edit Permission Error) ', async () => {
+      const groupId = 3;
+      const postId = 10;
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
+    });
+
+    it('Successfully failed to create a Like ', async () => {
+      const groupId = 1;
+      const postId = 2;
+      const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(409);
+      expect(res.body).toEqual({ error:'This request has already been processed. ' });
+    });
+  });
+
+  describe('Test DELETE /api/group/:group_id/post/:post_id/like', () => {
+    it('Successfully deleted a Like ', async () => {
+      const groupId = 1;
+      const postId = 2;
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully failed to delete a Like (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to delete a Like (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: 'Post Not Found' });
+    });
+
+    it('Successfully failed to delete a Like (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const postId = 'abc';
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to delete a Like (Edit Permission Error) ', async () => {
+      const groupId = 3;
+      const postId = 10;
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
+    });
+
+    it('Successfully failed to delete a Like ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
+
+      expect(res.status).toEqual(409);
+      expect(res.body).toEqual({ error:'This request has already been processed. ' });
     });
   });
 });

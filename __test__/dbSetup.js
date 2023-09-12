@@ -7,6 +7,7 @@ const PersonalSchedule = require('../src/models/personalSchedule');
 const Post = require('../src/models/post');
 const PostDetail = require('../src/models/postDetail');
 const Comment = require('../src/models/comment');
+const Like = require('../src/models/like');
 
 const mockUser = {
   email: 'test-user1@email.com',
@@ -107,6 +108,7 @@ async function setUpGroupDB() {
     inviteCode: 'inviteCode03',
     inviteExp: '2099-01-01T00:00:00.000Z',
   });
+  
   const user = await User.findAll();
   await user[0].addGroup(group1, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
   await user[0].addGroup(group2, { through: { accessLevel: 'regular', sharePersonalEvent: 1, isPendingMember: 0 } });
@@ -406,6 +408,17 @@ async function setUpGroupPostDB() {
   ]);
 }
 
+async function setUpLikeDB() {
+  await Like.bulkCreate([
+    {
+      id: 1, postId: 2, userId: 1,
+    },
+    {
+      id: 2, postId: 3, userId: 1, 
+    },
+  ]);
+}
+
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
@@ -428,6 +441,10 @@ async function tearDownGroupPostDB() {
   await db.sequelize.query('DELETE FROM `postDetails`');
 }
 
+async function tearDownLikeDB() {
+  await db.sequelize.query('DELETE FROM `like`');
+}
+
 module.exports = {
   db,
   mockUser,
@@ -438,11 +455,13 @@ module.exports = {
   setUpPersonalScheduleDB2,
   setUpGroupScheduleDB2,
   setUpGroupPostDB,
+  setUpLikeDB,
   tearDownUserDB,
   tearDownGroupDB,
   tearDownGroupScheduleDB,
   tearDownPersonalScheduleDB,
   tearDownGroupPostDB,
+  tearDownLikeDB,
   syncDB,
   dropDB,
 };

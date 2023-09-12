@@ -16,12 +16,12 @@ const sequelize = new Sequelize(
       database: dbConfig.database,
     },
     pool: {
-      max: 5,
+      max: 100,
       min: 0,
       idle: 10000,
     },
     // eslint-disable-next-line no-console
-    logging: process.env.NODE_ENV == 'test' ? false : console.log(),
+    logging: process.env.NODE_ENV == 'test' ? false : false,
   },
 );
 

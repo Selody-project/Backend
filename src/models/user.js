@@ -51,6 +51,10 @@ class User extends Sequelize.Model {
     db.User.hasMany(db.Post, {
       foreignKey: 'userId',
     });
+    db.User.hasMany(db.Like, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
     db.User.hasMany(db.Comment, {
       foreignKey: 'userId',
     });

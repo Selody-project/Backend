@@ -9,4 +9,5 @@ class ApiError extends Error {
     this.status = status || 500;
   }
 }
+
 module.exports = ApiError;

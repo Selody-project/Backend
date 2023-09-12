@@ -1,10 +1,12 @@
 const { Sequelize } = require('sequelize');
-const {
-  isMine,
-  getAccessLevel,
-} = require('../utils/accessLevel');
 
 const { Op } = Sequelize;
+const { sequelize } = require('../models/index');
+const {
+  isMine,
+  isLike,
+  getAccessLevel,
+} = require('../utils/accessLevel');
 
 // Model
 const User = require('../models/user');
@@ -12,12 +14,13 @@ const Group = require('../models/group');
 const Post = require('../models/post');
 const PostDetail = require('../models/postDetail');
 const Comment = require('../models/comment');
+const Like = require('../models/like');
 
 // Error
 const {
   DataFormatError, ApiError,
   UserNotFoundError, GroupNotFoundError, PostNotFoundError, CommentNotFoundError,
-  EditPermissionError,
+  EditPermissionError, DuplicateLikeError,
 } = require('../errors');
 
 // Validator
@@ -103,6 +106,7 @@ async function getSinglePost(req, res, next) {
       post: {
         postId: post.postId,
         isMine: isMine(user, post),
+        isLike: (await isLike(user, post)),
         author,
         title,
         content,
@@ -154,14 +158,21 @@ async function getGroupPosts(req, res, next) {
       limit: pageSize,
     });
 
-    const feed = rows.map((post) => ({
-      postId: post.postId,
-      isMine: isMine(user, post),
-      title: post.title,
-      author: post.author,
-      createdAt: post.createdAt,
-      content: post.postDetail.content,
-    }));
+    const feed = await Promise.all(
+      rows.map(async (post) => {
+        const isMineValue = isMine(user, post);
+        const isLikeValue = await isLike(user, post);
+        return {
+          postId: post.postId,
+          isMine: isMineValue,
+          isLike: isLikeValue,
+          title: post.title,
+          author: post.author,
+          createdAt: post.createdAt,
+          content: post.postDetail.content,
+        };
+      }),
+    );
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, feed });
   } catch (err) {
@@ -239,6 +250,125 @@ async function deleteGroupPost(req, res, next) {
     return res.status(204).end();
   } catch (err) {
     return next(new ApiError());
+  }
+}
+
+async function postGroupPostLike(req, res, next) {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      throw (new DataFormatError());
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId, { transaction }),
+      User.findOne({ where: { nickname: req.nickname }, transaction }),
+      Post.findByPk(postId, { transaction }),
+    ]);
+
+    if (!group) {
+      throw (new GroupNotFoundError());
+    }
+
+    if (!user) {
+      throw (new UserNotFoundError());
+    }
+
+    if (!post) {
+      throw (new PostNotFoundError());
+    }
+
+    const existingLike = await Like.findOne({
+      where: {
+        userId: user.userId,
+        postId: post.postId,
+      },
+      transaction,
+    });
+
+    if (existingLike) {
+      throw (new DuplicateLikeError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      throw (new EditPermissionError());
+    }
+
+    const like = await Like.create({}, { transaction });
+    await user.addLike(like, { transaction });
+    await post.addLikes(like, { transaction });
+
+    await transaction.commit();
+    return res.status(201).json({ message: 'Successfully created a Like.' });
+  } catch (err) {
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
+  }
+}
+
+async function deleteGroupPostLike(req, res, next) {
+  let transaction;
+  try {
+    transaction = await sequelize.transaction();
+    const { error: paramError } = validatePostIdSchema(req.params);
+    if (paramError) {
+      throw new DataFormatError();
+    }
+
+    const { group_id: groupId, post_id: postId } = req.params;
+    const [group, user, post] = await Promise.all([
+      Group.findByPk(groupId, { transaction }),
+      User.findOne({ where: { nickname: req.nickname }, transaction }),
+      Post.findByPk(postId, { transaction }),
+    ]);
+
+    if (!group) {
+      throw (new GroupNotFoundError());
+    }
+
+    if (!user) {
+      throw (new UserNotFoundError());
+    }
+
+    if (!post) {
+      throw (new PostNotFoundError());
+    }
+
+    const accessLevel = await getAccessLevel(user, group);
+    if (accessLevel === 'viewer') {
+      throw new EditPermissionError();
+    }
+
+    const like = await Like.findOne({
+      where: {
+        userId: user.userId,
+        postId: post.postId,
+      },
+      transaction,
+    });
+    if (!like) {
+      throw (new DuplicateLikeError());
+    }
+    await like.destroy({ transaction });
+
+    await transaction.commit();
+
+    return res.status(204).end();
+  } catch (err) {
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -483,15 +613,22 @@ async function getUserFeed(req, res, next) {
       limit: pageSize,
     });
 
-    const feed = posts.map((post) => ({
-      postId: post.postId,
-      groupId: post.groupId,
-      isMine: isMine(user, post),
-      title: post.title,
-      author: post.author,
-      createdAt: post.createdAt,
-      content: post.postDetail.content,
-    }));
+    const feed = await Promise.all(
+      posts.map(async (post) => {
+        const isMineValue = isMine(user, post);
+        const isLikeValue = await isLike(user, post);
+        return {
+          postId: post.postId,
+          groupId: post.groupId,
+          isMine: isMineValue,
+          isLike: isLikeValue,
+          title: post.title,
+          author: post.author,
+          createdAt: post.createdAt,
+          content: post.postDetail.content,
+        };
+      }),
+    );
 
     return res.status(200).json({ feed });
   } catch (err) {
@@ -505,6 +642,8 @@ module.exports = {
   getGroupPosts,
   putGroupPost,
   deleteGroupPost,
+  postGroupPostLike,
+  deleteGroupPostLike,
   postComment,
   getSingleComment,
   getPostComment,
