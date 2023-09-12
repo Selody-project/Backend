@@ -4,6 +4,7 @@ const { Op } = Sequelize;
 const { sequelize } = require('../models/index');
 const {
   isMine,
+  isLike,
   getAccessLevel,
 } = require('../utils/accessLevel');
 
@@ -105,6 +106,7 @@ async function getSinglePost(req, res, next) {
       post: {
         postId: post.postId,
         isMine: isMine(user, post),
+        isLike: (await isLike(user, post)),
         author,
         title,
         content,
@@ -156,14 +158,21 @@ async function getGroupPosts(req, res, next) {
       limit: pageSize,
     });
 
-    const feed = rows.map((post) => ({
-      postId: post.postId,
-      isMine: isMine(user, post),
-      title: post.title,
-      author: post.author,
-      createdAt: post.createdAt,
-      content: post.postDetail.content,
-    }));
+    const feed = await Promise.all(
+      rows.map(async (post) => {
+        const isMineValue = isMine(user, post);
+        const isLikeValue = await isLike(user, post);
+        return {
+          postId: post.postId,
+          isMine: isMineValue,
+          isLike: isLikeValue,
+          title: post.title,
+          author: post.author,
+          createdAt: post.createdAt,
+          content: post.postDetail.content,
+        };
+      }),
+    );
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, feed });
   } catch (err) {
@@ -300,8 +309,8 @@ async function postGroupPostLike(req, res, next) {
 
     if (!err || err.status === undefined) {
       return next(new ApiError());
-    };
-    return next(err)
+    }
+    return next(err);
   }
 }
 
@@ -346,7 +355,7 @@ async function deleteGroupPostLike(req, res, next) {
       transaction,
     });
     if (!like) {
-      throw next(new DuplicateLikeError());
+      throw (new DuplicateLikeError());
     }
     await like.destroy({ transaction });
 
@@ -358,8 +367,8 @@ async function deleteGroupPostLike(req, res, next) {
 
     if (!err || err.status === undefined) {
       return next(new ApiError());
-    };
-    return next(err)
+    }
+    return next(err);
   }
 }
 
@@ -604,15 +613,22 @@ async function getUserFeed(req, res, next) {
       limit: pageSize,
     });
 
-    const feed = posts.map((post) => ({
-      postId: post.postId,
-      groupId: post.groupId,
-      isMine: isMine(user, post),
-      title: post.title,
-      author: post.author,
-      createdAt: post.createdAt,
-      content: post.postDetail.content,
-    }));
+    const feed = await Promise.all(
+      posts.map(async (post) => {
+        const isMineValue = isMine(user, post);
+        const isLikeValue = await isLike(user, post);
+        return {
+          postId: post.postId,
+          groupId: post.groupId,
+          isMine: isMineValue,
+          isLike: isLikeValue,
+          title: post.title,
+          author: post.author,
+          createdAt: post.createdAt,
+          content: post.postDetail.content,
+        };
+      }),
+    );
 
     return res.status(200).json({ feed });
   } catch (err) {

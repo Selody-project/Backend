@@ -845,6 +845,7 @@ describe('Test /api/group endpoints', () => {
           content: 'test-content1',
           title: 'test-title1',
           isMine: true,
+          isLike: false,
           postId: 1,
         },
       };
@@ -888,25 +889,25 @@ describe('Test /api/group endpoints', () => {
         accessLevel: 'owner',
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true,
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLike: false,
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false,
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLike: true,
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true,
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLike: true,
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true,
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLike: false,
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true,
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLike: false,
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false,
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLike: false,
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false,
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLike: false,
           },
         ],
       };
@@ -914,6 +915,7 @@ describe('Test /api/group endpoints', () => {
       const feed = res.body.feed.map((post) => ({
         postId: post.postId,
         isMine: post.isMine,
+        isLike: post.isLike,
         title: post.title,
         author: post.author,
         content: post.content,

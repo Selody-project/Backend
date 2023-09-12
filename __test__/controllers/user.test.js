@@ -5,7 +5,7 @@ const {
   db, syncDB, dropDB,
   setUpUserDB, setUpPersonalScheduleDB,
   tearDownUserDB, tearDownPersonalScheduleDB, setUpGroupScheduleDB2, tearDownGroupScheduleDB,
-  tearDownGroupDB, setUpGroupDB, setUpGroupPostDB, tearDownGroupPostDB,
+  tearDownGroupDB, setUpGroupDB, setUpGroupPostDB, tearDownGroupPostDB, setUpLikeDB, tearDownLikeDB,
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
@@ -32,9 +32,11 @@ describe('Test /api/user endpoints', () => {
     await setUpPersonalScheduleDB();
     await setUpGroupScheduleDB2();
     await setUpGroupPostDB();
+    await setUpLikeDB();
   });
 
   afterEach(async () => {
+    await tearDownLikeDB();
     await tearDownGroupPostDB();
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
@@ -610,6 +612,7 @@ describe('Test /api/user endpoints', () => {
           postId: 1,
           groupId: 1,
           isMine: true,
+          isLike: false,
           title: 'test-title1',
           author: 'test-user1',
           content: 'test-content1'
@@ -618,6 +621,7 @@ describe('Test /api/user endpoints', () => {
           postId: 2,
           groupId: 1,
           isMine: false,
+          isLike: true,
           title: 'test-title2',
           author: 'test-user2',
           content: 'test-content2'
@@ -626,6 +630,7 @@ describe('Test /api/user endpoints', () => {
           postId: 3,
           groupId: 1,
           isMine: true,
+          isLike: true,
           title: 'test-title3',
           author: 'test-user1',
           content: 'test-content3'
@@ -634,6 +639,7 @@ describe('Test /api/user endpoints', () => {
           postId: 4,
           groupId: 1,
           isMine: true,
+          isLike: false,
           title: 'test-title4',
           author: 'test-user1',
           content: 'test-content4'
@@ -642,6 +648,7 @@ describe('Test /api/user endpoints', () => {
           postId: 5,
           groupId: 1,
           isMine: true,
+          isLike: false,
           title: 'test-title5',
           author: 'test-user1',
           content: 'test-content5'
@@ -650,6 +657,7 @@ describe('Test /api/user endpoints', () => {
           postId: 6,
           groupId: 2,
           isMine: false,
+          isLike: false,
           title: 'test-title6',
           author: 'test-user2',
           content: 'test-content6'
@@ -658,6 +666,7 @@ describe('Test /api/user endpoints', () => {
           postId: 7,
           groupId: 1,
           isMine: false,
+          isLike: false,
           title: 'test-title7',
           author: 'test-user2',
           content: 'test-content7'
@@ -666,6 +675,7 @@ describe('Test /api/user endpoints', () => {
           postId: 8,
           groupId: 1,
           isMine: false,
+          isLike: false,
           title: 'test-title8',
           author: 'test-user2',
           content: 'test-content8'
@@ -674,6 +684,7 @@ describe('Test /api/user endpoints', () => {
           postId: 9,
           groupId: 2,
           isMine: true,
+          isLike: false,
           title: 'test-title9',
           author: 'test-user1',
           content: 'test-content9'
@@ -682,6 +693,7 @@ describe('Test /api/user endpoints', () => {
           postId: 10,
           groupId: 1,
           isMine: true,
+          isLike: false,
           title: 'test-title10',
           author: 'test-user1',
           content: 'test-content10'
@@ -695,6 +707,7 @@ describe('Test /api/user endpoints', () => {
         author: post.author,
         content: post.content,
         isMine: post.isMine,
+        isLike: post.isLike,
       }));
       expect(res.status).toEqual(200);
       expect(result).toEqual(expectedResult);

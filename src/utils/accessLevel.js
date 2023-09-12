@@ -1,5 +1,6 @@
 // Model
 const UserGroup = require('../models/userGroup');
+const Like = require('../models/like');
 
 // Error
 const {
@@ -11,6 +12,23 @@ function isMine(user, content) {
     return true;
   }
   return false;
+}
+
+async function isLike(user, post) {
+  try {
+    const association = await Like.findOne({
+      where: {
+        userId: user.userId,
+        postId: post.postId,
+      },
+    });
+    if (!association) {
+      return false;
+    }
+    return true;
+  } catch (err) {
+    throw (new ApiError());
+  }
 }
 
 async function getAccessLevel(user, group) {
@@ -26,11 +44,12 @@ async function getAccessLevel(user, group) {
     }
     return association.accessLevel;
   } catch (err) {
-    throw new ApiError();
+    throw (new ApiError());
   }
 }
 
 module.exports = {
   isMine,
+  isLike,
   getAccessLevel,
 };
