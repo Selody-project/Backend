@@ -11,7 +11,7 @@ const {
   DataFormatError, ApiError,
   UserNotFoundError, GroupNotFoundError,
   UnauthorizedError, ExpiredCodeError,
-  InvalidGroupJoinError, UserIsLeaderError,
+  InvalidGroupJoinError, UserIsLeaderError, NoBanPermission,
 } = require('../errors');
 
 // Validator
@@ -572,6 +572,11 @@ async function deleteGroupMember(req, res, next) {
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
       return next(new UnauthorizedError());
+    }
+
+    const memberAccessLevel = await getAccessLevel(member, group);
+    if (memberAccessLevel === 'owner' || memberAccessLevel === 'admin') {
+      return next(new NoBanPermission());
     }
 
     await group.removeUser(member);

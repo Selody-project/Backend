@@ -1325,7 +1325,7 @@ describe('Test /api/group endpoints', () => {
   describe('Test DELETE /api/group/:group_id/members/:user_id', () => {
     it('Successfully expelled a member. ', async () => {
       const groupId = 1;
-      const userId = 2;
+      const userId = 4;
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(204);
     });
@@ -1352,6 +1352,14 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+    });
+
+    it('Successfully failed to expell a member. (No Ban Permission Error) ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You cannot ban the leader or administrator. ' });
     });
   });
 
