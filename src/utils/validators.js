@@ -32,12 +32,8 @@ const yearMonthDayScehma = Joi.object({
 });
 
 const groupSchema = Joi.object({
-  groupId: Joi.number().min(0),
-  name: Joi.string().max(45),
+  name: Joi.string().max(45).required(),
   description: Joi.string().max(300),
-  member: Joi.number().min(1),
-  inviteCode: Joi.string(),
-  inviteExp: Joi.date(),
 });
 
 const groupIdSchema = Joi.object({
@@ -45,43 +41,16 @@ const groupIdSchema = Joi.object({
 });
 
 const scheduleDateSchema = Joi.object({
-  startDateTime: Joi.date(),
-  endDateTime: Joi.date(),
+  startDateTime: Joi.date().required(),
+  endDateTime: Joi.date().required(),
 });
 
 const scheduleSchema = Joi.object({
-  id: Joi.number().min(0),
-  title: Joi.string().max(45),
-  content: Joi.string(),
-  startDateTime: Joi.date(),
-  endDateTime: Joi.date(),
-  recurrence: Joi.number(),
-  freq: Joi.string().max(10),
-  interval: Joi.number(),
-  byweekday: Joi.string(),
-  until: Joi.date(),
-});
-
-const groupScheduleSchema = Joi.object({
-  groupId: Joi.number(),
   title: Joi.string().max(45).required(),
   content: Joi.string(),
-  startDateTime: Joi.date(),
-  endDateTime: Joi.date(),
-  recurrence: Joi.number(),
-  freq: Joi.string().max(10),
-  interval: Joi.number(),
-  byweekday: Joi.string(),
-  until: Joi.date(),
-});
-
-const userScheduleSchema = Joi.object({
-  userId: Joi.number(),
-  title: Joi.string().max(45).required(),
-  content: Joi.string(),
-  startDateTime: Joi.date(),
-  endDateTime: Joi.date(),
-  recurrence: Joi.number(),
+  startDateTime: Joi.date().required(),
+  endDateTime: Joi.date().required(),
+  recurrence: Joi.number().required(),
   freq: Joi.string().max(10),
   interval: Joi.number(),
   byweekday: Joi.string(),
@@ -104,8 +73,8 @@ const eventPoroposalSchema = Joi.object({
 });
 
 const postSchema = Joi.object({
-  title: Joi.string(),
-  content: Joi.string(),
+  title: Joi.string().required(),
+  content: Joi.string().required(),
 });
 
 const postIdSchema = Joi.object({
@@ -127,7 +96,7 @@ const commentIdSchema = Joi.object({
   comment_id: Joi.number().min(0).required(),
 });
 
-const groupJoinParamSchema = Joi.object({
+const groupJoinInviteCodeSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
   inviteCode: Joi.string().min(0).required(),
 });
@@ -153,9 +122,7 @@ module.exports = {
   validateScheduleSchema: validator(scheduleSchema),
   validateScheduleIdSchema: validator(scheduleIdSchema),
   validateGroupScheduleIdSchema: validator(groupScheduleIdSchema),
-  validateGroupScheduleSchema: validator(groupScheduleSchema),
   validateScheduleDateSchema: validator(scheduleDateSchema),
-  validateUserScheduleSchema: validator(userScheduleSchema),
   validateYYYYMMDateSchema: validator(yearMonthScehma),
   validateYYYYMMDDDateSchema: validator(yearMonthDayScehma),
   validateEventProposalSchema: validator(eventPoroposalSchema),
@@ -164,7 +131,7 @@ module.exports = {
   validatePageSchema: validator(pageSchema),
   validateCommentSchema: validator(commentSchema),
   validateCommentIdSchema: validator(commentIdSchema),
-  validateGroupJoinParamSchema: validator(groupJoinParamSchema),
+  validateGroupJoinInviteCodeSchema: validator(groupJoinInviteCodeSchema),
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
   validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
 };

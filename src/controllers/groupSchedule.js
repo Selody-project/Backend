@@ -22,13 +22,13 @@ const {
 // Validator
 const {
   validateGroupIdSchema, validateEventProposalSchema,
-  validateGroupScheduleSchema, validateScheduleDateSchema,
+  validateScheduleSchema, validateScheduleDateSchema,
   validateGroupScheduleIdSchema,
 } = require('../utils/validators');
 
 async function postGroupSchedule(req, res, next) {
   try {
-    const { error: bodyError } = validateGroupScheduleSchema(req.body);
+    const { error: bodyError } = validateScheduleSchema(req.body);
     const { error: paramError } = validateGroupIdSchema(req.params);
 
     if (paramError || bodyError) {
@@ -170,7 +170,7 @@ async function getGroupSchedule(req, res, next) {
 async function putGroupSchedule(req, res, next) {
   try {
     const { error: paramError } = validateGroupScheduleIdSchema(req.params);
-    const { error: bodyError } = validateGroupScheduleSchema(req.body);
+    const { error: bodyError } = validateScheduleSchema(req.body);
 
     if (paramError || bodyError) {
       return next(new DataFormatError());

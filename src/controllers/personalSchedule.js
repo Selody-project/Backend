@@ -14,13 +14,12 @@ const {
 
 // Validator
 const {
-  validateUserScheduleSchema, validateScheduleIdSchema, validateScheduleDateSchema,
-  validateScheduleSchema,
+  validateScheduleIdSchema, validateScheduleDateSchema, validateScheduleSchema,
 } = require('../utils/validators');
 
 async function postPersonalSchedule(req, res, next) {
   try {
-    const { error: bodyError } = validateUserScheduleSchema(req.body);
+    const { error: bodyError } = validateScheduleSchema(req.body);
     if (bodyError) {
       return next(new DataFormatError());
     }

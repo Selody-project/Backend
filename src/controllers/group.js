@@ -17,7 +17,7 @@ const {
 // Validator
 const {
   validateGroupSchema, validateGroupIdSchema, validatePageSchema,
-  validateGroupJoinParamSchema, validateGroupJoinRequestSchema,
+  validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword,
 } = require('../utils/validators');
 const { getAccessLevel } = require('../utils/accessLevel');
@@ -515,7 +515,7 @@ async function postInviteLink(req, res, next) {
 
 async function postJoinGroupWithInviteCode(req, res, next) {
   try {
-    const { error: paramError } = validateGroupJoinParamSchema(req.params);
+    const { error: paramError } = validateGroupJoinInviteCodeSchema(req.params);
     if (paramError) {
       return next(new DataFormatError());
     }

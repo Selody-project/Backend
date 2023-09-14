@@ -475,9 +475,13 @@ describe('Test /api/user endpoints', () => {
       const id = 1;
       const res = await request(app).put(`/api/user/calendar/${id}`).set('Cookie', cookie).send({
         title: 'modified-title',
+        content: 'modified-content',
+        startDateTime: '2099-01-01T12:00:00.000Z',
+        endDateTime: '2099-01-01T12:00:00.000Z',
+        recurrence: 0,
       });
       const modifiedSchedule = await PersonalSchedule.findOne({
-        where: { title: 'modified-title' },
+        where: { title: 'modified-title', content: 'modified-content' },
       });
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
