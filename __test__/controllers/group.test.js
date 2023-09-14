@@ -224,13 +224,15 @@ describe('Test /api/group endpoints', () => {
       const groupId = 1;
       const scheduleId = 1;
       const res = await request(app).put(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie).send({
-        groupId: 1,
         title: 'modified-title',
         content: 'modified-contnent',
+        startDateTime: '2099-01-01T12:00:00.000Z',
+        endDateTime: '2099-01-01T12:00:00.000Z',
+        recurrence: 0,
       });
 
       const modifiedSchedule = await GroupSchedule.findOne({
-        where: { title: 'modified-title' },
+        where: { title: 'modified-title', content: 'modified-contnent' },
       });
 
       expect(modifiedSchedule.id).toEqual(1);
