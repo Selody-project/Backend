@@ -15,7 +15,7 @@ const {
 
 // Validator
 const {
-  validateJoinSchema, validateUserIdSchema, validatePasswordSchema,
+  validateProfileSchema, validateUserIdSchema, validatePasswordSchema,
 } = require('../utils/validators');
 
 async function getUserProfile(req, res, next) {
@@ -39,7 +39,7 @@ async function getUserGroup(req, res, next) {
 
 async function patchUserProfile(req, res, next) {
   try {
-    const { error: bodyError } = validateJoinSchema(req.body);
+    const { error: bodyError } = validateProfileSchema(req.body);
     if (bodyError) {
       return next(new DataFormatError());
     }
@@ -50,11 +50,16 @@ async function patchUserProfile(req, res, next) {
       return next(new UserNotFoundError());
     }
 
-    const { nickname } = req.body;
+    const { nickname, email } = req.body;
     const duplicate = await User.findAll({
       where: {
         [Op.and]: [
-          { nickname },
+          {
+            [Op.or]: [
+              { nickname },
+              { email },
+            ],
+          },
           { userId: { [Op.not]: user.userId } },
         ],
       },
@@ -62,9 +67,7 @@ async function patchUserProfile(req, res, next) {
     if (duplicate.length > 0) {
       return next(new DuplicateUserError());
     }
-    await user.update({
-      nickname,
-    });
+    await user.update({ nickname, email });
     req.nickname = nickname;
     next();
   } catch (err) {
