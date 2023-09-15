@@ -88,8 +88,10 @@ describe('Test /api/user endpoints', () => {
   describe('Test PATCH /api/user/profile', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
+      const newEmail = 'newEmail@email.com';
       let res = await request(app).patch('/api/user/profile').set('Cookie', cookie).send({
         nickname: newNickname,
+        email: newEmail,
       });
 
       // eslint-disable-next-line prefer-destructuring
@@ -104,7 +106,7 @@ describe('Test /api/user endpoints', () => {
 
       const expectedProfile = {
         user: {
-          email: 'test-user1@email.com',
+          email: 'newEmail@email.com',
           nickname: newNickname,
           provider: 'local',
           snsId: null,

@@ -1784,6 +1784,9 @@
               "properties": {
                 "nickname": {
                   "example": "string"
+                },
+                "email": {
+                  "example": "string"
                 }
               }
             }

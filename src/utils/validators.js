@@ -10,6 +10,11 @@ const joinSchema = Joi.object({
   password: Joi.string().min(10).max(100),
 }).or('email', 'nickname');
 
+const profileSchema = Joi.object({
+  email: Joi.string().email().required(),
+  nickname: Joi.string().max(15).required(),
+});
+
 const passwordSchema = Joi.object({
   password: Joi.string().min(10).max(100).required(),
 });
@@ -115,6 +120,7 @@ const groupSearchKeywordSchema = Joi.object({
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
+  validateProfileSchema: validator(profileSchema),
   validatePasswordSchema: validator(passwordSchema),
   validateUserIdSchema: validator(userIdSchema),
   validateGroupSchema: validator(groupSchema),
