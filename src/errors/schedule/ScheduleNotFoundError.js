@@ -1,9 +1,9 @@
 const ApiError = require('../apiError');
 
-class UnathroizedError extends ApiError {
+class ScheduleNotFoundError extends ApiError {
   constructor(message) {
     super(message || 'Schedule Not Found', 404);
   }
 }
 
-module.exports = UnathroizedError;
+module.exports = ScheduleNotFoundError;

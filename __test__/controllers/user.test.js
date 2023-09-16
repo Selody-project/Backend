@@ -109,7 +109,6 @@ describe('Test /api/user endpoints', () => {
           email: 'newEmail@email.com',
           nickname: newNickname,
           provider: 'local',
-          snsId: null,
           userId: 1,
         },
       };
@@ -125,13 +124,12 @@ describe('Test /api/user endpoints', () => {
       let res = await request(app).patch('/api/user/profile/password').set('Cookie', cookie).send({
         password: newPassword,
       });
-
       expect(res.status).toEqual(200);
 
-      res = await request(app).get('/api/auth/token/verify').set('Cookie', cookie).send();
-      const comparePassword = await bcrypt.compare(newPassword, res.body.user.password);
-
-      expect(comparePassword).toEqual(true);
+      res = await request(app).post('/api/auth/login').set('Cookie', cookie).send({
+        email: 'test-user1@email.com',
+        password: newPassword,
+      });
       expect(res.status).toEqual(200);
     });
   });
@@ -481,6 +479,10 @@ describe('Test /api/user endpoints', () => {
         startDateTime: '2099-01-01T12:00:00.000Z',
         endDateTime: '2099-01-01T12:00:00.000Z',
         recurrence: 0,
+        freq: null,
+        interval: null,
+        byweekday: null,
+        until: null,
       });
       const modifiedSchedule = await PersonalSchedule.findOne({
         where: { title: 'modified-title', content: 'modified-content' },
@@ -506,6 +508,10 @@ describe('Test /api/user endpoints', () => {
         startDateTime: '2023-02-03T00:00:00.000Z',
         endDateTime: '2023-05-15T00:00:00.000Z',
         recurrence: 0,
+        freq: null,
+        interval: null,
+        byweekday: null,
+        until: null,
       };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
@@ -522,7 +528,7 @@ describe('Test /api/user endpoints', () => {
         freq: 'WEEKLY',
         interval: 1,
         byweekday: 'MO',
-        until: '2026-01-05',
+        until: '2026-01-05T00:00:00.000Z',
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(201);

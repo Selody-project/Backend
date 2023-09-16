@@ -181,8 +181,12 @@ class PersonalSchedule extends Sequelize.Model {
           });
         }
       });
+      if (earliestDate === Number.MAX_SAFE_INTEGER) {
+        earliestDate = null;
+      }
       return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
+      console.log(err);
       throw new ApiError();
     }
   }

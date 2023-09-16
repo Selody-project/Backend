@@ -4,9 +4,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 // Error
-const { 
-  ApiError, 
-  TokenExpireError, InvalidTokenError
+const {
+  ApiError,
+  TokenExpireError, InvalidTokenError,
 } = require('../errors');
 
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
@@ -75,16 +75,21 @@ function verifyToken(req, res, next) {
   }
 }
 
-function renewToken(req, res, next) {
+async function renewToken(req, res, next) {
   try {
     const authToken = req.cookies.refreshToken;
     if (!authToken) throw new InvalidTokenError();
     const { nickname } = jwt.verify(authToken, REFRESH_SECRET_KEY);
     const accessToken = token().access(nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
+    const user = await User.findOne({ where: { nickname } });
     return res.status(200).json({
-      message: 'Token renewal successful',
-      nickname: req.nickname,
+      message: 'JWT 갱신에 성공하였습니다',
+      userId: user.userId,
+      email: user.email,
+      nickname,
+      provider: user.provider,
+      snsId: user.snsId,
     });
   } catch (err) {
     if (err.name === 'TokenExpireError') {

@@ -5,14 +5,14 @@ const validator = (schema) => (payload) => schema.validate(payload, { abortEarly
 
 const joinSchema = Joi.object({
   userId: Joi.number(),
-  email: Joi.string().email(),
-  nickname: Joi.string().max(15),
+  email: Joi.string().email().min(0).max(40),
+  nickname: Joi.string().min(0).max(15),
   password: Joi.string().min(10).max(100),
 }).or('email', 'nickname');
 
 const profileSchema = Joi.object({
-  email: Joi.string().email().required(),
-  nickname: Joi.string().max(15).required(),
+  email: Joi.string().email().min(1).max(40).required(),
+  nickname: Joi.string().min(1).max(15).required(),
 });
 
 const passwordSchema = Joi.object({
@@ -20,8 +20,8 @@ const passwordSchema = Joi.object({
 });
 
 const loginSchema = Joi.object({
-  email: Joi.string().email().required(),
-  password: Joi.string().max(100).required(),
+  email: Joi.string().email().min(1).max(40).required(),
+  password: Joi.string().min(1).max(100).required(),
 });
 
 const userIdSchema = Joi.object({
@@ -37,7 +37,7 @@ const yearMonthDayScehma = Joi.object({
 });
 
 const groupSchema = Joi.object({
-  name: Joi.string().max(45).required(),
+  name: Joi.string().min(1).max(45).required(),
   description: Joi.string().max(300),
 });
 
@@ -55,11 +55,27 @@ const scheduleSchema = Joi.object({
   content: Joi.string(),
   startDateTime: Joi.date().required(),
   endDateTime: Joi.date().required(),
-  recurrence: Joi.number().required(),
-  freq: Joi.string().max(10),
-  interval: Joi.number(),
-  byweekday: Joi.string(),
-  until: Joi.date(),
+  recurrence: Joi.valid(0, 1).required(),
+  freq: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.string().max(10).required(),
+  }),
+  interval: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.number().required(),
+  }),
+  byweekday: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.string().min(0).required(),
+  }),
+  until: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.date().required(),
+  }),
 });
 
 const scheduleIdSchema = Joi.object({
@@ -78,8 +94,8 @@ const eventPoroposalSchema = Joi.object({
 });
 
 const postSchema = Joi.object({
-  title: Joi.string().required(),
-  content: Joi.string().required(),
+  title: Joi.string().max(45).required(),
+  content: Joi.string().max(1000).required(),
 });
 
 const postIdSchema = Joi.object({
@@ -92,7 +108,7 @@ const pageSchema = Joi.object({
 });
 
 const commentSchema = Joi.object({
-  content: Joi.string().max(500).required(),
+  content: Joi.string().max(250).required(),
 });
 
 const commentIdSchema = Joi.object({
@@ -113,7 +129,7 @@ const groupJoinRequestSchema = Joi.object({
 
 const groupSearchKeywordSchema = Joi.object({
   keyword: Joi.alternatives().try(
-    Joi.string().min(1).required(), Joi.number().min(0).required(),
+    Joi.string().min(2).max(45).required(), Joi.number().min(0).required(),
   ),
 });
 

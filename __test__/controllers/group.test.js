@@ -229,6 +229,10 @@ describe('Test /api/group endpoints', () => {
         startDateTime: '2099-01-01T12:00:00.000Z',
         endDateTime: '2099-01-01T12:00:00.000Z',
         recurrence: 0,
+        freq: null,
+        interval: null,
+        byweekday: null,
+        until: null,
       });
 
       const modifiedSchedule = await GroupSchedule.findOne({
