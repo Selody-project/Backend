@@ -1,5 +1,5 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Restful api 명세서",
     "description": "RestFul API 클라이언트 UI",
@@ -16,26 +16,30 @@
         "description": "아이디, 닉네임 중복확인 후 회원가입을 진행합니다.",
         "summary": "로컬 유저 회원가입",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "testUser@email.com"
-                },
-                "nickname": {
-                  "example": "testUser"
-                },
-                "password": {
-                  "example": "super_strong_password"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "testUser@email.com",
+                    "type": "VARCHAR(40)"
+                  },
+                  "nickname": {
+                    "example": "testUser",
+                    "type": "VARCHAR(15)"
+                  },
+                  "password": {
+                    "example": "super_strong_password",
+                    "type": "VARCHAR(100)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -57,23 +61,26 @@
         "description": "",
         "summary": "로컬 유저 로그인",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "email": {
-                  "example": "example@email.com"
-                },
-                "password": {
-                  "example": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "example": "testUser@email.com",
+                    "type": "VARCHAR(40)"
+                  },
+                  "password": {
+                    "example": "super_strong_password",
+                    "type": "VARCHAR(100)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -95,23 +102,28 @@
         "description": "",
         "summary": "네이버 로그인",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "access_token": {
-                  "example": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_token": {
+                    "example": "string",
+                    "type": "TEXT"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
+          },
+          "500": {
+            "description": "서버 에러"
           }
         }
       }
@@ -121,15 +133,6 @@
         "description": "",
         "summary": "로그아웃",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -151,11 +154,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -185,13 +183,6 @@
         "description": "",
         "summary": "토큰 갱신",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -210,13 +201,6 @@
         "description": "",
         "summary": "토큰 검증",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -235,23 +219,26 @@
         "description": "",
         "summary": "그룹 생성",
         "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "string"
-                },
-                "description": {
-                  "example": "test-description"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "example": "test-group",
+                    "type": "VARCHAR(45)"
+                  },
+                  "description": {
+                    "example": "test-description",
+                    "type": "VARCHAR(300)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -303,11 +290,6 @@
             "required": true,
             "type": "string",
             "description": "The search keyword (can be either an integer or a string)"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -340,11 +322,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -375,31 +352,32 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "name": {
-                  "example": "modified-name"
-                },
-                "description": {
-                  "example": "modified-description"
-                },
-                "leader": {
-                  "example": 2
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "example": "modified-name",
+                    "type": "VARCHAR(45)"
+                  },
+                  "description": {
+                    "example": "modified-description",
+                    "type": "VARCHAR(300)"
+                  },
+                  "leader": {
+                    "example": 2,
+                    "type": "BIGINT"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -431,11 +409,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -471,11 +444,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -508,11 +476,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -545,11 +508,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -580,11 +538,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -623,11 +576,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -669,11 +617,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -715,11 +658,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -755,11 +693,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -790,11 +723,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -833,11 +761,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -862,16 +785,204 @@
         }
       }
     },
-    "/api/group/calendar/{schedule_id}": {
+    "/api/group/{group_id}/calendar": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 등록",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "test-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "test-content",
+                    "type": "VARCHAR(300)"
+                  },
+                  "startDateTime": {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "endDateTime": {
+                    "example": "2099-01-01T13:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "recurrence": {
+                    "example": 0,
+                    "type": "TINYINT(1)"
+                  },
+                  "freq": {
+                    "example": null,
+                    "type": "ENUM(DAILY, WEEKLY, MONTHLY, YEARLY)"
+                  },
+                  "interval": {
+                    "example": null,
+                    "type": "integer"
+                  },
+                  "byweekday": {
+                    "example": null,
+                    "type": "TEXT"
+                  },
+                  "until": {
+                    "example": null,
+                    "type": "DATETIME"
+                  }
+                }
+              },
+              "examples": {
+                "non-recurrence" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
+                },
+                "recurrence1" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": "",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
+                },
+                "recurrence2" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": "",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시"
+                },
+                "recurrence3" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": "MO,WE,FR",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
+                },
+                "recurrence4" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": "",
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "로그인 실패"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "get": {
+        "description": "",
+        "summary": "그룹 일정 조회",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2000-01-01T00:00:00.000Z"
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2100-01-01T00:00:00.000Z"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/calendar/{schedule_id}": {
       "get": {
         "description": "그룹 일정을 단일 조회합니다.",
         "summary": "그룹 일정 단일 조회",
         "tags": ["Group Schedule"],
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
           },
           {
             "name": "schedule_id",
@@ -904,48 +1015,62 @@
         "tags": ["Group Schedule"],
         "parameters": [
           {
-            "name": "schedule_id",
+            "name": "group_id",
             "in": "path",
             "required": true,
             "type": "integer"
           },
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "content": {
-                  "example": "string"
-                },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
+            "name": "schedule_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "modified-title"
+                  },
+                  "content": {
+                    "example": "modified-content"
+                  },
+                  "startDateTime": {
+                    "example": "2099-02-01T12:00:00.000Z"
+                  },
+                  "endDateTime": {
+                    "example": "2099-02-01T13:00:00.000Z"
+                  },
+                  "recurrence": {
+                    "example": 0,
+                    "type": "TINYINT(1)"
+                  },
+                  "freq": {
+                    "example": null,
+                    "type": "ENUM(DAILY, WEEKLY, MONTHLY, YEARLY)"
+                  },
+                  "interval": {
+                    "example": null,
+                    "type": "integer"
+                  },
+                  "byweekday": {
+                    "example": null,
+                    "type": "TEXT"
+                  },
+                  "until": {
+                    "example": null,
+                    "type": "DATETIME"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
             "description": "성공"
@@ -969,6 +1094,12 @@
         "summary": "그룹 일정 삭제",
         "tags": ["Group Schedule"],
         "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
           {
             "name": "schedule_id",
             "in": "path",
@@ -995,113 +1126,6 @@
         }
       }
     },
-    "/api/group/{group_id}/calendar": {
-      "post": {
-        "description": "",
-        "summary": "그룹 일정 등록",
-        "tags": ["Group Schedule"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "content": {
-                  "example": "string"
-                },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "로그인 실패"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
-      "get": {
-        "description": "",
-        "summary": "그룹 일정 조회",
-        "tags": ["Group Schedule"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "startDateTime",
-            "in": "query",
-            "type": "DATETIME"
-          },
-          {
-            "name": "endDateTime",
-            "in": "query",
-            "type": "DATETIME"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
     "/api/group/{group_id}/proposal": {
       "get": {
         "description": "",
@@ -1115,25 +1139,23 @@
             "type": "integer"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
             "name": "date1",
             "in": "query",
             "required": true,
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "example": "2099-01-01T00:00:00.000Z"
           },
           {
             "name": "date2",
             "in": "query",
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "example": "2099-02-01T00:00:00.000Z"
           },
           {
             "name": "date3",
             "in": "query",
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "example": "2099-03-01T00:00:00.000Z"
           }
         ],
         "responses": {
@@ -1169,11 +1191,6 @@
             "in": "query",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1201,28 +1218,28 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "content": {
-                  "example": "string"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "test-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "test-content",
+                    "type": "VARCHAR(1000)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
             "description": "성공"
@@ -1256,11 +1273,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1294,28 +1306,28 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "modified-title"
-                },
-                "content": {
-                  "example": "modified-content"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "modified-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "modified-content",
+                    "type": "VARCHAR(1000)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -1350,11 +1362,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1393,11 +1400,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1437,11 +1439,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1483,11 +1480,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1521,25 +1513,24 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "content": {
-                  "example": "test-comment"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "example": "test-comment",
+                    "type": "VARCHAR(250)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
             "description": "성공"
@@ -1579,11 +1570,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1623,25 +1609,24 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "content": {
-                  "example": "modified-comment"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "example": "modified-comment",
+                    "type": "VARCHAR(250)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -1682,11 +1667,6 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
           }
         ],
         "responses": {
@@ -1714,11 +1694,6 @@
         "summary": "최신 피드 조회",
         "tags": ["Feed"],
         "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
           {
             "name": "page",
             "in": "query",
@@ -1750,13 +1725,6 @@
         "description": "",
         "summary": "유저 그룹 조회",
         "tags": ["User"],
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
         "responses": {
           "200": {
             "description": "성공"
@@ -1775,23 +1743,26 @@
         "description": "",
         "summary": "유저 정보 수정",
         "tags": ["User"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "nickname": {
-                  "example": "string"
-                },
-                "email": {
-                  "example": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nickname": {
+                    "example": "modified-nick",
+                    "type": "VARCHAR(15)"
+                  },
+                  "email": {
+                    "example": "modified-email@email.com",
+                    "type": "VARCHAR(40)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -1819,20 +1790,22 @@
         "description": "",
         "summary": "유저 비밀번호 수정",
         "tags": ["User"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "password": {
-                  "example": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "password": {
+                    "example": "super_strong_password",
+                    "type": "VARCHAR(100)"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "성공"
@@ -1862,22 +1835,19 @@
             "name": "user_id",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
+            "type": "integer"
           },
           {
             "name": "startDateTime",
             "in": "query",
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "example": "2000-01-01T00:00:00.000Z"
           },
           {
             "name": "endDateTime",
             "in": "query",
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "example": "2100-01-01T00:00:00.000Z"
           }
         ],
         "responses": {
@@ -1899,44 +1869,125 @@
         "description": "",
         "summary": "유저 일정 등록",
         "tags": ["User Schedule"],
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "test-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "test-content",
+                    "type": "VARCHAR(300)"
+                  },
+                  "startDateTime": {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "endDateTime": {
+                    "example": "2099-01-01T13:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "recurrence": {
+                    "example": 0,
+                    "type": "TINYINT(1)"
+                  },
+                  "freq": {
+                    "example": null,
+                    "type": "ENUM(DAILY, WEEKLY, MONTHLY, YEARLY)"
+                  },
+                  "interval": {
+                    "example": null,
+                    "type": "integer"
+                  },
+                  "byweekday": {
+                    "example": null,
+                    "type": "TEXT"
+                  },
+                  "until": {
+                    "example": null,
+                    "type": "DATETIME"
+                  }
+                }
+              },
+              "examples": {
+                "non-recurrence" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
                 },
-                "content": {
-                  "example": "string"
+                "recurrence1" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": "",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
                 },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
+                "recurrence2" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": "",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시"
                 },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
+                "recurrence3" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": "MO,WE,FR",
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
                 },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
+                "recurrence4" : {
+                  "value": {
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": "",
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
             "description": "성공"
@@ -1962,11 +2013,6 @@
         "summary": "유저 일정 단일 조회",
         "tags": ["User Schedule"],
         "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
           {
             "name": "schedule_id",
             "in": "path",
@@ -2002,44 +2048,56 @@
             "in": "path",
             "required": true,
             "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "title": {
-                  "example": "string"
-                },
-                "content": {
-                  "example": "string"
-                },
-                "startDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "endDateTime": {
-                  "example": "2099-01-01T12:00:00.000Z"
-                },
-                "recurrence": {
-                  "example": "tinyint(1)"
-                },
-                "freq": {
-                  "example": "DAILY, WEEKLY, MONTHLY, YEARLY"
-                },
-                "interval": {
-                  "example": "integer"
-                },
-                "byweekday": {
-                  "example": "MO,TU,WE,TH,FR,SA,SU"
-                },
-                "until": {
-                  "example": "2099-01-01T12:00:00.000Z"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "example": "modified-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "modified-content",
+                    "type": "VARCHAR(300)"
+                  },
+                  "startDateTime": {
+                    "example": "2099-02-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "endDateTime": {
+                    "example": "2099-02-01T13:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "recurrence": {
+                    "example": 0,
+                    "type": "TINYINT(1)"
+                  },
+                  "freq": {
+                    "example": null,
+                    "type": "ENUM(DAILY, WEEKLY, MONTHLY, YEARLY)"
+                  },
+                  "interval": {
+                    "example": null,
+                    "type": "integer"
+                  },
+                  "byweekday": {
+                    "example": null,
+                    "type": "TEXT"
+                  },
+                  "until": {
+                    "example": null,
+                    "type": "DATETIME"
+                  }
                 }
               }
             }
           }
-        ],
+        },
         "responses": {
           "201": {
             "description": "성공"
@@ -2099,7 +2157,7 @@
             "name": "group_id",
             "in": "path",
             "required": true,
-            "type": "string"
+            "type": "integer"
           }
         ],
         "responses": {
@@ -2122,266 +2180,300 @@
       }
     }
   },
-  "definitions": {
-    "Users": {
-      "type": "object",
-      "required": [
-        "email",
-        "nickname",
-        "password"
-      ],
-      "properties": {
-        "userId": {
-          "type": "BIGINT"
+  "components": {
+    "schemas": {
+      "Users": {
+        "type": "object",
+        "required": [
+          "email",
+          "nickname",
+          "password"
+        ],
+        "properties": {
+          "userId": {
+            "type": "BIGINT"
+          },
+          "email": {
+            "type": "VARCHAR(40)"
+          },
+          "nickname": {
+            "type": "VARCHAR(15)"
+          },
+          "password": {
+            "type": "VARCHAR(100)"
+          },
+          "provider": {
+            "type": "ENUM('local', 'naver', 'google')"
+          },
+          "snsId": {
+            "type": "VARCHAR(100)"
+          },
+          "createdAt": {
+            "type": "DATETIME"
+          },
+          "updatedAt": {
+            "type": "DATETIME"
+          },
+          "deletedAt": {
+            "type": "DATETIME"
+          }
         },
-        "email": {
-          "type": "VARCHAR(40)"
-        },
-        "nickname": {
-          "type": "VARCHAR(15)"
-        },
-        "password": {
-          "type": "VARCHAR(100)"
-        },
-        "provider": {
-          "type": "ENUM('local', 'naver', 'google')"
-        },
-        "snsId": {
-          "type": "VARCHAR(100)"
-        },
-        "createdAt": {
-          "type": "DATETIME"
-        },
-        "updatedAt": {
-          "type": "DATETIME"
-        },
-        "deletedAt": {
-          "type": "DATETIME"
+        "xml": {
+          "name": "users"
         }
       },
-      "xml": {
-        "name": "users"
-      }
-    },
-    "Groups": {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "groupId": {
-          "type": "BIGINT"
+      "Groups": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "groupId": {
+            "type": "BIGINT"
+          },
+          "name": {
+            "type": "VARCHAR(45)"
+          },
+          "description": {
+            "type": "TEXT"
+          },
+          "member": {
+            "type": "INT"
+          },
+          "leader": {
+            "type": "INT"
+          },
+          "inviteCode": {
+            "type": "TEXT"
+          },
+          "inviteExp": {
+            "type": "DATETIME"
+          },
+          "isPublicGroup": {
+            "type": "TINYINT(1)"
+          }
         },
-        "name": {
-          "type": "VARCHAR(45)"
-        },
-        "member": {
-          "type": "INT"
-        },
-        "leader": {
-          "type": "INT"
+        "xml": {
+          "name": "Groups"
         }
       },
-      "xml": {
-        "name": "Groups"
-      }
-    },
-    "PersonalSchedule": {
-      "type": "object",
-      "required": [
-        "userId",
-        "title",
-        "startDateTime",
-        "endDateTime",
-        "recurrence"
-      ],
-      "properties": {
-        "id": {
-          "type": "BIGINT"
+      "PersonalSchedule": {
+        "type": "object",
+        "required": [
+          "userId",
+          "title",
+          "startDateTime",
+          "endDateTime",
+          "recurrence"
+        ],
+        "properties": {
+          "id": {
+            "type": "BIGINT"
+          },
+          "userId": {
+            "type": "BIGINT"
+          },
+          "title": {
+            "type": "VARCHAR(45)"
+          },
+          "content": {
+            "type": "TEXT"
+          },
+          "startDateTime": {
+            "type": "DATETIME"
+          },
+          "endDateTime": {
+            "type": "DATETIME"
+          },
+          "recurrence": {
+            "type": "TINYINT(1)"
+          },
+          "freq": {
+            "type": "VARCHAR(10)"
+          },
+          "interval": {
+            "type": "integer"
+          },
+          "byweekday": {
+            "type": "TEXT"
+          },
+          "until": {
+            "type": "DATETIME"
+          }
         },
-        "userId": {
-          "type": "BIGINT"
-        },
-        "title": {
-          "type": "VARCHAR(45)"
-        },
-        "content": {
-          "type": "TEXT"
-        },
-        "startDateTime": {
-          "type": "DATETIME"
-        },
-        "endDateTime": {
-          "type": "DATETIME"
-        },
-        "recurrence": {
-          "type": "TINYINT(1)"
-        },
-        "freq": {
-          "type": "STRING(10)"
-        },
-        "interval": {
-          "type": "integer"
-        },
-        "byweekday": {
-          "type": "TEXT"
-        },
-        "until": {
-          "type": "DATETIME"
+        "xml": {
+          "name": "PersonalSchedule"
         }
       },
-      "xml": {
-        "name": "PersonalSchedule"
-      }
-    },
-    "GroupSchedule": {
-      "type": "object",
-      "required": [
-        "groupId",
-        "title",
-        "startDateTime",
-        "endDateTime",
-        "recurrence"
-      ],
-      "properties": {
-        "id": {
-          "type": "BIGINT"
+      "GroupSchedule": {
+        "type": "object",
+        "required": [
+          "groupId",
+          "title",
+          "startDateTime",
+          "endDateTime",
+          "recurrence"
+        ],
+        "properties": {
+          "id": {
+            "type": "BIGINT"
+          },
+          "groupId": {
+            "type": "BIGINT"
+          },
+          "title": {
+            "type": "VARCHAR(45)"
+          },
+          "content": {
+            "type": "TEXT"
+          },
+          "startDateTime": {
+            "type": "DATETIME"
+          },
+          "endDateTime": {
+            "type": "DATETIME"
+          },
+          "recurrence": {
+            "type": "TINYINT(1)"
+          },
+          "freq": {
+            "type": "VARCHAR(10)"
+          },
+          "interval": {
+            "type": "integer"
+          },
+          "byweekday": {
+            "type": "TEXT"
+          },
+          "until": {
+            "type": "DATETIME"
+          }
         },
-        "groupId": {
-          "type": "BIGINT"
-        },
-        "title": {
-          "type": "VARCHAR(45)"
-        },
-        "content": {
-          "type": "TEXT"
-        },
-        "startDateTime": {
-          "type": "DATETIME"
-        },
-        "endDateTime": {
-          "type": "DATETIME"
-        },
-        "recurrence": {
-          "type": "TINYINT(1)"
-        },
-        "freq": {
-          "type": "STRING(10)"
-        },
-        "interval": {
-          "type": "integer"
-        },
-        "byweekday": {
-          "type": "TEXT"
-        },
-        "until": {
-          "type": "DATETIME"
+        "xml": {
+          "name": "GroupSchedule"
         }
       },
-      "xml": {
-        "name": "GroupSchedule"
-      }
-    },
-    "UserGroup": {
-      "type": "object",
-      "required": [
-        "userId",
-        "groupId"
-      ],
-      "properties": {
-        "groupId": {
-          "type": "BIGINT"
+      "UserGroup": {
+        "type": "object",
+        "required": [
+          "userId",
+          "groupId"
+        ],
+        "properties": {
+          "groupId": {
+            "type": "BIGINT"
+          },
+          "userId": {
+            "type": "BIGINT"
+          },
+          "sharePersonalEvent": {
+            "type": "TINYINT(1)"
+          },
+          "isPendingMember": {
+            "type": "TINYINT(1)"
+          },
+          "accessLevel": {
+            "type": "ENUM('viewer', 'regular', 'admin', 'owner')"
+          }
         },
-        "userId": {
-          "type": "BIGINT"
-        },
-        "sharePersonalEvent": {
-          "type": "TINYINT(1)"
-        },
-        "isPendingMember": {
-          "type": "TINYINT(1)"
+        "xml": {
+          "name": "UserGroup"
         }
       },
-      "xml": {
-        "name": "UserGroup"
-      }
-    },
-    "Post": {
-      "type": "object",
-      "required": [
-        "groupId",
-        "userId",
-        "title",
-        "author"
-      ],
-      "properties": {
-        "postId": {
-          "type": "BIGINT"
+      "Post": {
+        "type": "object",
+        "required": [
+          "groupId",
+          "userId",
+          "title",
+          "author"
+        ],
+        "properties": {
+          "postId": {
+            "type": "BIGINT"
+          },
+          "groupId": {
+            "type": "BIGINT"
+          },
+          "userId": {
+            "type": "BIGINT"
+          },
+          "title": {
+            "type": "VARCHAR(45)"
+          },
+          "author": {
+            "type": "VARCHAR(45)"
+          }
         },
-        "groupId": {
-          "type": "BIGINT"
-        },
-        "userId": {
-          "type": "BIGINT"
-        },
-        "title": {
-          "type": "VARCHAR(45)"
-        },
-        "author": {
-          "type": "VARCHAR(45)"
+        "xml": {
+          "name": "Post"
         }
       },
-      "xml": {
-        "name": "Post"
-      }
-    },
-    "PostDetail": {
-      "type": "object",
-      "required": [
-        "postId",
-        "content"
-      ],
-      "properties": {
-        "postDetailId": {
-          "type": "BIGINT"
+      "PostDetail": {
+        "type": "object",
+        "required": [
+          "postId",
+          "content"
+        ],
+        "properties": {
+          "postDetailId": {
+            "type": "BIGINT"
+          },
+          "postId": {
+            "type": "BIGINT"
+          },
+          "content": {
+            "type": "TEXT"
+          }
         },
-        "postId": {
-          "type": "BIGINT"
-        },
-        "content": {
-          "type": "TEXT"
+        "xml": {
+          "name": "PostDetail"
         }
       },
-      "xml": {
-        "name": "PostDetail"
-      }
-    },
-    "Comment": {
-      "type": "object",
-      "required": [
-        "userId",
-        "postId",
-        "content"
-      ],
-      "properties": {
-        "commentId": {
-          "type": "BIGINT"
+      "Comment": {
+        "type": "object",
+        "required": [
+          "userId",
+          "postId",
+          "content"
+        ],
+        "properties": {
+          "commentId": {
+            "type": "BIGINT"
+          },
+          "userId": {
+            "type": "BIGINT"
+          },
+          "postId": {
+            "type": "BIGINT"
+          },
+          "content": {
+            "type": "VARCHAR(250)"
+          },
+          "depth": {
+            "type": "integer"
+          }
         },
-        "userId": {
-          "type": "BIGINT"
-        },
-        "postId": {
-          "type": "BIGINT"
-        },
-        "content": {
-          "type": "TEXT"
-        },
-        "depth": {
-          "type": "integer"
+        "xml": {
+          "name": "Comment"
         }
       },
-      "xml": {
-        "name": "Comment"
+      "like": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "BIGINT"
+          },
+          "userId": {
+            "type": "BIGINT"
+          },
+          "postId": {
+            "type": "BIGINT"
+          }
+        },
+        "xml": {
+          "name": "Like"
+        }
       }
     }
   }

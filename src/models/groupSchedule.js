@@ -179,6 +179,9 @@ class GroupSchedule extends Sequelize.Model {
           });
         }
       });
+      if (earliestDate === Number.MAX_SAFE_INTEGER) {
+        earliestDate = null;
+      }
       return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
       throw new ApiError();

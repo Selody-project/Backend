@@ -21,7 +21,16 @@ const {
 async function getUserProfile(req, res, next) {
   try {
     const user = await User.findOne({ where: { nickname: req.nickname } });
-    return res.status(200).json({ user });
+    return res.status(200).json({
+      user: {
+        userId: user.userId,
+        email: user.email,
+        nickname: user.nickname,
+        provider: user.provider,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
   } catch (err) {
     return next(new ApiError());
   }

@@ -110,7 +110,6 @@ async function getUserPersonalSchedule(req, res, next) {
       ];
       return res.status(200).json(event);
     }
-
     return res.status(200).json(userEvent);
   } catch (err) {
     return next(new ApiError());
