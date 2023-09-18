@@ -10,7 +10,7 @@ const {
 } = require('../middleware/token');
 
 const {
-  getUserProfile, withdrawal,
+  withdrawal,
 } = require('../controllers/user');
 
 const router = express.Router();
@@ -21,7 +21,7 @@ router.delete('/logout', verifyToken, logout);
 router.post('/naver', getNaverUserInfo, joinSocialUser, createToken);
 router.post('/google', getGoogleUserInfo, createToken);
 router.get('/token/refresh', renewToken);
-router.get('/token/verify', verifyToken, getUserProfile);
+router.get('/token/verify', verifyToken, (req, res) => { res.status(200).end(); });
 router.delete('/withdrawal/:user_id', withdrawal);
 
 module.exports = router;
