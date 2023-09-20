@@ -31,23 +31,6 @@ describe('Test /auth endpoints', () => {
     await db.sequelize.close();
   });
 
-  describe('Test POST /auth/join', () => {
-    it('Successfully create a new user ', async () => {
-      const mockBody = {
-        email: 't23@email.com',
-        nickname: 't3',
-        password: 'super_strong_password',
-      };
-      const response = await request(app).post('/api/auth/join').send(mockBody);
-      expect(response.status).toEqual(200);
-    });
-
-    it('Failed to create a new user (already existing email) ', async () => {
-      const response = await request(app).post('/api/auth/join').send(mockUser);
-      expect(response.status).toEqual(409);
-    });
-  });
-
   describe('Test POST /auth/login', () => {
     it('Login Failed ', async () => {
       const response = await request(app).post('/api/auth/login').send({

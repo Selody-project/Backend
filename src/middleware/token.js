@@ -35,19 +35,19 @@ const token = () => ({
 // nickname을 이용해 발급하므로 해당 미들웨어를 이용할 때, req에 nickname을 전달해줘야함.
 async function createToken(req, res, next) {
   try {
-    const { nickname } = req;
-    const accessToken = token().access(nickname);
-    const refreshToken = token().access(nickname);
+    const { user } = req;
+    const accessToken = token().access(user.nickname);
+    const refreshToken = token().access(user.nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
-    const user = await User.findOne({ where: { nickname } });
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
       userId: user.userId,
       email: user.email,
-      nickname,
+      nickname: user.nickname,
       provider: user.provider,
       snsId: user.snsId,
+      profileImage: user.profileImage,
     });
   } catch (error) {
     return next(new ApiError());
@@ -62,7 +62,7 @@ function verifyToken(req, res, next) {
       return next(new InvalidTokenError());
     }
     req.nickname = jwt.verify(authToken, ACCESS_SECRET_KEY).nickname;
-    return next();
+    next();
   } catch (err) {
     if (err.name === 'TokenExpireError') {
       return next(new TokenExpireError());

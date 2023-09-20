@@ -9,6 +9,7 @@ dotenv.config();
 
 const cors = require('cors');
 const swaggerUi = require('swagger-ui-express');
+const fileUpload = require('express-fileupload');
 const { config } = require('./config/config');
 
 const apiError = require('./middleware/apiError');
@@ -21,6 +22,8 @@ const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 
 const app = express();
+
+app.use(fileUpload());
 
 app.use('/api/', rateLimit({
   windowMs: 1 * 60 * 1000,

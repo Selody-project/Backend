@@ -1,5 +1,6 @@
 const express = require('express');
 const { createToken } = require('../middleware/token');
+const { uploadMiddleware } = require('../middleware/s3');
 
 // User
 const {
@@ -13,8 +14,9 @@ const {
   getUserPersonalSchedule, getSingleUserSchedule,
   postPersonalSchedule, putPersonalSchedule, deletePersonalSchedule,
 } = require('../controllers/personalSchedule');
-
-const { deleteGroupUser } = require('../controllers/group');
+const {
+  deleteGroupUser,
+} = require('../controllers/group');
 
 // Feed
 const {
@@ -26,7 +28,7 @@ const router = express.Router();
 // User
 router.get('/group', getUserGroup);
 router.delete('/group/:group_id', deleteGroupUser);
-router.patch('/profile', patchUserProfile, createToken);
+router.patch('/profile', uploadMiddleware, patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);
 router.patch('/userSetup/:user_id', updateUserSetUp);
 router.get('/userSetup', getUserSetup);

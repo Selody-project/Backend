@@ -58,7 +58,7 @@ function getKey(header, callback) {
 
 async function getGoogleUserInfo(req, res, next) {
   try {
-    const { accessToken } = req.body;
+    const { access_token: accessToken } = req.body;
     if (!accessToken) throw new InvalidTokenError();
 
     jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
@@ -70,15 +70,16 @@ async function getGoogleUserInfo(req, res, next) {
 
       const user = await User.findOne({ where: { email: userEmail } });
       if (!user) {
-        await User.create({
+        req.user = await User.create({
           email: userEmail,
           nickname,
           provider: 'GOOGLE',
+          profileImage: decoded.picture,
         });
-        req.nickname = nickname;
       } else {
-        req.nickname = user.nickname;
-      } 
+        user.profileImage = decoded.picture;
+        req.user = user;
+      }
       next();
     });
   } catch (err) {
@@ -98,15 +99,16 @@ async function joinSocialUser(req, res, next) {
     const user = await User.findOne({ where: { email: req.body.email } });
     if (!user) {
       const nickname = `naver-${req.body.id}`.slice(0, 15);
-      await User.create({
+      req.user = await User.create({
         email: req.body.email,
         nickname,
         provider: 'NAVER',
         snsId: req.body.id,
+        profileImage: req.body.profile_image,
       });
-      req.nickname = nickname;
     } else {
-      req.nickname = user.nickname;
+      user.profileImage = req.body.profile_image;
+      req.user = user;
     }
     next();
   } catch (err) {
@@ -139,7 +141,7 @@ async function join(req, res, next) {
   if (email && nickname && password) {
     try {
       const hash = await bcrypt.hash(password, 12);
-      await User.create({
+      req.user = await User.create({
         email,
         nickname,
         password: hash,
@@ -171,7 +173,7 @@ async function login(req, res, next) {
 
     const result = await bcrypt.compare(password, user.password);
     if (result) {
-      req.nickname = user.nickname;
+      req.user = user;
       return next();
     }
 

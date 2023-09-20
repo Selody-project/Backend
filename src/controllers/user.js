@@ -1,5 +1,6 @@
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
+const { deleteBucketImage } = require('../middleware/s3');
 
 // Model
 const User = require('../models/user');
@@ -18,24 +19,6 @@ const {
   validateProfileSchema, validateUserIdSchema, validatePasswordSchema,
 } = require('../utils/validators');
 
-async function getUserProfile(req, res, next) {
-  try {
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    return res.status(200).json({
-      user: {
-        userId: user.userId,
-        email: user.email,
-        nickname: user.nickname,
-        provider: user.provider,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-      },
-    });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
 async function getUserGroup(req, res, next) {
   try {
     const user = await User.findOne({ where: { nickname: req.nickname } });
@@ -48,15 +31,19 @@ async function getUserGroup(req, res, next) {
 
 async function patchUserProfile(req, res, next) {
   try {
+    if (!req.body.data) {
+      throw (new DataFormatError());
+    }
+    req.body = JSON.parse(req.body.data);
+
     const { error: bodyError } = validateProfileSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const user = await User.findOne({ where: { nickname: req.nickname } });
-
     if (!user) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     const { nickname, email } = req.body;
@@ -74,13 +61,24 @@ async function patchUserProfile(req, res, next) {
       },
     });
     if (duplicate.length > 0) {
-      return next(new DuplicateUserError());
+      throw (new DuplicateUserError());
     }
-    await user.update({ nickname, email });
+    const previousProfileImage = user.profileImage;
+    if (req.fileUrl !== null) {
+      await user.update({ nickname, email, profileImage: req.fileUrl });
+      await deleteBucketImage(previousProfileImage);
+    } else {
+      await user.update({ nickname, email });
+    }
     req.nickname = nickname;
+    req.user = user;
     next();
   } catch (err) {
-    return next(new ApiError());
+    await deleteBucketImage(req.fileUrl);
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -105,6 +103,7 @@ async function patchUserPassword(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
@@ -180,7 +179,6 @@ async function updateUserSetUp(req, res, next) {
 }
 
 module.exports = {
-  getUserProfile,
   getUserGroup,
   patchUserProfile,
   patchUserPassword,

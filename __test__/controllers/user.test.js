@@ -89,32 +89,19 @@ describe('Test /api/user endpoints', () => {
     it('Successfully modified user profile ', async () => {
       const newNickname = 'newNickname';
       const newEmail = 'newEmail@email.com';
-      let res = await request(app).patch('/api/user/profile').set('Cookie', cookie).send({
-        nickname: newNickname,
+      const data = `{\"nickname\": \"${newNickname}\", \"email\": \"${newEmail}\"}`;
+      const res = await request(app).patch('/api/user/profile').set('Cookie', cookie).field('data', data);
+      const expectedResult = {
         email: newEmail,
-      });
-
-      // eslint-disable-next-line prefer-destructuring
-      const newCookie = res.headers['set-cookie'][0];
-      expect(res.status).toEqual(200);
-
-      res = await request(app).get('/api/auth/token/verify').set('Cookie', newCookie).send();
-      delete res.body.user.createdAt;
-      delete res.body.user.deletedAt;
-      delete res.body.user.updatedAt;
-      delete res.body.user.password;
-
-      const expectedProfile = {
-        user: {
-          email: 'newEmail@email.com',
-          nickname: newNickname,
-          provider: 'local',
-          userId: 1,
-        },
+        message: 'JWT 발급에 성공하였습니다',
+        nickname: newNickname,
+        profileImage: 'profileImageLink',
+        provider: 'local',
+        snsId: null,
+        userId: 1,
       };
-
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedProfile);
+      expect(res.body).toEqual(expectedResult);
     });
   });
 
