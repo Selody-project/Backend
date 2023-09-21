@@ -1,8 +1,5 @@
 const request = require('request');
 const bcrypt = require('bcrypt');
-const { Sequelize } = require('sequelize');
-
-const { Op } = Sequelize;
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
 
@@ -12,7 +9,8 @@ const User = require('../models/user');
 // Error
 const {
   ApiError, DataFormatError,
-  DuplicateUserError, InvalidIdPasswordError, InvalidTokenError,
+  DuplicateEmailError, DuplicateNicknameError,
+  InvalidIdPasswordError, InvalidTokenError,
   TokenExpireError,
 } = require('../errors');
 
@@ -126,17 +124,18 @@ async function join(req, res, next) {
   }
 
   const { email, nickname, password } = req.body;
-  let options;
-  if (email && !nickname) {
-    options = { where: { email } };
-  } else if (!email && nickname) {
-    options = { where: { nickname } };
-  } else {
-    options = { where: { [Op.or]: [{ email }, { nickname }] } };
+
+  if (nickname) {
+    const user = await User.findOne({ where: { nickname } });
+    if (user) {
+      return next(new DuplicateNicknameError());
+    }
   }
-  const user = await User.findOne(options);
-  if (user) {
-    return next(new DuplicateUserError());
+  if (email) {
+    const user = await User.findOne({ where: { email } });
+    if (user) {
+      return next(new DuplicateEmailError());
+    }
   }
   if (email && nickname && password) {
     try {

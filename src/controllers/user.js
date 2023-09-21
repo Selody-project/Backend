@@ -11,7 +11,8 @@ const PersonalSchedule = require('../models/personalSchedule');
 // Error
 const {
   ApiError, DataFormatError,
-  UserNotFoundError, DuplicateUserError, UserIsLeaderError, BelongToGroupError,
+  UserNotFoundError, UserIsLeaderError, BelongToGroupError,
+  DuplicateNicknameError, DuplicateEmailError,
 } = require('../errors');
 
 // Validator
@@ -43,22 +44,21 @@ async function patchUserProfile(req, res, next) {
 
     const { nickname, email } = req.body;
     const { user } = req;
-    const duplicate = await User.findAll({
-      where: {
-        [Op.and]: [
-          {
-            [Op.or]: [
-              { nickname },
-              { email },
-            ],
-          },
-          { userId: { [Op.not]: user.userId } },
-        ],
-      },
+
+    const nicknameDuplicate = await User.findAll({
+      where: { userId: { [Op.not]: user.userId }, nickname },
     });
-    if (duplicate.length > 0) {
-      throw (new DuplicateUserError());
+    if (nicknameDuplicate.length !== 0) {
+      throw (new DuplicateNicknameError());
     }
+
+    const emailDuplicate = await User.findAll({
+      where: { userId: { [Op.not]: user.userId }, email },
+    });
+    if (emailDuplicate.length !== 0) {
+      throw (new DuplicateEmailError());
+    }
+
     const previousProfileImage = user.profileImage;
     if (req.fileUrl !== null) {
       await user.update({ nickname, email, profileImage: req.fileUrl });
@@ -94,7 +94,6 @@ async function patchUserPassword(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
