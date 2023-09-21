@@ -7,7 +7,6 @@ const {
 } = require('../utils/accessLevel');
 
 // Model
-const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const Group = require('../models/group');
 const GroupSchedule = require('../models/groupSchedule');
@@ -16,7 +15,7 @@ const UserGroup = require('../models/userGroup');
 // Error
 const {
   DataFormatError, ApiError,
-  UserNotFoundError, ScheduleNotFoundError, GroupNotFoundError, EditPermissionError,
+  ScheduleNotFoundError, GroupNotFoundError, EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -36,10 +35,8 @@ async function postGroupSchedule(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
@@ -86,16 +83,11 @@ async function getSingleGroupSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId, group_id: groupId } = req.params;
-
-    const [user, group, schedule] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
       GroupSchedule.findByPk(scheduleId),
     ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -104,6 +96,7 @@ async function getSingleGroupSchedule(req, res, next) {
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
+
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, schedule });
   } catch (err) {
@@ -120,14 +113,8 @@ async function getGroupSchedule(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -177,15 +164,11 @@ async function putGroupSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId, group_id: groupId } = req.params;
-    const [user, group, schedule] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
       GroupSchedule.findByPk(scheduleId),
     ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -215,15 +198,11 @@ async function deleteGroupSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId, group_id: groupId } = req.params;
-    const [user, group, schedule] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
       GroupSchedule.findByPk(scheduleId),
     ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -256,14 +235,8 @@ async function getEventProposal(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());

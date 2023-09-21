@@ -21,7 +21,7 @@ const {
 
 async function getUserGroup(req, res, next) {
   try {
-    const user = await User.findOne({ where: { nickname: req.nickname } });
+    const { user } = req;
     const groupList = await user.getGroups();
     return res.status(200).json({ groupList });
   } catch (err) {
@@ -31,7 +31,7 @@ async function getUserGroup(req, res, next) {
 
 async function patchUserProfile(req, res, next) {
   try {
-    if (!req.body.data) {
+    if (!req.body?.data) {
       throw (new DataFormatError());
     }
     req.body = JSON.parse(req.body.data);
@@ -41,12 +41,8 @@ async function patchUserProfile(req, res, next) {
       throw (new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    if (!user) {
-      throw (new UserNotFoundError());
-    }
-
     const { nickname, email } = req.body;
+    const { user } = req;
     const duplicate = await User.findAll({
       where: {
         [Op.and]: [
@@ -90,12 +86,7 @@ async function patchUserPassword(req, res, next) {
     }
 
     const { password } = req.body;
-
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
 
     await user.update({
       password: await bcrypt.hash(password, 12),
@@ -103,7 +94,6 @@ async function patchUserPassword(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
-    console.log(err);
     return next(new ApiError());
   }
 }
@@ -159,8 +149,8 @@ async function updateUserSetUp(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
     const { updatedSharePersonalEvent } = req.body;
+    const { user } = req;
 
     const updatePromises = updatedSharePersonalEvent.map(async (groupSetup) => {
       const { groupId, sharePersonalEvent } = groupSetup;
