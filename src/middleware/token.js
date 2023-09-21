@@ -6,7 +6,7 @@ const User = require('../models/user');
 // Error
 const {
   ApiError,
-  TokenExpireError, InvalidTokenError,
+  TokenExpireError, InvalidTokenError, UserNotFoundError,
 } = require('../errors');
 
 const ACCESS_SECRET_KEY = process.env.JWT_SECRET;
@@ -55,13 +55,20 @@ async function createToken(req, res, next) {
 }
 
 // jwt 검증
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   try {
     const authToken = req.cookies.accessToken;
     if (!authToken) {
       return next(new InvalidTokenError());
     }
+
     req.nickname = jwt.verify(authToken, ACCESS_SECRET_KEY).nickname;
+    const user = await User.findOne({ where: { nickname: req.nickname } });
+
+    if (!user) {
+      return next(new UserNotFoundError());
+    }
+    req.user = user;
     next();
   } catch (err) {
     if (err.name === 'TokenExpireError') {

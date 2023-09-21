@@ -1,14 +1,14 @@
 const moment = require('moment');
+const { isMine } = require('../utils/accessLevel');
 
 // Model
-const User = require('../models/user');
 const PersonalSchedule = require('../models/personalSchedule');
 const GroupSchedule = require('../models/groupSchedule');
 
 // Error
 const {
   ApiError, DataFormatError,
-  UserNotFoundError, ScheduleNotFoundError, NotFoundError,
+  ScheduleNotFoundError, NotFoundError,
   EditPermissionError,
 } = require('../errors');
 
@@ -24,11 +24,7 @@ async function postPersonalSchedule(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
 
     const {
       title, content, startDateTime, endDateTime,
@@ -62,10 +58,15 @@ async function getSingleUserSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId } = req.params;
+    const { user } = req;
     const schedule = await PersonalSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
+    }
+
+    if (!isMine(user, schedule)) {
+      return next(new EditPermissionError());
     }
 
     return res.status(200).json(schedule);
@@ -81,10 +82,7 @@ async function getUserPersonalSchedule(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
 
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
@@ -126,16 +124,14 @@ async function putPersonalSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId } = req.params;
-    const [user, schedule] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      PersonalSchedule.findByPk(scheduleId),
-    ]);
+    const { user } = req;
+    const schedule = await PersonalSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
     }
 
-    if (user.userId !== schedule.userId) {
+    if (!isMine(user, schedule)) {
       return next(new EditPermissionError());
     }
 
@@ -154,16 +150,14 @@ async function deletePersonalSchedule(req, res, next) {
     }
 
     const { schedule_id: scheduleId } = req.params;
-    const [schedule, user] = await Promise.all([
-      PersonalSchedule.findByPk(scheduleId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const schedule = await PersonalSchedule.findByPk(scheduleId);
 
     if (!schedule) {
       return next(new NotFoundError());
     }
 
-    if (user.userId !== schedule.userId) {
+    if (!isMine(user, schedule)) {
       return next(new EditPermissionError());
     }
 

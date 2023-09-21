@@ -9,7 +9,6 @@ const {
 } = require('../utils/accessLevel');
 
 // Model
-const User = require('../models/user');
 const Group = require('../models/group');
 const Post = require('../models/post');
 const PostDetail = require('../models/postDetail');
@@ -19,7 +18,7 @@ const Like = require('../models/like');
 // Error
 const {
   DataFormatError, ApiError,
-  UserNotFoundError, GroupNotFoundError, PostNotFoundError, CommentNotFoundError,
+  GroupNotFoundError, PostNotFoundError, CommentNotFoundError,
   EditPermissionError, DuplicateLikeError,
 } = require('../errors');
 
@@ -40,17 +39,11 @@ async function postGroupPost(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [group, user] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
@@ -79,15 +72,11 @@ async function getSinglePost(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [user, group, post] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
     ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -130,14 +119,8 @@ async function getGroupPosts(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -194,9 +177,9 @@ async function putGroupPost(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, user, post] = await Promise.all([
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
       Post.findByPk(postId),
     ]);
 
@@ -230,9 +213,9 @@ async function deleteGroupPost(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, user, post] = await Promise.all([
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
       Post.findByPk(postId),
     ]);
 
@@ -267,18 +250,14 @@ async function postGroupPostLike(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, user, post] = await Promise.all([
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId, { transaction }),
-      User.findOne({ where: { nickname: req.nickname }, transaction }),
       Post.findByPk(postId, { transaction }),
     ]);
 
     if (!group) {
       throw (new GroupNotFoundError());
-    }
-
-    if (!user) {
-      throw (new UserNotFoundError());
     }
 
     if (!post) {
@@ -328,18 +307,14 @@ async function deleteGroupPostLike(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, user, post] = await Promise.all([
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId, { transaction }),
-      User.findOne({ where: { nickname: req.nickname }, transaction }),
       Post.findByPk(postId, { transaction }),
     ]);
 
     if (!group) {
       throw (new GroupNotFoundError());
-    }
-
-    if (!user) {
-      throw (new UserNotFoundError());
     }
 
     if (!post) {
@@ -386,18 +361,14 @@ async function postComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [group, user, post] = await Promise.all([
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
       Post.findByPk(postId),
     ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
     }
 
     if (!post) {
@@ -427,8 +398,8 @@ async function getSingleComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
-    const [user, group, post, comment] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
       Comment.findByPk(commentId),
@@ -463,8 +434,8 @@ async function getPostComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
-    const [user, group, post] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
+    const { user } = req;
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
     ]);
@@ -505,9 +476,9 @@ async function putComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
-    const [group, user, post, comment] = await Promise.all([
+    const { user } = req;
+    const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
       Post.findByPk(postId),
       Comment.findByPk(commentId),
     ]);
@@ -545,19 +516,15 @@ async function deleteComment(req, res, next) {
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
-    const [group, user, post, comment] = await Promise.all([
+    const { user } = req;
+    const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
       Post.findByPk(postId),
       Comment.findByPk(commentId),
     ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
     }
 
     if (!post) {
@@ -588,12 +555,7 @@ async function getUserFeed(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
-
+    const { user } = req;
     const groups = (await user.getGroups()).map((group) => group.groupId);
 
     const { page } = req.query;

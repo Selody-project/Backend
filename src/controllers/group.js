@@ -29,12 +29,8 @@ async function postGroup(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
-
     const { name, description } = req.body;
+    const { user } = req;
     const group = await Group.create({
       name, description, member: 1, leader: user.userId,
     });
@@ -53,11 +49,8 @@ async function getGroupInfo(req, res, next) {
     if (error) return next(new DataFormatError());
 
     const { group_id: groupId } = req.params;
-
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -87,10 +80,8 @@ async function getGroupDetail(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -154,10 +145,8 @@ async function putGroup(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [group, user] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -185,17 +174,11 @@ async function deleteGroup(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [group, user] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
@@ -218,13 +201,8 @@ async function deleteGroupUser(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [group, user] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -337,18 +315,11 @@ async function postGroupJoinRequest(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-
-    const [group, user] = await Promise.all([
-      Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!user) {
-      return next(new UserNotFoundError());
     }
 
     await group.addUser(user, { through: { isPendingMember: 1 } });
@@ -366,18 +337,18 @@ async function postGroupJoinApprove(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const { group_id: groupId, user_id: userId } = req.params;
-
-    const [group, user] = await Promise.all([
+    const { group_id: groupId, user_id: applicantId } = req.params;
+    const { user } = req;
+    const [group, applicant] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
+      User.findByPk(applicantId),
     ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (!user) {
+    if (!applicant) {
       return next(new UserNotFoundError());
     }
 
@@ -386,7 +357,7 @@ async function postGroupJoinApprove(req, res, next) {
       return next(new UnauthorizedError());
     }
 
-    await UserGroup.update({ isPendingMember: 0 }, { where: { userId } });
+    await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId } });
     await group.update({ member: (group.member + 1) });
 
     return res.status(200).json({ message: 'Successfully approved the membership registration. ' });
@@ -402,18 +373,18 @@ async function postGroupJoinReject(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const { group_id: groupId, user_id: userId } = req.params;
-
-    const [group, user] = await Promise.all([
+    const { group_id: groupId, user_id: applicantId } = req.params;
+    const { user } = req;
+    const [group, applicant] = await Promise.all([
       Group.findByPk(groupId),
-      User.findOne({ where: { nickname: req.nickname } }),
+      User.findByPk(applicantId),
     ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (!user) {
+    if (!applicant) {
       return next(new UserNotFoundError());
     }
 
@@ -422,7 +393,7 @@ async function postGroupJoinReject(req, res, next) {
       return next(new UnauthorizedError());
     }
 
-    await UserGroup.destroy({ where: { userId } });
+    await UserGroup.destroy({ where: { userId: applicantId } });
 
     return res.status(200).json({ message: 'Successfully rejected the membership request. ' });
   } catch (err) {
@@ -438,10 +409,8 @@ async function getInviteLink(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -469,10 +438,8 @@ async function postInviteLink(req, res, next) {
     }
 
     const { group_id: groupId } = req.params;
-    const [user, group] = await Promise.all([
-      User.findOne({ where: { nickname: req.nickname } }),
-      Group.findByPk(groupId),
-    ]);
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -521,10 +488,8 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     }
 
     const { group_id: groupId, inviteCode } = req.params;
-    const [group, user] = await Promise.all([
-      Group.findOne({ where: { inviteCode, groupId } }),
-      User.findOne({ where: { nickname: req.nickname } }),
-    ]);
+    const { user } = req;
+    const group = await Group.findOne({ where: { inviteCode, groupId } });
 
     if (!group) {
       return next(new GroupNotFoundError());
@@ -555,17 +520,17 @@ async function deleteGroupMember(req, res, next) {
 
     const { group_id: groupId, user_id: userId } = req.params;
 
-    const [group, member, user] = await Promise.all([
+    const { user } = req;
+    const [group, member] = await Promise.all([
       Group.findByPk(groupId),
       User.findByPk(userId),
-      User.findOne({ where: { nickname: req.nickname } }),
     ]);
 
     if (!group) {
       return next(new GroupNotFoundError());
     }
 
-    if (!user || !member) {
+    if (!member) {
       return next(new UserNotFoundError());
     }
 
