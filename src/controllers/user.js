@@ -94,6 +94,7 @@ async function patchUserPassword(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
