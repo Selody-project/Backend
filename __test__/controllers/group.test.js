@@ -702,10 +702,8 @@ describe('Test /api/group endpoints', () => {
       const groupId = 1;
       const title = 'testTitle';
       const content = 'testContent';
-      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(201);
       expect(res.body).toEqual({ message: 'Successfully created the post.' });
@@ -715,10 +713,8 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const title = 'testTitle';
       const content = 'testContent';
-      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
@@ -727,10 +723,8 @@ describe('Test /api/group endpoints', () => {
       const groupId = 1;
       const title = 123;
       const content = 123;
-      const res = (await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"test\": \"${content}\"}`;
+      const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
@@ -742,10 +736,8 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const title = 'modified-title';
       const content = 'modified-content';
-      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual({ message: 'Successfully modified the post.' });
@@ -756,10 +748,9 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const title = 'testTitle';
       const content = 'testContent';
-      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
+
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
@@ -769,10 +760,9 @@ describe('Test /api/group endpoints', () => {
       const postId = 10000;
       const title = 'testTitle';
       const content = 'testContent';
-      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
+
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Post Not Found' });
     });
@@ -782,10 +772,9 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const title = 123;
       const content = 123;
-      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"test\": \"${content}\"}`;
+      const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
+
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
@@ -795,10 +784,9 @@ describe('Test /api/group endpoints', () => {
       const postId = 2;
       const title = 'modified-title';
       const content = 'modified-content';
-      const res = (await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).send({
-        title,
-        content,
-      }));
+      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
+
       expect(res.status).toEqual(403);
       expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
     });
@@ -854,6 +842,7 @@ describe('Test /api/group endpoints', () => {
           isLiked: false,
           likesCount: 0,
           postId: 1,
+          image: null,
         },
       };
       expect(res.status).toEqual(200);
