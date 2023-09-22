@@ -23,13 +23,13 @@ const s3Config = {
 
 const s3Client = new S3Client(s3Config);
 
-function getFileNameFromUrl(fileUrl) {
+function getFilePathFromUrl(fileUrl) {
   const urlParts = fileUrl.split('/');
-  const fileKey = urlParts.slice(3).join('/');
-  return fileKey;
+  const filePath = urlParts.slice(3).join('/');
+  return filePath;
 }
 
-async function uploadMiddleware(req, res, next) {
+async function uploadProfileMiddleware(req, res, next) {
   try {
     if (req?.files?.image) {
       const contentLength = req.headers['content-length'];
@@ -41,17 +41,54 @@ async function uploadMiddleware(req, res, next) {
 
       const file = req.files.image;
       const fileName = transliterate(sanitizeFileName(req.files.image.name));
+      const bucketName = process.env.AWS_BUCKET_NAME;
+      const folderName = process.env.AWS_PROFILE_FOLDER;
       const contentType = mime.getType(fileName);
       const bucketParams = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: `${Date.now()}_${fileName}`,
+        Key: `${folderName}/${Date.now()}_${fileName}`,
         Body: file.data,
         ContentType: contentType,
       };
 
       const command = new PutObjectCommand(bucketParams);
       await s3Client.send(command);
-      const fileUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.amazonaws.com/${bucketParams.Key}`;
+      const fileUrl = `https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`;
+      req.fileUrl = fileUrl;
+    } else {
+      req.fileUrl = null;
+    }
+    next();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function uploadPostMiddleware(req, res, next) {
+  try {
+    if (req?.files?.image) {
+      const contentLength = req.headers['content-length'];
+      const maxFileSize = 3 * 1024 * 1024;
+
+      if (contentLength > maxFileSize) {
+        return next(new FileTooLargeError());
+      }
+
+      const file = req.files.image;
+      const fileName = transliterate(sanitizeFileName(req.files.image.name));
+      const bucketName = process.env.AWS_BUCKET_NAME;
+      const folderName = process.env.AWS_POST_FOLDER;
+      const contentType = mime.getType(fileName);
+      const bucketParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${folderName}/${Date.now()}_${fileName}`,
+        Body: file.data,
+        ContentType: contentType,
+      };
+
+      const command = new PutObjectCommand(bucketParams);
+      await s3Client.send(command);
+      const fileUrl = `https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`;
       req.fileUrl = fileUrl;
     } else {
       req.fileUrl = null;
@@ -66,23 +103,23 @@ async function deleteBucketImage(fileUrl) {
   try {
     if (fileUrl !== null || fileUrl === process.env.DEFAULT_USER_IMAGE) {
       const bucketName = process.env.AWS_BUCKET_NAME;
-      const fileKey = getFileNameFromUrl(fileUrl);
+      const fileKey = getFilePathFromUrl(fileUrl);
       const deleteParams = {
         Bucket: bucketName,
         Key: fileKey,
       };
-
       const deleteCommand = new DeleteObjectCommand(deleteParams);
       await s3Client.send(deleteCommand);
     }
 
     return true;
   } catch (err) {
-    throw new ApiError();
+    return new ApiError();
   }
 }
 
 module.exports = {
-  uploadMiddleware,
+  uploadProfileMiddleware,
+  uploadPostMiddleware,
   deleteBucketImage,
 };

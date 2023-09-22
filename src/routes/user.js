@@ -1,6 +1,6 @@
 const express = require('express');
 const { createToken } = require('../middleware/token');
-const { uploadMiddleware } = require('../middleware/s3');
+const { uploadProfileMiddleware } = require('../middleware/s3');
 
 // User
 const {
@@ -28,7 +28,7 @@ const router = express.Router();
 // User
 router.get('/group', getUserGroup);
 router.delete('/group/:group_id', deleteGroupUser);
-router.patch('/profile', uploadMiddleware, patchUserProfile, createToken);
+router.patch('/profile', uploadProfileMiddleware, patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);
 router.patch('/userSetup/:user_id', updateUserSetUp);
 router.get('/userSetup', getUserSetup);

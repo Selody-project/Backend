@@ -31,7 +31,7 @@ async function postPersonalSchedule(req, res, next) {
       recurrence, freq, interval, byweekday, until,
     } = req.body;
 
-    await PersonalSchedule.create({
+    const schedule = await PersonalSchedule.create({
       userId: user.userId,
       title,
       content,
@@ -44,7 +44,10 @@ async function postPersonalSchedule(req, res, next) {
       until,
     });
 
-    return res.status(201).json({ message: 'Successfully create user schedule' });
+    return res.status(201).json({
+      message: 'Successfully create user schedule',
+      schedule,
+    });
   } catch (err) {
     return next(new ApiError());
   }
