@@ -1,6 +1,7 @@
 const { Sequelize } = require('sequelize');
 
 const { Op } = Sequelize;
+const { deleteBucketImage } = require('../middleware/s3');
 const { sequelize } = require('../models/index');
 const {
   isMine,
@@ -31,11 +32,16 @@ const {
 
 async function postGroupPost(req, res, next) {
   try {
+    if (!req.body?.data) {
+      throw (new DataFormatError());
+    }
+    req.body = JSON.parse(req.body.data);
+
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: bodyError } = validatePostSchema(req.body);
 
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -43,24 +49,33 @@ async function postGroupPost(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const { title, content } = req.body;
     const post = await Post.create({ author: req.nickname, title });
-    await post.createPostDetail({ content });
+
+    if (req.fileUrl !== null) {
+      await post.createPostDetail({ content, image: req.fileUrl });
+    } else {
+      await post.createPostDetail({ content });
+    }
 
     await user.addPosts(post);
     await group.addPosts(post);
 
     return res.status(201).json({ message: 'Successfully created the post.' });
   } catch (err) {
-    return next(new ApiError());
+    await deleteBucketImage(req.fileUrl);
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -87,7 +102,7 @@ async function getSinglePost(req, res, next) {
     }
 
     const { title, author } = post;
-    const { content } = (await post.getPostDetail()).dataValues;
+    const { content, image } = (await post.getPostDetail()).dataValues;
 
     const accessLevel = await getAccessLevel(user, group);
     const isMineValue = isMine(user, post);
@@ -102,6 +117,7 @@ async function getSinglePost(req, res, next) {
         author,
         title,
         content,
+        image,
       },
     });
   } catch (err) {
@@ -157,6 +173,7 @@ async function getGroupPosts(req, res, next) {
           author: post.author,
           createdAt: post.createdAt,
           content: post.postDetail.content,
+          image: post.postDetail.image,
         };
       }),
     );
@@ -169,39 +186,56 @@ async function getGroupPosts(req, res, next) {
 
 async function putGroupPost(req, res, next) {
   try {
+    if (!req.body?.data) {
+      throw (new DataFormatError());
+    }
+    req.body = JSON.parse(req.body.data);
+
     const { error: paramError } = validatePostIdSchema(req.params);
     const { error: bodyError } = validatePostSchema(req.body);
 
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
-    const [group, post] = await Promise.all([
+    const [group, post, postDetail] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
+      PostDetail.findOne({ where: { postId } }),
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     if (!isMine(user, post)) {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const { title, content } = req.body;
     await post.update({ title });
-    await PostDetail.update({ content }, { where: { postId } });
+
+    const previousPostImage = postDetail.image;
+    if (req.fileUrl !== null) {
+      await postDetail.update({ content, image: req.fileUrl });
+      await deleteBucketImage(previousPostImage);
+    } else {
+      await postDetail.update({ content });
+    }
 
     return res.status(200).json({ message: 'Successfully modified the post.' });
   } catch (err) {
-    return next(new ApiError());
+    await deleteBucketImage(req.fileUrl);
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -214,9 +248,10 @@ async function deleteGroupPost(req, res, next) {
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
-    const [group, post] = await Promise.all([
+    const [group, post, postDetail] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
+      PostDetail.findOne({ where: { postId } }),
     ]);
 
     if (!group) {
@@ -231,9 +266,10 @@ async function deleteGroupPost(req, res, next) {
     if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, post))) {
       return next(new EditPermissionError());
     }
-
+    const previousPostImage = postDetail.image;
     await post.destroy();
 
+    await deleteBucketImage(previousPostImage);
     return res.status(204).end();
   } catch (err) {
     return next(new ApiError());

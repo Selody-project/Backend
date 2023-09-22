@@ -13,6 +13,11 @@ class PostDetail extends Sequelize.Model {
         type: Sequelize.TEXT,
         allowNull: false,
       },
+      image: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: null,
+      },
     }, {
       sequelize,
       timestamps: true,

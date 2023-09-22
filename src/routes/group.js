@@ -25,6 +25,9 @@ const {
   postGroupPostLike, deleteGroupPostLike,
   postComment, getPostComment, getSingleComment, putComment, deleteComment,
 } = require('../controllers/feed');
+const {
+  uploadPostMiddleware,
+} = require('../middleware/s3');
 
 const router = express.Router();
 
@@ -55,10 +58,10 @@ router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);
 router.get('/:group_id/proposal', getEventProposal);
 
 // Feed
-router.post('/:group_id/post', postGroupPost);
+router.post('/:group_id/post', uploadPostMiddleware, postGroupPost);
 router.get('/:group_id/post', getGroupPosts);
 router.get('/:group_id/post/:post_id', getSinglePost);
-router.put('/:group_id/post/:post_id', putGroupPost);
+router.put('/:group_id/post/:post_id', uploadPostMiddleware, putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);
 
 router.post('/:group_id/post/:post_id/like', postGroupPostLike);
