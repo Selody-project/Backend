@@ -55,7 +55,7 @@ async function postGroupSchedule(req, res, next) {
       until,
     } = req.body;
 
-    const schedule = await GroupSchedule.create({
+    await GroupSchedule.create({
       groupId,
       title,
       content,
@@ -71,7 +71,18 @@ async function postGroupSchedule(req, res, next) {
     });
     return res.status(201).json({
       message: 'Successfully create group schedule',
-      schedule,
+      groupId,
+      title,
+      content,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
+      possible: null,
+      impossible: null,
     });
   } catch (err) {
     return next(new ApiError());
