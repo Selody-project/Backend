@@ -12,6 +12,9 @@ class Group extends Sequelize.Model {
       name: {
         type: Sequelize.STRING(45),
         allowNull: false,
+        validate: {
+          len: [3, 20],
+        },
       },
       description: {
         type: Sequelize.TEXT,
