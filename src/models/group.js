@@ -13,7 +13,7 @@ class Group extends Sequelize.Model {
         type: Sequelize.STRING(45),
         allowNull: false,
         validate: {
-          len: [3, 20],
+          len: [2, 20],
         },
       },
       description: {
