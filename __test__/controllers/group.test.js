@@ -214,8 +214,24 @@ describe('Test /api/group endpoints', () => {
         byweekday: 'MO',
         until: '2026-01-05',
       });
+      const expectedResult = {
+        byweekday: "MO",
+        content: "test-content",
+        endDateTime: "2023-05-07",
+        freq: "WEEKLY",
+        groupId: "1",
+        impossible: null,
+        interval: 1,
+        message: "Successfully create group schedule",
+        possible: null,
+        recurrence: 1,
+        startDateTime: "2023-05-06",
+        title: "test-title",
+        until: "2026-01-05",
+      }
 
       expect(res.status).toEqual(201);
+      expect(res.body).toEqual(expectedResult);
     });
   });
 
