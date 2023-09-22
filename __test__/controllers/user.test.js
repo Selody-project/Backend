@@ -502,7 +502,22 @@ describe('Test /api/user endpoints', () => {
       };
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      const expectedResult = {
+        byweekday: null,
+        content: "test-content1",
+        endDateTime: "2023-05-15 00:00:00",
+        freq: null,
+        interval: null,
+        message: "Successfully create user schedule",
+        recurrence: 0,
+        startDateTime: "2023-02-03 00:00:00",
+        title: "test-title",
+        until: null,
+        userId: 1,
+      };
+
       expect(res.statusCode).toEqual(201);
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully insert a user schedule into the database (recurrence)', async () => {
