@@ -645,26 +645,26 @@ describe('Test /api/group endpoints', () => {
           {
             startDateTime: '2030-04-16T00:00:00.000Z',
             endDateTime: '2030-04-16T23:59:59.000Z',
-            duration: 1440
-          }
+            duration: 1440,
+          },
         ],
         '2000-04-01T00:00:00.000Z': [
           {
             startDateTime: '2000-04-01T09:30:00.000Z',
             endDateTime: '2000-04-01T13:00:00.000Z',
-            duration: 210
+            duration: 210,
           },
           {
             startDateTime: '2000-04-01T18:00:00.000Z',
             endDateTime: '2000-04-01T23:59:59.000Z',
-            duration: 360
+            duration: 360,
           },
           {
             startDateTime: '2000-04-01T00:00:00.000Z',
             endDateTime: '2000-04-01T08:00:00.000Z',
-            duration: 480
-          }
-        ]
+            duration: 480,
+          },
+        ],
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedProposal);
@@ -923,7 +923,7 @@ describe('Test /api/group endpoints', () => {
           },
         ],
       };
-      const accessLevel = res.body.accessLevel;
+      const { accessLevel } = res.body;
       const feed = res.body.feed.map((post) => ({
         postId: post.postId,
         isMine: post.isMine,
@@ -1166,7 +1166,7 @@ describe('Test /api/group endpoints', () => {
         },
       };
 
-      const accessLevel = res.body.accessLevel;
+      const { accessLevel } = res.body;
       const comment = {
         commentId: res.body.comment.commentId,
         postId: res.body.comment.postId,
@@ -1265,7 +1265,7 @@ describe('Test /api/group endpoints', () => {
             isPendingMember: 1, nickname: 'test-user5', userId: 5,
           },
         },
-      ]; 
+      ];
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });
@@ -1425,19 +1425,8 @@ describe('Test /api/group endpoints', () => {
         keyword,
       }));
 
-      const expectedResult = [{
-        groupId: 1,
-        name: 'test-group1',
-        description: 'test-description1',
-        member: 2,
-        leader: 1,
-        inviteCode: 'inviteCode01',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-      }];
-
-      expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedResult);
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
@@ -1447,6 +1436,15 @@ describe('Test /api/group endpoints', () => {
       }));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to retrieved the group (Keyword Length Range) ', async () => {
+      const keyword = 'a';
+      const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
+        keyword,
+      }));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
   });
 
@@ -1529,7 +1527,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(409);
-      expect(res.body).toEqual({ error:'This request has already been processed. ' });
+      expect(res.body).toEqual({ error: 'This request has already been processed. ' });
     });
   });
 
@@ -1584,7 +1582,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(409);
-      expect(res.body).toEqual({ error:'This request has already been processed. ' });
+      expect(res.body).toEqual({ error: 'This request has already been processed. ' });
     });
   });
 });

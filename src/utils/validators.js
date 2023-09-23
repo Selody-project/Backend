@@ -128,9 +128,7 @@ const groupJoinRequestSchema = Joi.object({
 });
 
 const groupSearchKeywordSchema = Joi.object({
-  keyword: Joi.alternatives().try(
-    Joi.string().min(2).max(45).required(), Joi.number().min(0).required(),
-  ),
+  keyword: Joi.string().min(2).max(45).required(),
 });
 
 module.exports = {
