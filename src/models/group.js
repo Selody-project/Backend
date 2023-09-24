@@ -57,6 +57,10 @@ class Group extends Sequelize.Model {
       foreignKey: 'groupId',
       onDelete: 'cascade',
     });
+    db.Group.hasMany(db.UserGroup, {
+      foreignKey: 'groupId',
+      onDelete: 'cascade',
+    });
   }
 }
 

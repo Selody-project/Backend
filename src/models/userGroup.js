@@ -5,9 +5,22 @@ const Group = require('./group');
 class UserGroup extends Sequelize.Model {
   static initiate(sequelize) {
     UserGroup.init({
-      sharePersonalEvent: {
+      userId: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+      },
+      groupId: {
+        type: Sequelize.BIGINT,
+        allowNull: false,
+      },
+      shareScheduleOption: {
         type: Sequelize.TINYINT(1),
-        allowNull: true,
+        allowNull: false,
+        defaultValue: 1,
+      },
+      notificationOption: {
+        type: Sequelize.TINYINT(1),
+        allowaNull: false,
         defaultValue: 1,
       },
       isPendingMember: {

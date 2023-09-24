@@ -63,7 +63,7 @@ describe('Test /api/user endpoints', () => {
           inviteExp: '2099-01-01T00:00:00.000Z',
           isPublicGroup: 0,
           UserGroup: {
-            groupId: 1, userId: 1, sharePersonalEvent: 1, isPendingMember: 0, accessLevel: 'owner',
+            groupId: 1, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'owner',
           },
         }, {
           groupId: 2,
@@ -75,7 +75,7 @@ describe('Test /api/user endpoints', () => {
           inviteExp: '2000-01-01T00:00:00.000Z',
           isPublicGroup: 0,
           UserGroup: {
-            groupId: 2, userId: 1, sharePersonalEvent: 1, isPendingMember: 0, accessLevel: 'regular',
+            groupId: 2, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'regular',
           },
         }],
       };
@@ -503,17 +503,18 @@ describe('Test /api/user endpoints', () => {
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       const expectedResult = {
-        byweekday: null,
-        content: "test-content1",
-        endDateTime: "2023-05-15 00:00:00",
+        id: 25,
+        userId: 1,
+        message: "Successfully create user schedule",    
+        title: 'test-title',
+        content: 'test-content1',
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        endDateTime: '2023-05-15T00:00:00.000Z',
+        recurrence: 0,
         freq: null,
         interval: null,
-        message: "Successfully create user schedule",
-        recurrence: 0,
-        startDateTime: "2023-02-03 00:00:00",
-        title: "test-title",
+        byweekday: null,
         until: null,
-        userId: 1,
       };
 
       expect(res.statusCode).toEqual(201);
@@ -572,44 +573,48 @@ describe('Test /api/user endpoints', () => {
 
   describe('Test DELETE /api/auth/withdrawal', () => {
     it('Successfully deleted a user from user table', async () => {
-      const id = 4;
-      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
+      let res = await request(app).post('/api/auth/login').send({
+        email: 'test-user6@email.com',
+        password: 'super_strong_password',
+      });
+      // eslint-disable-next-line prefer-destructuring
+      const tempCookie = res.headers['set-cookie'][0];
+      res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', tempCookie);
       expect(res.status).toEqual(204);
     });
 
     it('Successfully failed to delete a user from user table (UserIsLeader Error)', async () => {
-      const id = 1;
-      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
+      const res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', cookie);
       expect(res.status).toEqual(499);
     });
 
     it('Successfully failed to delete a user from user table (BelongToGroup Error)', async () => {
-      const id = 5;
-      const res = await request(app).delete(`/api/auth/withdrawal/${id}`).set('Cookie', cookie);
+      let res = await request(app).post('/api/auth/login').send({
+        email: 'test-user5@email.com',
+        password: 'super_strong_password',
+      });
+      // eslint-disable-next-line prefer-destructuring
+      const tempCookie = res.headers['set-cookie'][0];
+      res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', tempCookie);
       expect(res.status).toEqual(403);
     });
   });
 
-  describe('Test PATCH /api/user/updateUserSetup', () => {
-    it('Successfully update sharePersoanlEvent from user table', async () => {
-      const id = 1;
-      const result = {
-        updatedSharePersonalEvent: [
-          {
-            groupId: 1,
-            sharePersonalEvent: 0,
-          },
-          {
-            groupId: 2,
-            sharePersonalEvent: 0,
-          },
-          {
-            groupId: 3,
-            sharePersonalEvent: 1,
-          },
-        ],
-      };
-      const res = await request(app).patch(`/api/user/userSetup/${id}`).set('Cookie', cookie).send(result);
+  describe('Test PATCH /api/user/settings', () => {
+    it('Successfully updated a shareScheduleOption', async () => {
+      const groupId = 1;
+      const res = await request(app).patch(`/api/user/settings/${groupId}`).set('Cookie', cookie).send({
+        shareScheduleOption: 1
+      });
+
+      expect(res.status).toEqual(200);
+    });
+
+    it('Successfully updated a notificationOption', async () => {
+      const groupId = 1;
+      const res = await request(app).patch(`/api/user/settings/${groupId}`).set('Cookie', cookie).send({
+        notificationOption: 1
+      });
 
       expect(res.status).toEqual(200);
     });

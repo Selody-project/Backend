@@ -206,28 +206,27 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/calendar`).set('Cookie', cookie).send({
         title: 'test-title',
         content: 'test-content',
-        startDateTime: '2023-05-06',
-        endDateTime: '2023-05-07',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
         recurrence: 1,
         freq: 'WEEKLY',
         interval: 1,
         byweekday: 'MO',
-        until: '2026-01-05',
+        until: '2026-01-05T00:00:00.000Z',
       });
       const expectedResult = {
-        byweekday: "MO",
-        content: "test-content",
-        endDateTime: "2023-05-07",
-        freq: "WEEKLY",
-        groupId: "1",
-        impossible: null,
-        interval: 1,
-        message: "Successfully create group schedule",
-        possible: null,
+        id: 24,
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
         recurrence: 1,
-        startDateTime: "2023-05-06",
-        title: "test-title",
-        until: "2026-01-05",
+        freq: 'WEEKLY',
+        interval: 1,
+        byweekday: 'MO',
+        until: '2026-01-05T00:00:00.000Z',
+        groupId: 1,
+        message: "Successfully create group schedule",
       }
 
       expect(res.status).toEqual(201);
@@ -720,9 +719,19 @@ describe('Test /api/group endpoints', () => {
       const content = 'testContent';
       const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
-
+      const expectedResult = {
+        author: 'test-user1',
+        content: 'testContent',
+        image: null,
+        message: 'Successfully created the post.',
+        postDetailId: 11,
+        postId: 11,
+        title: 'testTitle',
+      }
+      delete res.body.updatedAt;
+      delete res.body.createdAt;
       expect(res.status).toEqual(201);
-      expect(res.body).toEqual({ message: 'Successfully created the post.' });
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to create the post (Group Not Found) ', async () => {
@@ -754,9 +763,21 @@ describe('Test /api/group endpoints', () => {
       const content = 'modified-content';
       const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
-
+      const expectedResult = {
+        author: 'test-user1',
+        content: 'modified-content',
+        groupId: 1,
+        image: null,
+        message: 'Successfully modified the post.',
+        postDetailId: 1,
+        postId: 1,
+        title: 'modified-title',
+        userId: 1,
+      }
+      delete res.body.updatedAt;
+      delete res.body.createdAt;
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual({ message: 'Successfully modified the post.' });
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to modified the post (Group Not Found) ', async () => {
@@ -1003,9 +1024,17 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).post(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie).send({
         content,
       }));
-
+      const expectedResult = {
+        commentId: 5,
+        content: 'testComment',
+        depth: 0,
+        message: 'Successfully created the comment.',
+        postId: 1,
+      }
+      delete res.body.updatedAt;
+      delete res.body.createdAt;
       expect(res.status).toEqual(201);
-      expect(res.body).toEqual({ message: 'Successfully created the comment.' });
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to create the comment (Group Not Found) ', async () => {
@@ -1052,9 +1081,19 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).put(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie).send({
         content,
       }));
+      const expectedResult = {
+        commentId: 1,
+        content: 'testComment',
+        depth: 0,
+        message: 'Successfully created the comment.',
+        postId: 1,
+        userId: 1,
+      }
+      delete res.body.updatedAt;
+      delete res.body.createdAt;
 
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual({ message: 'Successfully modified the comment.' });
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to modified the comment (Group Not Found) ', async () => {

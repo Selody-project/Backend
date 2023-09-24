@@ -133,6 +133,11 @@ const groupSearchKeywordSchema = Joi.object({
   ),
 });
 
+const userSettingSchema = Joi.object({
+  shareScheduleOption: Joi.number(),
+  notificationOption: Joi.number(),
+}).or('shareScheduleOption', 'notificationOption');
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -156,4 +161,5 @@ module.exports = {
   validateGroupJoinInviteCodeSchema: validator(groupJoinInviteCodeSchema),
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
   validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
+  validateUserSettingSchema: validator(userSettingSchema),
 };

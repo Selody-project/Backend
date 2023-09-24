@@ -174,19 +174,11 @@
         }
       }
     },
-    "/api/auth/withdrawal/{user_id}": {
+    "/api/auth/withdrawal": {
       "delete": {
         "description": "회원 탈퇴",
-        "summary": "유저 회원 탈퇴",
+        "summary": "회원 탈퇴",
         "tags": ["Auth"],
-        "parameters": [
-          {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
         "responses": {
           "204": {
             "description": "성공"
@@ -1775,6 +1767,91 @@
         }
       }
     },
+    "/api/user/settings": {
+      "get": {
+        "description": "",
+        "summary": "그룹 설정 조회",
+        "tags": ["User"],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/user/settings/{group_id}": {
+      "patch": {
+        "description": "shareScheduleOption과 notificationOption이 있을텐데, 각 토글에 알맞은 key-value값만을 포함하여 변경하면 됩니다.(예시 참고)",
+        "summary": "그룹 설정 변경",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "shareScheduleOption": {
+                    "type": "TINYINT(1)"
+                  },
+                  "notificationOption": {
+                    "type": "TINYINT(1)"
+                  }
+                }
+              },
+              "examples": {
+                "shareScheduleOption" : {
+                  "value": {
+                    "shareScheduleOption": 0
+                  },
+                  "description": "일정 공유 토글 on/off"
+                },
+                "notificationOption" : {
+                  "value": {
+                    "notificationOption": 0
+                  },
+                  "description": "알림 토글 on/off"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음(본인의 그룹이 아님)"
+          },
+          "404": {
+            "description": "존재하지 않는 유저/그룹"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },  
     "/api/user/profile": {
       "patch": {
         "description": "프로필 이미지 변경 시, 이미지 파일을 같이 전달해주세요. 이미지를 제외한 닉네임, 이메일 변경 시에는 send empty value 체크 후에 data만 작성 후, 요청을 보내주시면 됩니다.",
@@ -1864,7 +1941,7 @@
           }
         }
       }
-    },          
+    },  
     "/api/user/calendar": {
       "get": {
         "description": "",
@@ -2406,7 +2483,10 @@
           "userId": {
             "type": "BIGINT"
           },
-          "sharePersonalEvent": {
+          "shareScheduleOption": {
+            "type": "TINYINT(1)"
+          },
+          "notificationOption": {
             "type": "TINYINT(1)"
           },
           "isPendingMember": {

@@ -1,4 +1,6 @@
-const { Op } = require('sequelize');
+const { Sequelize } = require('sequelize');
+
+const { Op } = Sequelize;
 const bcrypt = require('bcrypt');
 const { deleteBucketImage } = require('../middleware/s3');
 
@@ -11,13 +13,15 @@ const PersonalSchedule = require('../models/personalSchedule');
 // Error
 const {
   ApiError, DataFormatError,
-  UserNotFoundError, UserIsLeaderError, BelongToGroupError,
+  UserIsLeaderError, BelongToGroupError,
   DuplicateNicknameError, DuplicateEmailError,
+  EditPermissionError, GroupNotFoundError,
 } = require('../errors');
 
 // Validator
 const {
-  validateProfileSchema, validateUserIdSchema, validatePasswordSchema,
+  validateProfileSchema, validateGroupIdSchema, validatePasswordSchema,
+  validateUserSettingSchema,
 } = require('../utils/validators');
 
 async function getUserGroup(req, res, next) {
@@ -100,19 +104,8 @@ async function patchUserPassword(req, res, next) {
 
 async function withdrawal(req, res, next) {
   try {
-    const { error: paramError } = validateUserIdSchema(req.params);
-    if (paramError) {
-      return next(new DataFormatError());
-    }
-
-    const { user_id: userId } = req.params;
-    const [user, leader] = await Promise.all([
-      User.findByPk(userId),
-      Group.findOne({ where: { leader: userId } }),
-    ]);
-    if (!user) {
-      return next(new UserNotFoundError());
-    }
+    const { user } = req;
+    const leader = await Group.findOne({ where: { leader: user.userId } });
 
     if (leader) {
       return next(new UserIsLeaderError());
@@ -123,7 +116,7 @@ async function withdrawal(req, res, next) {
       return next(new BelongToGroupError());
     }
 
-    await PersonalSchedule.destroy({ where: { userId } });
+    await PersonalSchedule.destroy({ where: { userId: user.userId } });
     await user.destroy();
 
     return res.status(204).json({ message: 'Successfully deleted' });
@@ -134,35 +127,55 @@ async function withdrawal(req, res, next) {
 
 async function getUserSetup(req, res, next) {
   try {
-    const user = await User.findOne({ where: { nickname: req.nickname } });
-    const groupList = await user.getGroups();
-    return res.status(200).json({ groupList });
+    const { user } = req;
+    const options = await User.findAll({
+      attributes: ['userId'],
+      include: [
+        {
+          model: Group,
+          through: {
+            attributes: ['shareScheduleOption', 'notificationOption'],
+          },
+          attributes: ['groupId', 'name'],
+        },
+      ],
+      where: { userId: user.userId },
+    });
+    const parsedOptions = options[0].Groups.map((option) => ({
+      groupId: option.dataValues.groupId,
+      name: option.dataValues.name,
+      shareScheduleOption: option.UserGroup.dataValues.shareScheduleOption,
+      notificationOption: option.UserGroup.dataValues.notificationOption,
+    }));
+    return res.status(200).json(parsedOptions);
   } catch (err) {
     return next(new ApiError());
   }
 }
 
-async function updateUserSetUp(req, res, next) {
+async function patchUserSetUp(req, res, next) {
   try {
-    const { error: paramError } = validateUserIdSchema(req.params);
-    if (paramError) {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: bodyError } = validateUserSettingSchema(req.body);
+    if (paramError || bodyError) {
       return next(new DataFormatError());
     }
 
-    const { updatedSharePersonalEvent } = req.body;
     const { user } = req;
+    const { group_id: groupId } = req.params;
+    const group = await Group.findByPk(groupId);
 
-    const updatePromises = updatedSharePersonalEvent.map(async (groupSetup) => {
-      const { groupId, sharePersonalEvent } = groupSetup;
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
 
-      await UserGroup.update(
-        { sharePersonalEvent },
-        { where: { groupId, userId: user.userId } },
-      );
-    });
-    await Promise.all(updatePromises);
+    if (!(await user.hasGroup(group))) {
+      return next(new EditPermissionError());
+    }
 
-    return res.status(200).json({ message: 'Successfully update User Setup ' });
+    await UserGroup.update(req.body, { where: { userId: user.userId, groupId } });
+
+    return res.status(200).json({ message: 'Successfully modified a setting ' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -174,5 +187,5 @@ module.exports = {
   patchUserPassword,
   withdrawal,
   getUserSetup,
-  updateUserSetUp,
+  patchUserSetUp,
 };

@@ -31,12 +31,12 @@ async function postPersonalSchedule(req, res, next) {
       recurrence, freq, interval, byweekday, until,
     } = req.body;
 
-    await PersonalSchedule.create({
+    const schedule = await PersonalSchedule.create({
       userId: user.userId,
       title,
       content,
-      startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD HH:mm:ss'),
-      endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD HH:mm:ss'),
+      startDateTime,
+      endDateTime,
       recurrence,
       freq,
       interval,
@@ -44,19 +44,12 @@ async function postPersonalSchedule(req, res, next) {
       until,
     });
 
-    return res.status(201).json({
-      message: 'Successfully create user schedule',
-      userId: user.userId,
-      title,
-      content,
-      startDateTime: moment.utc(startDateTime).format('YYYY-MM-DD HH:mm:ss'),
-      endDateTime: moment.utc(endDateTime).format('YYYY-MM-DD HH:mm:ss'),
-      recurrence,
-      freq,
-      interval,
-      byweekday,
-      until,
-    });
+    const response = {
+      ...{ message: 'Successfully create user schedule' },
+      ...schedule.dataValues,
+    };
+
+    return res.status(201).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -147,8 +140,14 @@ async function putPersonalSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
-    return res.status(201).json({ message: 'Successfully Modified.' });
+    const modifiedSchedule = await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
+
+    const response = {
+      ...{ message: 'Successfully Modified.' },
+      ...modifiedSchedule.dataValues,
+    };
+
+    return res.status(201).json(response);
   } catch (err) {
     return next(new ApiError());
   }
