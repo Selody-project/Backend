@@ -36,7 +36,6 @@ async function postGroupPost(req, res, next) {
       throw (new DataFormatError());
     }
     req.body = JSON.parse(req.body.data);
-
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: bodyError } = validatePostSchema(req.body);
 
@@ -62,7 +61,8 @@ async function postGroupPost(req, res, next) {
 
     let postDetail;
     if (req.fileUrl !== null) {
-      postDetail = await post.createPostDetail({ content, image: req.fileUrl });
+      const fileUrl = req.fileUrl.join(', ');
+      postDetail = await post.createPostDetail({ content, image: fileUrl });
     } else {
       postDetail = await post.createPostDetail({ content });
     }
@@ -227,15 +227,16 @@ async function putGroupPost(req, res, next) {
     const { title, content } = req.body;
     const modifiedPost = await post.update({ title });
 
-    const previousPostImage = postDetail.image;
+    const previousPostImages = postDetail.image?.split(', ');
+
     let modifiedDetail;
     if (req.fileUrl !== null) {
-      modifiedDetail = await postDetail.update({ content, image: req.fileUrl });
-      await deleteBucketImage(previousPostImage);
+      const fileUrl = req.fileUrl.join(', ');
+      modifiedDetail = await postDetail.update({ content, image: fileUrl });
     } else {
-      modifiedDetail = await postDetail.update({ content });
+      modifiedDetail = await postDetail.update({ content, image: null });
     }
-
+    await deleteBucketImage(previousPostImages);
     const response = {
       ...{ message: 'Successfully modified the post.' },
       ...modifiedPost.dataValues,

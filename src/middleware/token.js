@@ -61,7 +61,6 @@ async function verifyToken(req, res, next) {
     if (!authToken) {
       return next(new InvalidTokenError());
     }
-
     req.nickname = jwt.verify(authToken, ACCESS_SECRET_KEY).nickname;
     const user = await User.findOne({ where: { nickname: req.nickname } });
 
