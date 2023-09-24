@@ -63,6 +63,10 @@ class User extends Sequelize.Model {
     db.User.hasMany(db.Comment, {
       foreignKey: 'userId',
     });
+    db.User.hasMany(db.UserGroup, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
   }
 }
 

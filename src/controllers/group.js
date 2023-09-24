@@ -37,7 +37,12 @@ async function postGroup(req, res, next) {
 
     await user.addGroup(group, { through: { accessLevel: 'owner' } });
 
-    return res.status(200).json({ message: 'Successfully create group' });
+    const response = {
+      ...{ message: 'Successfully create group' },
+      ...group.dataValues,
+    };
+
+    return res.status(200).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -158,9 +163,13 @@ async function putGroup(req, res, next) {
     }
 
     const { name, description, leader } = req.body;
-    await group.update({ name, description, leader });
+    const modifiedGroup = await group.update({ name, description, leader });
 
-    return res.status(200).json({ message: 'Successfully modified group info' });
+    const response = {
+      ...{ message: 'Successfully modified group info' },
+      ...modifiedGroup.dataValues,
+    };
+    return res.status(200).json(response);
   } catch (err) {
     return next(new ApiError());
   }

@@ -60,16 +60,22 @@ async function postGroupPost(req, res, next) {
     const { title, content } = req.body;
     const post = await Post.create({ author: req.nickname, title });
 
+    let postDetail;
     if (req.fileUrl !== null) {
-      await post.createPostDetail({ content, image: req.fileUrl });
+      postDetail = await post.createPostDetail({ content, image: req.fileUrl });
     } else {
-      await post.createPostDetail({ content });
+      postDetail = await post.createPostDetail({ content });
     }
 
     await user.addPosts(post);
     await group.addPosts(post);
 
-    return res.status(201).json({ message: 'Successfully created the post.' });
+    const response = {
+      ...{ message: 'Successfully created the post.' },
+      ...post.dataValues,
+      ...postDetail.dataValues,
+    };
+    return res.status(201).json(response);
   } catch (err) {
     await deleteBucketImage(req.fileUrl);
     if (!err || err.status === undefined) {
@@ -219,17 +225,23 @@ async function putGroupPost(req, res, next) {
     }
 
     const { title, content } = req.body;
-    await post.update({ title });
+    const modifiedPost = await post.update({ title });
 
     const previousPostImage = postDetail.image;
+    let modifiedDetail;
     if (req.fileUrl !== null) {
-      await postDetail.update({ content, image: req.fileUrl });
+      modifiedDetail = await postDetail.update({ content, image: req.fileUrl });
       await deleteBucketImage(previousPostImage);
     } else {
-      await postDetail.update({ content });
+      modifiedDetail = await postDetail.update({ content });
     }
 
-    return res.status(200).json({ message: 'Successfully modified the post.' });
+    const response = {
+      ...{ message: 'Successfully modified the post.' },
+      ...modifiedPost.dataValues,
+      ...modifiedDetail.dataValues,
+    };
+    return res.status(200).json(response);
   } catch (err) {
     await deleteBucketImage(req.fileUrl);
     if (!err || err.status === undefined) {
@@ -420,7 +432,11 @@ async function postComment(req, res, next) {
     const comment = await post.createComment({ content });
     await user.addComments(comment);
 
-    return res.status(201).json({ message: 'Successfully created the comment.' });
+    const response = {
+      ...{ message: 'Successfully created the comment.' },
+      ...comment.dataValues,
+    };
+    return res.status(201).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -536,9 +552,13 @@ async function putComment(req, res, next) {
     }
 
     const { content } = req.body;
-    await comment.update({ content });
+    const modifiedComment = await comment.update({ content });
+    const response = {
+      ...{ message: 'Successfully created the comment.' },
+      ...modifiedComment.dataValues,
+    };
 
-    return res.status(200).json({ message: 'Successfully modified the comment.' });
+    return res.status(200).json(response);
   } catch (err) {
     return next(new ApiError());
   }

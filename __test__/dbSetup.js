@@ -76,6 +76,17 @@ async function setUpUserDB() {
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
     },
+    {
+      userId: 6,
+      email: 'test-user6@email.com',
+      nickname: 'test-user6',
+      password: await bcrypt.hash('super_strong_password', 12),
+      provider: 'local',
+      profileImage: 'profileImageLink',
+      createdAt: '2023-04-26',
+      updatedAt: '2023-04-26',
+    },
+    
   ];
 
   await User.create(mockUserData[0]);
@@ -83,6 +94,7 @@ async function setUpUserDB() {
   await User.create(mockUserData[2]);
   await User.create(mockUserData[3]);
   await User.create(mockUserData[4]);
+  await User.create(mockUserData[5]);
 }
 
 async function setUpGroupDB() {
@@ -115,13 +127,13 @@ async function setUpGroupDB() {
   });
   
   const user = await User.findAll();
-  await user[0].addGroup(group1, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
-  await user[0].addGroup(group2, { through: { accessLevel: 'regular', sharePersonalEvent: 1, isPendingMember: 0 } });
-  await user[1].addGroup(group1, { through: { accessLevel: 'admin', sharePersonalEvent: 0, isPendingMember: 0 } });
-  await user[1].addGroup(group2, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
-  await user[2].addGroup(group3, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
-  await user[4].addGroup(group1, { through: { accessLevel: 'viewer', sharePersonalEvent: 1, isPendingMember: 1 } });
-  await user[4].addGroup(group3, { through: { accessLevel: 'admin', sharePersonalEvent: 1, isPendingMember: 0 } });
+  await user[0].addGroup(group1, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
+  await user[0].addGroup(group2, { through: { accessLevel: 'regular', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
+  await user[1].addGroup(group1, { through: { accessLevel: 'admin', shareScheduleOption: 0, notificationOption: 1, isPendingMember: 0 } });
+  await user[1].addGroup(group2, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
+  await user[2].addGroup(group3, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
+  await user[4].addGroup(group1, { through: { accessLevel: 'viewer', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 1 } });
+  await user[4].addGroup(group3, { through: { accessLevel: 'admin', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
 }
 
 async function setUpGroupScheduleDB() {

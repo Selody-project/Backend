@@ -55,8 +55,8 @@ async function postGroupSchedule(req, res, next) {
       until,
     } = req.body;
 
-    await GroupSchedule.create({
-      groupId,
+    const groupSchedule = await GroupSchedule.create({
+      groupId: group.groupId,
       title,
       content,
       startDateTime,
@@ -69,21 +69,12 @@ async function postGroupSchedule(req, res, next) {
       possible: null,
       impossible: null,
     });
-    return res.status(201).json({
-      message: 'Successfully create group schedule',
-      groupId,
-      title,
-      content,
-      startDateTime,
-      endDateTime,
-      recurrence,
-      freq,
-      interval,
-      byweekday,
-      until,
-      possible: null,
-      impossible: null,
-    });
+    const response = {
+      ...{ message: 'Successfully create group schedule' },
+      ...groupSchedule.dataValues,
+    };
+
+    return res.status(201).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -141,7 +132,7 @@ async function getGroupSchedule(req, res, next) {
     const users = (await UserGroup.findAll({
       where: {
         groupId,
-        sharePersonalEvent: 1,
+        shareScheduleOption: 1,
       },
       attributes: ['userId'],
     })).map((member) => member.userId);
@@ -197,8 +188,13 @@ async function putGroupSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    await schedule.update(req.body);
-    return res.status(201).json({ message: 'Successfully modify group schedule' });
+    const modifiedSchedule = await schedule.update(req.body);
+    const response = {
+      ...{ message: 'Successfully modify group schedule' },
+      ...modifiedSchedule.dataValues,
+    };
+
+    return res.status(201).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -264,7 +260,7 @@ async function getEventProposal(req, res, next) {
     const groupMembers = (await UserGroup.findAll({
       where: {
         groupId,
-        sharePersonalEvent: 1,
+        shareScheduleOption: 1,
       },
       attributes: ['userId'],
     })).map((member) => member.userId);
