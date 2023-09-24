@@ -65,15 +65,16 @@ async function patchUserProfile(req, res, next) {
 
     const previousProfileImage = user.profileImage;
     if (req.fileUrl !== null) {
-      await user.update({ nickname, email, profileImage: req.fileUrl });
+      const fileUrl = req.fileUrl.join(', ');
+      await user.update({ nickname, email, profileImage: fileUrl });
       await deleteBucketImage(previousProfileImage);
     } else {
       await user.update({ nickname, email });
     }
-    req.nickname = nickname;
     req.user = user;
-    next();
+    return next();
   } catch (err) {
+    console.log(err);
     await deleteBucketImage(req.fileUrl);
     if (!err || err.status === undefined) {
       return next(new ApiError());

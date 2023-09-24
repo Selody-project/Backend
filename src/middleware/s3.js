@@ -4,7 +4,7 @@ const {
 const mime = require('mime');
 const transliterate = require('transliterate');
 const {
-  ApiError, FileTooLargeError,
+  ApiError, FileTooLargeError, ImageLimitExceededError,
 } = require('../errors');
 
 function sanitizeFileName(fileName) {
@@ -54,11 +54,11 @@ async function uploadProfileMiddleware(req, res, next) {
       const command = new PutObjectCommand(bucketParams);
       await s3Client.send(command);
       const fileUrl = `https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`;
-      req.fileUrl = fileUrl;
+      req.fileUrl = [fileUrl];
     } else {
       req.fileUrl = null;
     }
-    next();
+    return next();
   } catch (err) {
     return next(new ApiError());
   }
@@ -66,18 +66,35 @@ async function uploadProfileMiddleware(req, res, next) {
 
 async function uploadPostMiddleware(req, res, next) {
   try {
-    if (req?.files?.image) {
-      const contentLength = req.headers['content-length'];
-      const maxFileSize = 3 * 1024 * 1024;
+    // 이미지 파일이 없으면 미들웨어를 바로 종료
+    const { files } = req;
+    if (files === undefined || files === null) {
+      req.fileUrl = null;
+      return next();
+    }
 
-      if (contentLength > maxFileSize) {
+    // 이미지 파일의 개수가 제한을 초과하면 에러를 발생
+    const imageLimit = 3;
+    if (Object.keys(files)?.length > imageLimit) {
+      return next(new ImageLimitExceededError());
+    }
+
+    const maxFileSize = 3 * 1024 * 1024;
+    const fileUrl = [];
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const folderName = process.env.AWS_POST_FOLDER;
+    const fileKeys = Object.keys(files);
+
+    /* eslint-disable-next-line */
+    for (const fileKey of fileKeys ) {
+      const file = files[fileKey];
+
+      // 이미지 파일 크기가 제한을 초과하면 에러를 발생
+      if (file.size > maxFileSize) {
         return next(new FileTooLargeError());
       }
 
-      const file = req.files.image;
-      const fileName = transliterate(sanitizeFileName(req.files.image.name));
-      const bucketName = process.env.AWS_BUCKET_NAME;
-      const folderName = process.env.AWS_POST_FOLDER;
+      const fileName = transliterate(sanitizeFileName(file.name));
       const contentType = mime.getType(fileName);
       const bucketParams = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -85,33 +102,41 @@ async function uploadPostMiddleware(req, res, next) {
         Body: file.data,
         ContentType: contentType,
       };
-
       const command = new PutObjectCommand(bucketParams);
+
+      /* eslint-disable-next-line */
       await s3Client.send(command);
-      const fileUrl = `https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`;
-      req.fileUrl = fileUrl;
-    } else {
-      req.fileUrl = null;
+      fileUrl.push(`https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`);
     }
-    next();
+    req.fileUrl = fileUrl;
+    return next();
   } catch (err) {
     return next(new ApiError());
   }
 }
 
-async function deleteBucketImage(fileUrl) {
+async function deleteBucketImage(fileUrls) {
   try {
-    if (fileUrl !== null || fileUrl === process.env.DEFAULT_USER_IMAGE) {
+    if (fileUrls !== null && fileUrls !== undefined && fileUrls.length !== 0) {
       const bucketName = process.env.AWS_BUCKET_NAME;
-      const fileKey = getFilePathFromUrl(fileUrl);
-      const deleteParams = {
-        Bucket: bucketName,
-        Key: fileKey,
-      };
-      const deleteCommand = new DeleteObjectCommand(deleteParams);
-      await s3Client.send(deleteCommand);
-    }
 
+      /* eslint-disable-next-line */
+      for (const fileUrl of fileUrls) {
+        if (fileUrl === process.env.DEFAULT_USER_IMAGE || fileUrl === '') {
+          /* eslint-disable-next-line */
+          continue;
+        }
+        const fileKey = getFilePathFromUrl(fileUrl);
+        const deleteParams = {
+          Bucket: bucketName,
+          Key: fileKey,
+        };
+        const deleteCommand = new DeleteObjectCommand(deleteParams);
+
+        /* eslint-disable-next-line */
+        await s3Client.send(deleteCommand);
+      }
+    }
     return true;
   } catch (err) {
     return new ApiError();
