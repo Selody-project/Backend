@@ -106,6 +106,7 @@ async function setUpGroupDB() {
     leader: 1,
     inviteCode: 'inviteCode01',
     inviteExp: '2099-01-01T00:00:00.000Z',
+    image: 'groupImageLink',
   });
   const group2 = await Group.create({
     groupId: 2,
@@ -115,6 +116,7 @@ async function setUpGroupDB() {
     leader: 2,
     inviteCode: 'expiredCode02',
     inviteExp: '2000-01-01T00:00:00.000Z',
+    image: 'groupImageLink',
   });
   const group3 = await Group.create({
     groupId: 3,
@@ -124,6 +126,7 @@ async function setUpGroupDB() {
     leader: 3,
     inviteCode: 'inviteCode03',
     inviteExp: '2099-01-01T00:00:00.000Z',
+    image: 'groupImageLink',
   });
   
   const user = await User.findAll();

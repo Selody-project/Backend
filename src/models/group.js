@@ -38,8 +38,12 @@ class Group extends Sequelize.Model {
       },
       isPublicGroup: {
         type: Sequelize.TINYINT,
-        defaultValue: false,
         allowNull: false,
+        defaultValue: false,
+      },
+      image: {
+        type: Sequelize.TEXT,
+        defaultValue: process.env.DEFAULT_GROUP_IMAGE,
       },
     }, {
       sequelize,

@@ -62,6 +62,7 @@ describe('Test /api/user endpoints', () => {
           inviteCode: 'inviteCode01',
           inviteExp: '2099-01-01T00:00:00.000Z',
           isPublicGroup: 0,
+          image: 'groupImageLink',
           UserGroup: {
             groupId: 1, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'owner',
           },
@@ -74,6 +75,7 @@ describe('Test /api/user endpoints', () => {
           inviteCode: 'expiredCode02',
           inviteExp: '2000-01-01T00:00:00.000Z',
           isPublicGroup: 0,
+          image: 'groupImageLink',
           UserGroup: {
             groupId: 2, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'regular',
           },
