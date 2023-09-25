@@ -381,34 +381,34 @@ async function setUpGroupPostDB() {
 
   await PostDetail.bulkCreate([
     {
-      postDetailId: 1, postId: 1, content: 'test-content1',
+      postDetailId: 1, postId: 1, content: 'test-content1', image: 'postImage'
     },
     {
-      postDetailId: 2, postId: 2, content: 'test-content2',
+      postDetailId: 2, postId: 2, content: 'test-content2', image: 'postImage'
     },
     {
-      postDetailId: 3, postId: 3, content: 'test-content3',
+      postDetailId: 3, postId: 3, content: 'test-content3', image: 'postImage'
     },
     {
-      postDetailId: 4, postId: 4, content: 'test-content4',
+      postDetailId: 4, postId: 4, content: 'test-content4', image: 'postImage'
     },
     {
-      postDetailId: 5, postId: 5, content: 'test-content5',
+      postDetailId: 5, postId: 5, content: 'test-content5', image: 'postImage'
     },
     {
-      postDetailId: 6, postId: 6, content: 'test-content6',
+      postDetailId: 6, postId: 6, content: 'test-content6', image: 'postImage'
     },
     {
-      postDetailId: 7, postId: 7, content: 'test-content7',
+      postDetailId: 7, postId: 7, content: 'test-content7', image: 'postImage'
     },
     {
-      postDetailId: 8, postId: 8, content: 'test-content8',
+      postDetailId: 8, postId: 8, content: 'test-content8', image: 'postImage'
     },
     {
-      postDetailId: 9, postId: 9, content: 'test-content9',
+      postDetailId: 9, postId: 9, content: 'test-content9', image: 'postImage'
     },
     {
-      postDetailId: 10, postId: 10, content: 'test-content10',
+      postDetailId: 10, postId: 10, content: 'test-content10', image: 'postImage'
     },
   ]);
 

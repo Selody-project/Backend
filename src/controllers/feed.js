@@ -27,7 +27,7 @@ const {
 const {
   validateGroupIdSchema,
   validatePostSchema, validatePostIdSchema, validatePageSchema,
-  validateCommentSchema, validateCommentIdSchema,
+  validateCommentSchema, validateCommentIdSchema, validateLastRecordIdSchema,
 } = require('../utils/validators');
 
 async function postGroupPost(req, res, next) {
@@ -133,14 +133,16 @@ async function getSinglePost(req, res, next) {
 
 async function getGroupPosts(req, res, next) {
   try {
-    const { error: paramError } = validateGroupIdSchema(req.params);
-    const { error: queryError } = validatePageSchema(req.query);
-
-    if (paramError || queryError) {
+    const { error: paramError } = validatePageSchema(req.params);
+    if (paramError) {
       return next(new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
+    let { last_record_id: lastRecordId } = req.params;
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
     const { user } = req;
     const group = await Group.findByPk(groupId);
 
@@ -148,13 +150,11 @@ async function getGroupPosts(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const { page } = req.query;
-    const pageSize = 7;
-
-    const startIndex = (page - 1) * pageSize;
-    const { rows } = await Post.findAndCountAll({
+    const pageSize = 9;
+    const posts = await Post.findAll({
       where: {
         groupId,
+        postId: { [Sequelize.Op.lt]: lastRecordId }, // ID가 지정한 ID보다 작은(더 오래된) 레코드 검색
       },
       include: [
         {
@@ -162,12 +162,18 @@ async function getGroupPosts(req, res, next) {
           as: 'postDetail',
         },
       ],
-      offset: startIndex,
-      limit: pageSize,
+      limit: pageSize, // 원하는 개수만큼 데이터 가져오기
+      order: [['createdAt', 'DESC']],
     });
+    let isEnd;
+    if (posts.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
+    }
 
     const feed = await Promise.all(
-      rows.map(async (post) => {
+      posts.map(async (post) => {
         const isMineValue = isMine(user, post);
         const { likesCount, isLikedValue } = (await isLike(user, post));
         return {
@@ -184,7 +190,7 @@ async function getGroupPosts(req, res, next) {
       }),
     );
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, feed });
+    return res.status(200).json({ accessLevel, isEnd, feed });
   } catch (err) {
     return next(new ApiError());
   }
@@ -607,23 +613,34 @@ async function deleteComment(req, res, next) {
 
 async function getUserFeed(req, res, next) {
   try {
-    const { error: queryError } = validatePageSchema(req.query);
-    if (queryError) {
+    const { error: paramError } = validateLastRecordIdSchema(req.params);
+    if (paramError) {
       return next(new DataFormatError());
     }
 
     const { user } = req;
     const groups = (await user.getGroups()).map((group) => group.groupId);
 
-    const { page } = req.query;
-    const pageSize = 12;
+    let { last_record_id: lastRecordId } = req.params;
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
 
-    const startIndex = (page - 1) * pageSize;
+    const pageSize = 9;
     const posts = await Post.findAll({
       where: {
-        groupId: {
-          [Op.in]: groups,
-        },
+        [Op.and]: [
+          {
+            groupId: {
+              [Op.in]: groups, // groups 배열의 값과 일치하는 groupId
+            },
+          },
+          {
+            postId: {
+              [Op.lt]: lastRecordId, // postId가 lastRecordId보다 작은 레코드
+            },
+          },
+        ],
       },
       include: [
         {
@@ -632,9 +649,14 @@ async function getUserFeed(req, res, next) {
         },
       ],
       order: [['createdAt', 'DESC']],
-      offset: startIndex,
       limit: pageSize,
     });
+    let isEnd;
+    if (posts.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
+    }
     const feed = await Promise.all(
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
@@ -653,7 +675,7 @@ async function getUserFeed(req, res, next) {
       }),
     );
 
-    return res.status(200).json({ feed });
+    return res.status(200).json({ isEnd, feed });
   } catch (err) {
     return next(new ApiError());
   }

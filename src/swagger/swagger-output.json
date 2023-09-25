@@ -276,15 +276,17 @@
             "description": "서버 에러"
           }
         }
-      },
+      }
+    },
+    "/api/group/list/{last_record_id}": {
       "get": {
-        "description": "한 페이지(9개의 group 정보) 단위로 그룹 리스트를 조회합니다. groupId, 그룹명, 소개, 멤버 수를 보여줍니다.",
+        "description": "9개 단위로 그룹 리스트를 조회합니다. groupId, 그룹명, 소개, 멤버 수를 보여줍니다.",
         "summary": "그룹 리스트 조회",
         "tags": ["Group"],
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
+            "name": "last_record_id",
+            "in": "path",
             "type": "integer"
           }
         ],
@@ -1193,10 +1195,10 @@
         }
       }
     },
-    "/api/group/{group_id}/post": {
+    "/api/group/{group_id}/feed/{last_record_id}": {
       "get": {
-        "description": "페이지네이션",
-        "summary": "그룹 포스트 페이지 조회(7개 단위)",
+        "description": "현재 마지막 레코드의 id 값을 last_record_id에 넣어 요청하면, 해당 레코드 이전에 생성된 9개의 시간순 레코드를 얻어옵니다. 첫 호출시에는 0을 넣어주세요.",
+        "summary": "그룹 피드 조회(9개 단위)",
         "tags": ["Feed"],
         "parameters": [
           {
@@ -1206,8 +1208,8 @@
             "type": "integer"
           },
           {
-            "name": "page",
-            "in": "query",
+            "name": "last_record_id",
+            "in": "path",
             "required": true,
             "type": "integer"
           }
@@ -1226,7 +1228,9 @@
             "description": "서버 에러"
           }
         }
-      },
+      }
+    },
+    "/api/group/{group_id}/post": {
       "post": {
         "description": "",
         "summary": "그룹 포스트 작성",
@@ -1729,15 +1733,15 @@
         }
       }
     },
-    "/api/user/feed": {
+    "/api/user/feed/{last_record_id}": {
       "get": {
-        "description": "가입된 모든 그룹의 피드를 시간순으로 가져옵니다 ( 12개 단위 )",
+        "description": "가입된 모든 그룹의 피드를 시간순으로 가져옵니다 ( 9개 단위 )",
         "summary": "최신 피드 조회",
         "tags": ["Feed"],
         "parameters": [
           {
-            "name": "page",
-            "in": "query",
+            "name": "last_record_id",
+            "in": "path",
             "required": true,
             "type": "integer"
           }

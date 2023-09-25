@@ -622,12 +622,10 @@ describe('Test /api/user endpoints', () => {
     });
   });
 
-  describe('Test GET /api/user/feed', () => {
+  describe('Test GET /api/user/feed/:last_record_id', () => {
     it('Successfully retrieved feed', async () => {
-      const page = 1;
-      const res = await request(app).get('/api/user/feed').set('Cookie', cookie).query({
-        page,
-      });
+      const lastRecordId = 0;
+      const res = await request(app).get(`/api/user/feed/${lastRecordId}`).set('Cookie', cookie);
       const expectedResult = [
         {
           postId: 1,
@@ -719,16 +717,6 @@ describe('Test /api/user endpoints', () => {
           author: 'test-user1',
           content: 'test-content9'
         },
-        {
-          postId: 10,
-          groupId: 1,
-          isMine: true,
-          isLiked: false,
-          likesCount: 0,
-          title: 'test-title10',
-          author: 'test-user1',
-          content: 'test-content10'
-        }
       ];
 
       const result = res.body.feed.map((post) => ({
@@ -746,10 +734,8 @@ describe('Test /api/user endpoints', () => {
     });
 
     it('Successfully failed to retrieve feed (DataFormat Error)', async () => {
-      const page = 'abc';
-      const res = await request(app).get('/api/user/feed').set('Cookie', cookie).query({
-        page,
-      });
+      const lastRecordId = 'abc';
+      const res = await request(app).get(`/api/user/feed/${lastRecordId}`).set('Cookie', cookie);
       expect(res.status).toEqual(400);
     });
   });

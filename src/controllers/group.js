@@ -1,4 +1,6 @@
-const { Op } = require('sequelize');
+const { Sequelize } = require('sequelize');
+
+const { Op } = Sequelize;
 const { deleteBucketImage } = require('../middleware/s3');
 
 // Model
@@ -17,7 +19,7 @@ const {
 
 // Validator
 const {
-  validateGroupSchema, validateGroupIdSchema, validatePageSchema,
+  validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword,
 } = require('../utils/validators');
@@ -137,27 +139,39 @@ async function getGroupDetail(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { error: queryError } = validatePageSchema(req.query);
-    if (queryError) {
+    const { error: paramError } = validateLastRecordIdSchema(req.params);
+    if (paramError) {
       return next(new DataFormatError());
     }
 
-    const { page } = req.query;
+    let { last_record_id: lastRecordId } = req.params;
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
+
     const pageSize = 9;
-    const startIndex = (page - 1) * pageSize;
-    const { rows } = await Group.findAndCountAll({
-      offset: startIndex,
+    let groups = await Group.findAll({
+      where: {
+        groupId: { [Sequelize.Op.lt]: lastRecordId },
+      },
       limit: pageSize,
+      order: [['groupId', 'DESC']],
     });
-    const result = rows.map((group) => ({
+    let isEnd;
+    if (groups.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
+    }
+    groups = groups.map((group) => ({
       groupId: group.groupId,
       name: group.name,
       description: group.description,
       member: group.member,
       image: group.image,
     }));
-    return res.status(200).json(result);
-  } catch {
+    return res.status(200).json({ isEnd, groups });
+  } catch (err) {
     return next(new ApiError());
   }
 }
