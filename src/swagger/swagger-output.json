@@ -245,17 +245,17 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "example": "test-group",
-                    "type": "VARCHAR(45)"
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
                   },
-                  "description": {
-                    "example": "test-description",
-                    "type": "VARCHAR(300)"
+                  "data": {
+                    "type": "string",
+                    "example": "{\"name\": \"test-group\", \"description\": \"test-description\"}"
                   }
                 }
               }
@@ -380,21 +380,17 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "example": "modified-name",
-                    "type": "VARCHAR(45)"
+                  "image": {
+                    "type": "string",
+                    "format": "binary"
                   },
-                  "description": {
-                    "example": "modified-description",
-                    "type": "VARCHAR(300)"
-                  },
-                  "leader": {
-                    "example": 2,
-                    "type": "BIGINT"
+                  "data": {
+                    "type": "string",
+                    "example": "{\"name\": \"modified-group\", \"description\": \"modified-description\"}"
                   }
                 }
               }
@@ -1250,7 +1246,15 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "image": {
+                  "image1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image2": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image3": {
                     "type": "string",
                     "format": "binary"
                   },
@@ -1341,7 +1345,15 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "image": {
+                  "image1": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image2": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "image3": {
                     "type": "string",
                     "format": "binary"
                   },

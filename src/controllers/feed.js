@@ -279,7 +279,7 @@ async function deleteGroupPost(req, res, next) {
     if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, post))) {
       return next(new EditPermissionError());
     }
-    const previousPostImage = postDetail.image;
+    const previousPostImage = postDetail.image?.split(', ');
     await post.destroy();
 
     await deleteBucketImage(previousPostImage);

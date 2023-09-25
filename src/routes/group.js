@@ -26,18 +26,18 @@ const {
   postComment, getPostComment, getSingleComment, putComment, deleteComment,
 } = require('../controllers/feed');
 const {
-  uploadPostMiddleware,
+  uploadGroupMiddleware, uploadPostMiddleware,
 } = require('../middleware/s3');
 
 const router = express.Router();
 
 // Group
-router.post('/', postGroup);
+router.post('/', uploadGroupMiddleware, postGroup);
 router.get('/', getGroupList);
 router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
-router.put('/:group_id', putGroup);
+router.put('/:group_id', uploadGroupMiddleware, putGroup);
 router.delete('/:group_id', deleteGroup);
 router.get('/:group_id/members', getGroupMembers);
 router.get('/:group_id/members/request', getPendingMembers);

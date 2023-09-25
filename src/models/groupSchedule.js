@@ -48,7 +48,7 @@ class GroupSchedule extends Sequelize.Model {
         allowNull: true,
       },
       byweekday: {
-        type: Sequelize.TEXT,
+        type: Sequelize.STRING(30),
         allowNull: true,
       },
       until: {

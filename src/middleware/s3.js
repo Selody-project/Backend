@@ -31,6 +31,13 @@ function getFilePathFromUrl(fileUrl) {
 
 async function uploadProfileMiddleware(req, res, next) {
   try {
+    // 이미지 파일이 없으면 미들웨어를 바로 종료
+    const { files } = req;
+    if (files === undefined || files === null) {
+      req.fileUrl = null;
+      return next();
+    }
+
     if (req?.files?.image) {
       const contentLength = req.headers['content-length'];
       const maxFileSize = 1 * 1024 * 1024;
@@ -43,6 +50,47 @@ async function uploadProfileMiddleware(req, res, next) {
       const fileName = transliterate(sanitizeFileName(req.files.image.name));
       const bucketName = process.env.AWS_BUCKET_NAME;
       const folderName = process.env.AWS_PROFILE_FOLDER;
+      const contentType = mime.getType(fileName);
+      const bucketParams = {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: `${folderName}/${Date.now()}_${fileName}`,
+        Body: file.data,
+        ContentType: contentType,
+      };
+
+      const command = new PutObjectCommand(bucketParams);
+      await s3Client.send(command);
+      const fileUrl = `https://${bucketName}.s3.amazonaws.com/${bucketParams.Key}`;
+      req.fileUrl = [fileUrl];
+    } else {
+      req.fileUrl = null;
+    }
+    return next();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function uploadGroupMiddleware(req, res, next) {
+  try {
+    // 이미지 파일이 없으면 미들웨어를 바로 종료
+    const { files } = req;
+    if (files === undefined || files === null) {
+      req.fileUrl = null;
+      return next();
+    }
+    if (req?.files?.image) {
+      const contentLength = req.headers['content-length'];
+      const maxFileSize = 1 * 1024 * 1024;
+
+      if (contentLength > maxFileSize) {
+        return next(new FileTooLargeError());
+      }
+
+      const file = req.files.image;
+      const fileName = transliterate(sanitizeFileName(req.files.image.name));
+      const bucketName = process.env.AWS_BUCKET_NAME;
+      const folderName = process.env.AWS_GROUP_FOLDER;
       const contentType = mime.getType(fileName);
       const bucketParams = {
         Bucket: process.env.AWS_BUCKET_NAME,
@@ -122,7 +170,7 @@ async function deleteBucketImage(fileUrls) {
 
       /* eslint-disable-next-line */
       for (const fileUrl of fileUrls) {
-        if (fileUrl === process.env.DEFAULT_USER_IMAGE || fileUrl === '') {
+        if (fileUrl === process.env.DEFAULT_USER_IMAGE || fileUrl === process.env.DEFAULT_GROUP_IMAGE || fileUrl === '') {
           /* eslint-disable-next-line */
           continue;
         }
@@ -145,6 +193,7 @@ async function deleteBucketImage(fileUrls) {
 
 module.exports = {
   uploadProfileMiddleware,
+  uploadGroupMiddleware,
   uploadPostMiddleware,
   deleteBucketImage,
 };

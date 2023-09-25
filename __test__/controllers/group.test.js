@@ -49,9 +49,9 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group', () => {
     it('Successfully create group', async () => {
-      const res = await request(app).post('/api/group').set('Cookie', cookie).send({
-        name: 'test-group',
-      });
+      const data = `{\"name\": \"test-group1\", \"description\": \"'test-description1'\"}`;
+      const res = await request(app).post('/api/group').set('Cookie', cookie).field('data', data);
+
       expect(res.status).toEqual(200);
     });
   });
@@ -87,29 +87,20 @@ describe('Test /api/group endpoints', () => {
   describe('Test PUT /api/group', () => {
     it('Successfully modified group info ', async () => {
       const groupId = 1;
-      const updateData = {
-        name: 'modified-group1',
-        description: 'modified-description1',
-        leader: 2,
-      };
-      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
+      const data = `{\"name\": \"modified-group1\", \"description\": \"modified-description1\"}`;
+      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).field('data', data);
 
       const group = await Group.findByPk(groupId);
 
       expect(res.status).toEqual(200);
       expect(group.name).toEqual('modified-group1');
       expect(group.description).toEqual('modified-description1');
-      expect(group.leader).toEqual(2);
     });
 
     it('Successfully failed to modified group (group not found)', async () => {
       const groupId = 100;
-      const updateData = {
-        name: 'modified-group1',
-        description: 'modified-description1',
-        leader: 2,
-      };
-      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).send(updateData);
+      const data = `{\"name\": \"modified-group1\", \"description\": \"'modified-description1'\"}`;
+      const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
     });
@@ -164,6 +155,7 @@ describe('Test /api/group endpoints', () => {
             leader: 1,
             member: 2,
             name: 'test-group1',
+            image: 'groupImageLink',
           },
           leaderInfo: {
             nickname: 'test-user1',
@@ -1431,6 +1423,7 @@ describe('Test /api/group endpoints', () => {
         inviteCode: 'inviteCode01',
         isPublicGroup: 0,
         inviteExp: '2099-01-01T00:00:00.000Z',
+        image: 'groupImageLink',
       },
       {
         groupId: 2,
@@ -1441,6 +1434,7 @@ describe('Test /api/group endpoints', () => {
         inviteCode: 'expiredCode02',
         isPublicGroup: 0,
         inviteExp: '2000-01-01T00:00:00.000Z',
+        image: 'groupImageLink',
       },
       {
         groupId: 3,
@@ -1451,6 +1445,7 @@ describe('Test /api/group endpoints', () => {
         inviteCode: 'inviteCode03',
         isPublicGroup: 0,
         inviteExp: '2099-01-01T00:00:00.000Z',
+        image: 'groupImageLink',
       },
       ];
 

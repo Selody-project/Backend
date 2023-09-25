@@ -63,7 +63,7 @@ async function patchUserProfile(req, res, next) {
       throw (new DuplicateEmailError());
     }
 
-    const previousProfileImage = user.profileImage;
+    const previousProfileImage = [user.profileImage];
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
       await user.update({ nickname, email, profileImage: fileUrl });
@@ -74,7 +74,6 @@ async function patchUserProfile(req, res, next) {
     req.user = user;
     return next();
   } catch (err) {
-    console.log(err);
     await deleteBucketImage(req.fileUrl);
     if (!err || err.status === undefined) {
       return next(new ApiError());
@@ -117,8 +116,10 @@ async function withdrawal(req, res, next) {
       return next(new BelongToGroupError());
     }
 
+    const previousProfileImage = [user.profileImage];
     await PersonalSchedule.destroy({ where: { userId: user.userId } });
     await user.destroy();
+    await deleteBucketImage(previousProfileImage);
 
     return res.status(204).json({ message: 'Successfully deleted' });
   } catch (err) {

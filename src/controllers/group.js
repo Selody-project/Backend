@@ -1,4 +1,5 @@
 const { Op } = require('sequelize');
+const { deleteBucketImage } = require('../middleware/s3');
 
 // Model
 const User = require('../models/user');
@@ -24,6 +25,11 @@ const { getAccessLevel } = require('../utils/accessLevel');
 
 async function postGroup(req, res, next) {
   try {
+    if (!req.body?.data) {
+      throw (new DataFormatError());
+    }
+    req.body = JSON.parse(req.body.data);
+
     const { error: bodyError } = validateGroupSchema(req.body);
     if (bodyError) {
       return next(new DataFormatError());
@@ -31,9 +37,18 @@ async function postGroup(req, res, next) {
 
     const { name, description } = req.body;
     const { user } = req;
-    const group = await Group.create({
-      name, description, member: 1, leader: user.userId,
-    });
+
+    let group;
+    if (req.fileUrl !== null) {
+      const fileUrl = req.fileUrl.join(', ');
+      group = await Group.create({
+        name, description, member: 1, leader: user.userId, image: fileUrl,
+      });
+    } else {
+      group = await Group.create({
+        name, description, member: 1, leader: user.userId, image: process.env.DEFAULT_GROUP_IMAGE,
+      });
+    }
 
     await user.addGroup(group, { through: { accessLevel: 'owner' } });
 
@@ -44,7 +59,11 @@ async function postGroup(req, res, next) {
 
     return res.status(200).json(response);
   } catch (err) {
-    return next(new ApiError());
+    await deleteBucketImage(req.fileUrl);
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -135,6 +154,7 @@ async function getGroupList(req, res, next) {
       name: group.name,
       description: group.description,
       member: group.member,
+      image: group.image,
     }));
     return res.status(200).json(result);
   } catch {
@@ -144,9 +164,14 @@ async function getGroupList(req, res, next) {
 
 async function putGroup(req, res, next) {
   try {
+    if (!req.body?.data) {
+      throw (new DataFormatError());
+    }
+    req.body = JSON.parse(req.body.data);
+
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -154,16 +179,24 @@ async function putGroup(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
-    const { name, description, leader } = req.body;
-    const modifiedGroup = await group.update({ name, description, leader });
+    const { name, description } = req.body;
+    const previousGroupImage = [group.image];
+    let modifiedGroup;
+    if (req.fileUrl !== null) {
+      const fileUrl = req.fileUrl.join(', ');
+      modifiedGroup = await group.update({ name, description, image: fileUrl });
+      await deleteBucketImage(previousGroupImage);
+    } else {
+      modifiedGroup = await group.update({ name, description });
+    }
 
     const response = {
       ...{ message: 'Successfully modified group info' },
@@ -171,7 +204,11 @@ async function putGroup(req, res, next) {
     };
     return res.status(200).json(response);
   } catch (err) {
-    return next(new ApiError());
+    await deleteBucketImage(req.fileUrl);
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -195,7 +232,9 @@ async function deleteGroup(req, res, next) {
       return next(new UnauthorizedError());
     }
 
+    const previousGroupImage = [group.image];
     await group.destroy();
+    await deleteBucketImage(previousGroupImage);
     return res.status(204).json({ message: 'Successfully delete group' });
   } catch (err) {
     return next(new ApiError());
