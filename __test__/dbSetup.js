@@ -86,7 +86,7 @@ async function setUpUserDB() {
       createdAt: '2023-04-26',
       updatedAt: '2023-04-26',
     },
-    
+
   ];
 
   await User.create(mockUserData[0]);
@@ -128,15 +128,58 @@ async function setUpGroupDB() {
     inviteExp: '2099-01-01T00:00:00.000Z',
     image: 'groupImageLink',
   });
-  
+  const group4 = await Group.create({
+    groupId: 4,
+    name: 'test-group4',
+    description: 'test-description4',
+    member: 2,
+    leader: 3,
+    inviteCode: 'inviteCode04',
+    inviteExp: '2099-01-01T00:00:00.000Z',
+    image: 'groupImageLink',
+  });
+
   const user = await User.findAll();
-  await user[0].addGroup(group1, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
-  await user[0].addGroup(group2, { through: { accessLevel: 'regular', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
-  await user[1].addGroup(group1, { through: { accessLevel: 'admin', shareScheduleOption: 0, notificationOption: 1, isPendingMember: 0 } });
-  await user[1].addGroup(group2, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
-  await user[2].addGroup(group3, { through: { accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
-  await user[4].addGroup(group1, { through: { accessLevel: 'viewer', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 1 } });
-  await user[4].addGroup(group3, { through: { accessLevel: 'admin', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0 } });
+  await user[0].addGroup(group1, {
+    through: {
+      accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[0].addGroup(group2, {
+    through: {
+      accessLevel: 'regular', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[1].addGroup(group1, {
+    through: {
+      accessLevel: 'admin', shareScheduleOption: 0, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[1].addGroup(group2, {
+    through: {
+      accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[2].addGroup(group3, {
+    through: {
+      accessLevel: 'owner', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[4].addGroup(group1, {
+    through: {
+      accessLevel: 'viewer', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 1,
+    },
+  });
+  await user[4].addGroup(group3, {
+    through: {
+      accessLevel: 'admin', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
+  await user[4].addGroup(group4, {
+    through: {
+      accessLevel: 'admin', sharePersonalEvent: 1, notificationOption: 1, isPendingMember: 0,
+    },
+  });
 }
 
 async function setUpGroupScheduleDB() {
@@ -381,34 +424,34 @@ async function setUpGroupPostDB() {
 
   await PostDetail.bulkCreate([
     {
-      postDetailId: 1, postId: 1, content: 'test-content1', image: 'postImage'
+      postDetailId: 1, postId: 1, content: 'test-content1', image: 'postImage',
     },
     {
-      postDetailId: 2, postId: 2, content: 'test-content2', image: 'postImage'
+      postDetailId: 2, postId: 2, content: 'test-content2', image: 'postImage',
     },
     {
-      postDetailId: 3, postId: 3, content: 'test-content3', image: 'postImage'
+      postDetailId: 3, postId: 3, content: 'test-content3', image: 'postImage',
     },
     {
-      postDetailId: 4, postId: 4, content: 'test-content4', image: 'postImage'
+      postDetailId: 4, postId: 4, content: 'test-content4', image: 'postImage',
     },
     {
-      postDetailId: 5, postId: 5, content: 'test-content5', image: 'postImage'
+      postDetailId: 5, postId: 5, content: 'test-content5', image: 'postImage',
     },
     {
-      postDetailId: 6, postId: 6, content: 'test-content6', image: 'postImage'
+      postDetailId: 6, postId: 6, content: 'test-content6', image: 'postImage',
     },
     {
-      postDetailId: 7, postId: 7, content: 'test-content7', image: 'postImage'
+      postDetailId: 7, postId: 7, content: 'test-content7', image: 'postImage',
     },
     {
-      postDetailId: 8, postId: 8, content: 'test-content8', image: 'postImage'
+      postDetailId: 8, postId: 8, content: 'test-content8', image: 'postImage',
     },
     {
-      postDetailId: 9, postId: 9, content: 'test-content9', image: 'postImage'
+      postDetailId: 9, postId: 9, content: 'test-content9', image: 'postImage',
     },
     {
-      postDetailId: 10, postId: 10, content: 'test-content10', image: 'postImage'
+      postDetailId: 10, postId: 10, content: 'test-content10', image: 'postImage',
     },
   ]);
 
@@ -434,7 +477,7 @@ async function setUpLikeDB() {
       id: 1, postId: 2, userId: 1,
     },
     {
-      id: 2, postId: 3, userId: 1, 
+      id: 2, postId: 3, userId: 1,
     },
     {
       id: 3, postId: 2, userId: 2,

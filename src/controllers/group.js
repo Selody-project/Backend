@@ -384,6 +384,17 @@ async function postGroupJoinRequest(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
+    const userBelongGroup = await UserGroup.findOne({
+      where: {
+        userId: user.userId,
+        groupId: group.groupId,
+      },
+    });
+
+    if (userBelongGroup) {
+      return next(new InvalidGroupJoinError());
+    }
+
     await group.addUser(user, { through: { isPendingMember: 1 } });
 
     return res.status(200).json({ message: 'Successfully completed the application for registration. ' });
