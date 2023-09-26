@@ -186,7 +186,6 @@ class PersonalSchedule extends Sequelize.Model {
       }
       return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
-      console.log(err);
       throw new ApiError();
     }
   }

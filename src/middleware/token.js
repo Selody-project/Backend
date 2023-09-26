@@ -96,6 +96,7 @@ async function renewToken(req, res, next) {
       nickname,
       provider: user.provider,
       snsId: user.snsId,
+      image: user.profileImage,
     });
   } catch (err) {
     if (err.name === 'TokenExpireError') {

@@ -40,7 +40,7 @@ async function postPersonalSchedule(req, res, next) {
       recurrence,
       freq,
       interval,
-      byweekday,
+      byweekday: `[${byweekday.join(', ')}]`,
       until,
     });
 
@@ -51,6 +51,7 @@ async function postPersonalSchedule(req, res, next) {
 
     return res.status(201).json(response);
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
