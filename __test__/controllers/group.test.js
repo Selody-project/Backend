@@ -565,7 +565,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 1;
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You are already a member of this group.' });
+      expect(res.body).toEqual({ error: '이미 가입된 그룹입니다.' });
     });
   });
 
