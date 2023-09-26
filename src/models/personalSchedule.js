@@ -47,7 +47,7 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: true,
       },
       byweekday: {
-        type: Sequelize.TEXT,
+        type: Sequelize.JSON,
         allowNull: true,
       },
       until: {

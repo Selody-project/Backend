@@ -73,14 +73,14 @@ describe('Test /api/group endpoints', () => {
       const id = 5;
       const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully fail to delete group (DataFormat Error)', async () => {
       const id = 'abc';
       const res = await request(app).delete(`/api/group/${id}`).set('Cookie', cookie);
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -129,7 +129,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully fail to get an group info (DataFormat Error)', async () => {
@@ -188,7 +188,7 @@ describe('Test /api/group endpoints', () => {
       const id = 10000;
       const res = (await request(app).get(`/api/group/${id}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 
@@ -203,7 +203,7 @@ describe('Test /api/group endpoints', () => {
         recurrence: 1,
         freq: 'WEEKLY',
         interval: 1,
-        byweekday: 'MO',
+        byweekday: ['MO'],
         until: '2026-01-05T00:00:00.000Z',
       });
       const expectedResult = {
@@ -215,7 +215,7 @@ describe('Test /api/group endpoints', () => {
         recurrence: 1,
         freq: 'WEEKLY',
         interval: 1,
-        byweekday: 'MO',
+        byweekday: ['MO'],
         until: '2026-01-05T00:00:00.000Z',
         groupId: 1,
         message: "Successfully create group schedule",
@@ -430,7 +430,7 @@ describe('Test /api/group endpoints', () => {
               until: '2025-01-01T00:00:00.000Z',
             },
             {
-              byweekday: 'MO,TU',
+              byweekday: ['MO','TU'],
               content: 'test-content15',
               freq: 'DAILY',
               groupId: 1,
@@ -558,7 +558,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 
@@ -573,7 +573,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 100;
       const res = (await request(app).post(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 
@@ -591,7 +591,7 @@ describe('Test /api/group endpoints', () => {
       const inviteCode = 'isWrongInviteCode';
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to join the group (Group Not Found2) ', async () => {
@@ -599,7 +599,7 @@ describe('Test /api/group endpoints', () => {
       const inviteCode = 'inviteCode01';
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to join the group (Expired Code Error) ', async () => {
@@ -607,7 +607,7 @@ describe('Test /api/group endpoints', () => {
       const inviteCode = 'expiredCode02';
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(410);
-      expect(res.body).toEqual({ error: 'Expired invitation code.' });
+      expect(res.body).toEqual({ error: '만료된 초대 링크입니다.' });
     });
 
     it('Successfully failed to join the group (Invalid Group Join Error) ', async () => {
@@ -615,7 +615,7 @@ describe('Test /api/group endpoints', () => {
       const inviteCode = 'inviteCode01';
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You are already a member of this group.' });
+      expect(res.body).toEqual({ error: '이미 가입된 그룹입니다.' });
     });
   });
 
@@ -692,7 +692,7 @@ describe('Test /api/group endpoints', () => {
       const scheduleId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Schedule Not Found' });
+      expect(res.body).toEqual({ error: '일정을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved a schedule. (DataFormat Error) ', async () => {
@@ -700,7 +700,7 @@ describe('Test /api/group endpoints', () => {
       const scheduleId = 'abc';
       const res = (await request(app).get(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -733,7 +733,7 @@ describe('Test /api/group endpoints', () => {
       const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to create the post (DataFormat Error) ', async () => {
@@ -743,7 +743,7 @@ describe('Test /api/group endpoints', () => {
       const data = `{\"title\": \"${title}\", \"test\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -781,7 +781,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to modified the post (Post Not Found) ', async () => {
@@ -793,7 +793,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to modified the post (DataFormat Error) ', async () => {
@@ -805,7 +805,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
 
     it('Successfully failed to modified the post (Edit Permission Error) ', async () => {
@@ -817,7 +817,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
     });
   });
 
@@ -836,7 +836,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to deleted the post (Post Not Found) ', async () => {
@@ -844,7 +844,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 10000;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to deleted the post (DataFormat Error) ', async () => {
@@ -852,7 +852,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 'abc';
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -883,7 +883,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the post. (Post Not Found) ', async () => {
@@ -891,7 +891,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the post. (DataFormat Error) ', async () => {
@@ -899,7 +899,7 @@ describe('Test /api/group endpoints', () => {
       const postId = 'abc';
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -962,7 +962,7 @@ describe('Test /api/group endpoints', () => {
       const lastRecordId = 0;
       const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the posts. (DataFormat Error) ', async () => {
@@ -970,7 +970,7 @@ describe('Test /api/group endpoints', () => {
       const lastRecordId = 0;
       const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1006,7 +1006,7 @@ describe('Test /api/group endpoints', () => {
       const lastRecordId = 'abc'
       const res = (await request(app).get(`/api/group/list/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1039,7 +1039,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to create the comment (Post Not Found) ', async () => {
@@ -1050,7 +1050,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to create the comment (DataFormat Error) ', async () => {
@@ -1061,7 +1061,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1098,7 +1098,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to modified the comment (Post Not Found) ', async () => {
@@ -1109,7 +1109,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to modified the comment (Comment Not Found) ', async () => {
@@ -1120,7 +1120,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Comment Not Found' });
+      expect(res.body).toEqual({ error: '댓글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to modified the comment (DataFormat Error) ', async () => {
@@ -1131,7 +1131,7 @@ describe('Test /api/group endpoints', () => {
         content,
       }));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1150,7 +1150,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to deleted the comment (Post Not Found) ', async () => {
@@ -1159,7 +1159,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to deleted the comment (Comment Not Found) ', async () => {
@@ -1168,7 +1168,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 10000;
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Comment Not Found' });
+      expect(res.body).toEqual({ error: '댓글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to deleted the comment (DataFormat Error) ', async () => {
@@ -1177,7 +1177,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 'abc';
       const res = (await request(app).delete(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1219,7 +1219,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the comment (Post Not Found) ', async () => {
@@ -1228,7 +1228,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the comment (Comment Not Found) ', async () => {
@@ -1237,7 +1237,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Comment Not Found' });
+      expect(res.body).toEqual({ error: '댓글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the comment. (DataFormat Error) ', async () => {
@@ -1246,7 +1246,7 @@ describe('Test /api/group endpoints', () => {
       const commentId = 1;
       const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment/${commentId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1276,14 +1276,14 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the comments (DataFormat Error) ', async () => {
       const groupId = 'abc';
       const res = (await request(app).get(`/api/group/${groupId}/members`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1307,14 +1307,14 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the comments (DataFormat Error) ', async () => {
       const groupId = 'abc';
       const res = (await request(app).get(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1331,7 +1331,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/approve`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to approve the membership registration. (DataFormat Error) ', async () => {
@@ -1339,7 +1339,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/approve`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1356,7 +1356,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/reject`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to reject the membership request. (DataFormat Error) ', async () => {
@@ -1364,7 +1364,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).post(`/api/group/${groupId}/members/${userId}/reject`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1381,7 +1381,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to expell a member. (User Not Found) ', async () => {
@@ -1389,7 +1389,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 10000;
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'User Not Found' });
+      expect(res.body).toEqual({ error: '유저를 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to expell a member. (DataFormat Error) ', async () => {
@@ -1397,7 +1397,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
 
     it('Successfully failed to expell a member. (No Ban Permission Error) ', async () => {
@@ -1405,7 +1405,7 @@ describe('Test /api/group endpoints', () => {
       const userId = 2;
       const res = (await request(app).delete(`/api/group/${groupId}/members/${userId}`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You cannot ban the leader or administrator. ' });
+      expect(res.body).toEqual({ error: '방장이나 관리자는 강퇴할 수 없습니다. ' });
     });
   });
 
@@ -1462,7 +1462,7 @@ describe('Test /api/group endpoints', () => {
       }));
 
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
@@ -1471,7 +1471,7 @@ describe('Test /api/group endpoints', () => {
         keyword,
       }));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the group (Keyword Length Range) ', async () => {
@@ -1480,7 +1480,7 @@ describe('Test /api/group endpoints', () => {
         keyword,
       }));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -1507,7 +1507,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 10000;
       const res = (await request(app).get(`/api/group/${groupId}/join/invite-link`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 
@@ -1527,7 +1527,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to create a Like (Post Not Found) ', async () => {
@@ -1536,7 +1536,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to create a Like (DataFormat Error) ', async () => {
@@ -1545,7 +1545,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
 
     it('Successfully failed to create a Like (Edit Permission Error) ', async () => {
@@ -1554,7 +1554,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
     });
 
     it('Successfully failed to create a Like ', async () => {
@@ -1563,7 +1563,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(409);
-      expect(res.body).toEqual({ error: 'This request has already been processed. ' });
+      expect(res.body).toEqual({ error: '이미 전달된 요청입니다. ' });
     });
   });
 
@@ -1582,7 +1582,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to delete a Like (Post Not Found) ', async () => {
@@ -1591,7 +1591,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Post Not Found' });
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to delete a Like (DataFormat Error) ', async () => {
@@ -1600,7 +1600,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
 
     it('Successfully failed to delete a Like (Edit Permission Error) ', async () => {
@@ -1609,7 +1609,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(403);
-      expect(res.body).toEqual({ error: 'You do not have permission to modify.' });
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
     });
 
     it('Successfully failed to delete a Like ', async () => {
@@ -1618,7 +1618,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(409);
-      expect(res.body).toEqual({ error: 'This request has already been processed. ' });
+      expect(res.body).toEqual({ error: '이미 전달된 요청입니다. ' });
     });
   });
 });

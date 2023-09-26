@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class InvalidIdPasswordError extends ApiError {
   constructor(message) {
-    super(message || 'Invalid User ID/Password', 401);
+    super(message || '사용자 ID 또는 비밀번호가 잘못되었습니다. ', 401);
   }
 }
 

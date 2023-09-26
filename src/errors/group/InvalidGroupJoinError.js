@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class InvalidGroupJoinError extends ApiError {
   constructor(message) {
-    super(message || 'You are already a member of this group.', 403);
+    super(message || '이미 가입된 그룹입니다.', 403);
   }
 }
 

@@ -2,7 +2,7 @@ const ApiError = require('./apiError');
 
 class DataFormatError extends ApiError {
   constructor(message) {
-    super(message || 'The requested data format is not valid.', 400);
+    super(message || '지원하지 않는 형식의 데이터입니다.', 400);
   }
 }
 

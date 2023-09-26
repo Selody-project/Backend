@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class ExpiredCodeError extends ApiError {
   constructor(message) {
-    super(message || 'Expired invitation code.', 410);
+    super(message || '만료된 초대 링크입니다.', 410);
   }
 }
 

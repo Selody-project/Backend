@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class DuplicateLikeError extends ApiError {
   constructor(message) {
-    super(message || 'This request has already been processed. ', 409);
+    super(message || '이미 전달된 요청입니다. ', 409);
   }
 }
 

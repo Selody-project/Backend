@@ -192,9 +192,6 @@
           "404": {
             "description": "존재하지 않는 유저"
           },
-          "499": {
-            "description": "리더를 위임하지 않은 그룹이 존재"
-          },
           "500": {
             "description": "서버 에러"
           }
@@ -915,10 +912,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": "MO,WE,FR",
+                    "byweekday": ["MO","WE","FR"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
                 },
                 "recurrence4" : {
                   "value": {
@@ -1965,12 +1962,6 @@
         "tags": ["User Schedule"],
         "parameters": [
           {
-            "name": "user_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
             "name": "startDateTime",
             "in": "query",
             "type": "DATETIME",
@@ -2098,10 +2089,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": "MO,WE,FR",
+                    "byweekday": ["MO","WE","FR"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
                 },
                 "recurrence4" : {
                   "value": {
@@ -2305,6 +2296,9 @@
           },
           "404": {
             "description": "존재하지 않는 그룹/유저"
+          },
+          "499": {
+            "description": "그룹 리더는 탈퇴할 수 없음"
           },
           "500": {
             "description": "서버 에러"

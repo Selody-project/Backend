@@ -17,7 +17,7 @@ function getRRuleByWeekDay(byweekday) {
   if (!byweekday) {
     return [];
   }
-  const arr = byweekday.split(',');
+  const arr = byweekday;
   const RRuleWeekDay = {
     MO: RRule.MO,
     TU: RRule.TU,
