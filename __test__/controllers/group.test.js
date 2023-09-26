@@ -871,7 +871,7 @@ describe('Test /api/group endpoints', () => {
           isLiked: false,
           likesCount: 0,
           postId: 1,
-          image: null,
+          image: 'postImage',
         },
       };
       expect(res.status).toEqual(200);
@@ -903,69 +903,72 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group/:group_id/post', () => {
+  describe('Test GET /api/group/:group_id/feed/:last_record_id', () => {
     it('Successfully retrieved the posts. ', async () => {
       const groupId = 1;
-      const page = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
-        page,
-      }));
+      const lastRecordId = 0;
+      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
       const expectedResult = {
         accessLevel: 'owner',
+        isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0,
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2,
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, image: 'postImage'
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1,
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, image: 'postImage'
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0,
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0,
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0,
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, image: 'postImage'
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0,
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, image: 'postImage'
+          },
+          {
+            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, image: 'postImage' 
           },
         ],
       };
-      const { accessLevel } = res.body;
-      const feed = res.body.feed.map((post) => ({
-        postId: post.postId,
-        isMine: post.isMine,
-        isLiked: post.isLiked,
-        likesCount: post.likesCount,
-        title: post.title,
-        author: post.author,
-        content: post.content,
-      }));
+      const { accessLevel, isEnd } = res.body;
+      const feed = [];
+      for (const post of res.body['feed']) {
+        feed.push({
+          postId: post.postId,
+          isMine: post.isMine,
+          isLiked: post.isLiked,
+          likesCount: post.likesCount,
+          title: post.title,
+          author: post.author,
+          content: post.content,
+          image: post.image,
+        });
+      }
+
       expect(res.status).toEqual(200);
-      expect({ accessLevel, feed }).toEqual(expectedResult);
+      expect({ accessLevel, isEnd, feed }).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the posts. (Group Not Found) ', async () => {
       const groupId = 10000;
-      const page = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
-        page,
-      }));
+      const lastRecordId = 0;
+      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
     });
 
     it('Successfully failed to retrieved the posts. (DataFormat Error) ', async () => {
       const groupId = 'abc';
-      const page = 1;
-      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
-        page,
-      }));
+      const lastRecordId = 0;
+      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });
@@ -973,36 +976,35 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group', () => {
     it('Successfully retrieved group lists. ', async () => {
-      const page = 1;
-      const res = (await request(app).get('/api/group').set('Cookie', cookie).query({
-        page,
-      }));
+      const res = (await request(app).get('/api/group/list/0').set('Cookie', cookie))
       const expectedResult = [
         {
-          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2,
+          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1, image: 'groupImageLink'
         },
         {
-          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6,
+          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6, image: 'groupImageLink'
         },
         {
-          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1,
+          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2, image: 'groupImageLink'
         },
       ];
-      const result = res.body.map((group) => ({
-        groupId: group.groupId,
-        name: group.name,
-        description: group.description,
-        member: group.member,
-      }));
+      const groups = [];
+      for (const group of res.body['groups']) {
+        groups.push({
+          groupId: group.groupId,
+          name: group.name,
+          description: group.description,
+          member: group.member,
+          image: group.image,
+        });
+      }
       expect(res.status).toEqual(200);
-      expect(result).toEqual(expectedResult);
+      expect(groups).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
-      const page = 'abc';
-      const res = (await request(app).get('/api/group').set('Cookie', cookie).query({
-        page,
-      }));
+      const lastRecordId = 'abc'
+      const res = (await request(app).get(`/api/group/list/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
     });

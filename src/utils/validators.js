@@ -104,7 +104,12 @@ const postIdSchema = Joi.object({
 });
 
 const pageSchema = Joi.object({
-  page: Joi.number().min(0).required(),
+  group_id: Joi.number().min(0).required(),
+  last_record_id: Joi.number().min(0).required(),
+});
+
+const lastRecordIdSchema = Joi.object({
+  last_record_id: Joi.number().min(0).required(),
 });
 
 const commentSchema = Joi.object({
@@ -154,6 +159,7 @@ module.exports = {
   validatePostSchema: validator(postSchema),
   validatePostIdSchema: validator(postIdSchema),
   validatePageSchema: validator(pageSchema),
+  validateLastRecordIdSchema: validator(lastRecordIdSchema),
   validateCommentSchema: validator(commentSchema),
   validateCommentIdSchema: validator(commentIdSchema),
   validateGroupJoinInviteCodeSchema: validator(groupJoinInviteCodeSchema),
