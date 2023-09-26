@@ -215,20 +215,20 @@ describe('Test /api/group endpoints', () => {
         until: '2026-01-05',
       });
       const expectedResult = {
-        byweekday: "MO",
-        content: "test-content",
-        endDateTime: "2023-05-07",
-        freq: "WEEKLY",
-        groupId: "1",
+        byweekday: 'MO',
+        content: 'test-content',
+        endDateTime: '2023-05-07',
+        freq: 'WEEKLY',
+        groupId: '1',
         impossible: null,
         interval: 1,
-        message: "Successfully create group schedule",
+        message: 'Successfully create group schedule',
         possible: null,
         recurrence: 1,
-        startDateTime: "2023-05-06",
-        title: "test-title",
-        until: "2026-01-05",
-      }
+        startDateTime: '2023-05-06',
+        title: 'test-title',
+        until: '2026-01-05',
+      };
 
       expect(res.status).toEqual(201);
       expect(res.body).toEqual(expectedResult);
@@ -558,7 +558,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group/:group_id/members/request', () => {
     it('Successfully completed the application for registration.  ', async () => {
-      const groupId = 1;
+      const groupId = 4;
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
     });
@@ -568,6 +568,13 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to complete the application for registration. (Member Group Not Found) ', async () => {
+      const groupId = 1;
+      const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You are already a member of this group.' });
     });
   });
 
@@ -973,6 +980,9 @@ describe('Test /api/group endpoints', () => {
         },
         {
           groupId: 3, name: 'test-group3', description: 'test-description3', member: 1,
+        },
+        {
+          groupId: 4, name: 'test-group4', description: 'test-description4', member: 2,
         },
       ];
       const result = res.body.map((group) => ({
@@ -1410,6 +1420,16 @@ describe('Test /api/group endpoints', () => {
         member: 1,
         leader: 3,
         inviteCode: 'inviteCode03',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+      },
+      {
+        groupId: 4,
+        name: 'test-group4',
+        description: 'test-description4',
+        member: 2,
+        leader: 3,
+        inviteCode: 'inviteCode04',
         isPublicGroup: 0,
         inviteExp: '2099-01-01T00:00:00.000Z',
       },

@@ -113,7 +113,16 @@ async function setUpGroupDB() {
     inviteCode: 'inviteCode03',
     inviteExp: '2099-01-01T00:00:00.000Z',
   });
-  
+  const group4 = await Group.create({
+    groupId: 4,
+    name: 'test-group4',
+    description: 'test-description4',
+    member: 2,
+    leader: 3,
+    inviteCode: 'inviteCode04',
+    inviteExp: '2099-01-01T00:00:00.000Z',
+  });
+
   const user = await User.findAll();
   await user[0].addGroup(group1, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
   await user[0].addGroup(group2, { through: { accessLevel: 'regular', sharePersonalEvent: 1, isPendingMember: 0 } });
@@ -122,6 +131,7 @@ async function setUpGroupDB() {
   await user[2].addGroup(group3, { through: { accessLevel: 'owner', sharePersonalEvent: 1, isPendingMember: 0 } });
   await user[4].addGroup(group1, { through: { accessLevel: 'viewer', sharePersonalEvent: 1, isPendingMember: 1 } });
   await user[4].addGroup(group3, { through: { accessLevel: 'admin', sharePersonalEvent: 1, isPendingMember: 0 } });
+  await user[4].addGroup(group4, { through: { accessLevel: 'admin', sharePersonalEvent: 1, isPendingMember: 0 } });
 }
 
 async function setUpGroupScheduleDB() {
@@ -419,7 +429,7 @@ async function setUpLikeDB() {
       id: 1, postId: 2, userId: 1,
     },
     {
-      id: 2, postId: 3, userId: 1, 
+      id: 2, postId: 3, userId: 1,
     },
     {
       id: 3, postId: 2, userId: 2,

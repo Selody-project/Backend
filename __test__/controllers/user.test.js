@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
@@ -126,7 +125,7 @@ describe('Test /api/user endpoints', () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
       const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
-        earliestDate : '2023-01-15T12:00:00.000Z',
+        earliestDate: '2023-01-15T12:00:00.000Z',
         nonRecurrenceSchedule: [
           {
             id: 1,
@@ -504,14 +503,14 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       const expectedResult = {
         byweekday: null,
-        content: "test-content1",
-        endDateTime: "2023-05-15 00:00:00",
+        content: 'test-content1',
+        endDateTime: '2023-05-15 00:00:00',
         freq: null,
         interval: null,
-        message: "Successfully create user schedule",
+        message: 'Successfully create user schedule',
         recurrence: 0,
-        startDateTime: "2023-02-03 00:00:00",
-        title: "test-title",
+        startDateTime: '2023-02-03 00:00:00',
+        title: 'test-title',
         until: null,
         userId: 1,
       };
@@ -630,7 +629,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title1',
           author: 'test-user1',
-          content: 'test-content1'
+          content: 'test-content1',
         },
         {
           postId: 2,
@@ -640,7 +639,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 2,
           title: 'test-title2',
           author: 'test-user2',
-          content: 'test-content2'
+          content: 'test-content2',
         },
         {
           postId: 3,
@@ -650,7 +649,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 1,
           title: 'test-title3',
           author: 'test-user1',
-          content: 'test-content3'
+          content: 'test-content3',
         },
         {
           postId: 4,
@@ -660,7 +659,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title4',
           author: 'test-user1',
-          content: 'test-content4'
+          content: 'test-content4',
         },
         {
           postId: 5,
@@ -670,7 +669,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title5',
           author: 'test-user1',
-          content: 'test-content5'
+          content: 'test-content5',
         },
         {
           postId: 6,
@@ -680,7 +679,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title6',
           author: 'test-user2',
-          content: 'test-content6'
+          content: 'test-content6',
         },
         {
           postId: 7,
@@ -690,7 +689,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title7',
           author: 'test-user2',
-          content: 'test-content7'
+          content: 'test-content7',
         },
         {
           postId: 8,
@@ -700,7 +699,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title8',
           author: 'test-user2',
-          content: 'test-content8'
+          content: 'test-content8',
         },
         {
           postId: 9,
@@ -710,7 +709,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title9',
           author: 'test-user1',
-          content: 'test-content9'
+          content: 'test-content9',
         },
         {
           postId: 10,
@@ -720,8 +719,8 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title10',
           author: 'test-user1',
-          content: 'test-content10'
-        }
+          content: 'test-content10',
+        },
       ];
 
       const result = res.body.feed.map((post) => ({
