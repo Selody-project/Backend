@@ -7,9 +7,7 @@
   },
   "host": "127.0.0.1:8000",
   "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/api/auth/join": {
       "post": {
@@ -571,6 +569,9 @@
           "401": {
             "description": "권한 없음"
           },
+          "403": {
+            "description": "이미 그룹에 가입된 유저"
+          },
           "404": {
             "description": "존재하지 않는 그룹"
           },
@@ -865,7 +866,7 @@
                 }
               },
               "examples": {
-                "non-recurrence" : {
+                "non-recurrence": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -878,7 +879,7 @@
                     "until": null
                   }
                 },
-                "recurrence1" : {
+                "recurrence1": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -892,7 +893,7 @@
                   },
                   "description": "매일 반복되는 일정 등록 예시"
                 },
-                "recurrence2" : {
+                "recurrence2": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -906,7 +907,7 @@
                   },
                   "description": "주간 반복 일정 등록 예시"
                 },
-                "recurrence3" : {
+                "recurrence3": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -920,7 +921,7 @@
                   },
                   "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
                 },
-                "recurrence4" : {
+                "recurrence4": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -1833,13 +1834,13 @@
                 }
               },
               "examples": {
-                "shareScheduleOption" : {
+                "shareScheduleOption": {
                   "value": {
                     "shareScheduleOption": 0
                   },
                   "description": "일정 공유 토글 on/off"
                 },
-                "notificationOption" : {
+                "notificationOption": {
                   "value": {
                     "notificationOption": 0
                   },
@@ -1867,7 +1868,7 @@
           }
         }
       }
-    },  
+    },
     "/api/user/profile": {
       "patch": {
         "description": "프로필 이미지 변경 시, 이미지 파일을 같이 전달해주세요. 이미지를 제외한 닉네임, 이메일 변경 시에는 send empty value 체크 후에 data만 작성 후, 요청을 보내주시면 됩니다.",
@@ -1917,7 +1918,7 @@
           }
         }
       }
-    }, 
+    },
     "/api/user/profile/password": {
       "patch": {
         "description": "",
@@ -1957,7 +1958,7 @@
           }
         }
       }
-    },  
+    },
     "/api/user/calendar": {
       "get": {
         "description": "",
@@ -2048,7 +2049,7 @@
                 }
               },
               "examples": {
-                "non-recurrence" : {
+                "non-recurrence": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -2061,7 +2062,7 @@
                     "until": null
                   }
                 },
-                "recurrence1" : {
+                "recurrence1": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -2075,7 +2076,7 @@
                   },
                   "description": "매일 반복되는 일정 등록 예시"
                 },
-                "recurrence2" : {
+                "recurrence2": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -2089,7 +2090,7 @@
                   },
                   "description": "주간 반복 일정 등록 예시"
                 },
-                "recurrence3" : {
+                "recurrence3": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -2103,7 +2104,7 @@
                   },
                   "description": "요일 반복 일정 등록 예시입니다. ('MO','TU','WE','TH','FR','SA','SU') 요일 반복 시에, freq는 WEEKLY 고정이며, 'MO,WE,FR' 예시와 같이 띄어쓰기 없이 붙여서 작성해주세요"
                 },
-                "recurrence4" : {
+                "recurrence4": {
                   "value": {
                     "title": "test-title",
                     "content": "test-content",
@@ -2126,7 +2127,7 @@
             "description": "성공"
           },
           "400": {
-            "description":"형식에 맞지 않는 데이터"
+            "description": "형식에 맞지 않는 데이터"
           },
           "401": {
             "description": "권한 없음"
@@ -2317,11 +2318,7 @@
     "schemas": {
       "Users": {
         "type": "object",
-        "required": [
-          "email",
-          "nickname",
-          "password"
-        ],
+        "required": ["email", "nickname", "password"],
         "properties": {
           "userId": {
             "type": "BIGINT"
@@ -2357,9 +2354,7 @@
       },
       "Groups": {
         "type": "object",
-        "required": [
-          "name"
-        ],
+        "required": ["name"],
         "properties": {
           "groupId": {
             "type": "BIGINT"
@@ -2488,10 +2483,7 @@
       },
       "UserGroup": {
         "type": "object",
-        "required": [
-          "userId",
-          "groupId"
-        ],
+        "required": ["userId", "groupId"],
         "properties": {
           "groupId": {
             "type": "BIGINT"
@@ -2518,12 +2510,7 @@
       },
       "Post": {
         "type": "object",
-        "required": [
-          "groupId",
-          "userId",
-          "title",
-          "author"
-        ],
+        "required": ["groupId", "userId", "title", "author"],
         "properties": {
           "postId": {
             "type": "BIGINT"
@@ -2547,10 +2534,7 @@
       },
       "PostDetail": {
         "type": "object",
-        "required": [
-          "postId",
-          "content"
-        ],
+        "required": ["postId", "content"],
         "properties": {
           "postDetailId": {
             "type": "BIGINT"
@@ -2568,11 +2552,7 @@
       },
       "Comment": {
         "type": "object",
-        "required": [
-          "userId",
-          "postId",
-          "content"
-        ],
+        "required": ["userId", "postId", "content"],
         "properties": {
           "commentId": {
             "type": "BIGINT"
