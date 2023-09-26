@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class ScheduleNotFoundError extends ApiError {
   constructor(message) {
-    super(message || 'Schedule Not Found', 404);
+    super(message || '일정을 찾을 수 없습니다.', 404);
   }
 }
 

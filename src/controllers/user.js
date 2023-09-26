@@ -12,8 +12,7 @@ const PersonalSchedule = require('../models/personalSchedule');
 
 // Error
 const {
-  ApiError, DataFormatError,
-  UserIsLeaderError, BelongToGroupError,
+  ApiError, DataFormatError, BelongToGroupError,
   DuplicateNicknameError, DuplicateEmailError,
   EditPermissionError, GroupNotFoundError,
 } = require('../errors');
@@ -105,12 +104,6 @@ async function patchUserPassword(req, res, next) {
 async function withdrawal(req, res, next) {
   try {
     const { user } = req;
-    const leader = await Group.findOne({ where: { leader: user.userId } });
-
-    if (leader) {
-      return next(new UserIsLeaderError());
-    }
-
     const groupList = await user.getGroups();
     if (groupList != 0) {
       return next(new BelongToGroupError());

@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class NotFoundError extends ApiError {
   constructor(message) {
-    super(message || 'Not Found data', 404);
+    super(message || '데이터를 찾을 수 없습니다.', 404);
   }
 }
 

@@ -47,7 +47,7 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: true,
       },
       byweekday: {
-        type: Sequelize.TEXT,
+        type: Sequelize.JSON,
         allowNull: true,
       },
       until: {
@@ -186,7 +186,6 @@ class PersonalSchedule extends Sequelize.Model {
       }
       return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
     } catch (err) {
-      console.log(err);
       throw new ApiError();
     }
   }

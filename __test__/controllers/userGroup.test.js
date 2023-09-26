@@ -57,7 +57,7 @@ describe('Test /api/group endpoints', () => {
       const groupId = 100;
       const res = await request(app).delete(`/api/user/group/${groupId}`).set('Cookie', cookie);
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Group Not Found' });
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 });

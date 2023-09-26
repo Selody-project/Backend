@@ -227,7 +227,7 @@ async function setUpGroupScheduleDB() {
       id: 14, groupId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
     {
-      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: 'MO,TU', until: '2025-01-01',
+      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: ['MO','TU'], until: '2025-01-01',
     },
     {
       id: 16, groupId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: '', until: '2023-03-20',
@@ -301,7 +301,7 @@ async function setUpPersonalScheduleDB() {
       id: 14, userId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: '', until: '2025-01-01',
     },
     {
-      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: 'MO,TU', until: '2025-01-01',
+      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: ['MO','TU'], until: '2025-01-01',
     },
     {
       id: 16, userId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: '', until: '2023-03-20',

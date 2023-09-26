@@ -2,7 +2,7 @@ const ApirError = require('../apiError');
 
 class UserIsLeaderError extends ApirError {
   constructor(message) {
-    super(message || 'Validation Error - Group leader cannot withdraw the account', 499);
+    super(message || '그룹의 리더는 탈퇴할 수 없습니다.', 499);
   }
 }
 

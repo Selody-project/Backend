@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class NoBanPermission extends ApiError {
   constructor(message) {
-    super(message || 'You cannot ban the leader or administrator. ', 403);
+    super(message || '방장이나 관리자는 강퇴할 수 없습니다. ', 403);
   }
 }
 

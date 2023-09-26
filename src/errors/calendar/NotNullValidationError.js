@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class NotNullValidationError extends ApiError {
   constructor(message) {
-    super(message || 'Not Null Validation', 400);
+    super(message || '값이 존재해야 합니다.', 400);
   }
 }
 

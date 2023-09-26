@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class EditPermissionError extends ApiError {
   constructor(message) {
-    super(message || 'You do not have permission to modify.', 403);
+    super(message || '수정할 권한이 없습니다.', 403);
   }
 }
 

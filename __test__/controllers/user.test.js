@@ -306,7 +306,7 @@ describe('Test /api/user endpoints', () => {
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: 'MO,TU',
+            byweekday: ['MO','TU'],
             content: 'test-content15',
             freq: 'DAILY',
             id: 15,
@@ -447,14 +447,14 @@ describe('Test /api/user endpoints', () => {
       const scheduleId = 10000;
       const res = (await request(app).get(`/api/user/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: 'Schedule Not Found' });
+      expect(res.body).toEqual({ error: '일정을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved a schedule. (DataFormat Error) ', async () => {
       const scheduleId = 'abc';
       const res = (await request(app).get(`/api/user/calendar/${scheduleId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -531,7 +531,7 @@ describe('Test /api/user endpoints', () => {
         recurrence: 1,
         freq: 'WEEKLY',
         interval: 1,
-        byweekday: 'MO',
+        byweekday: ['MO'],
         until: '2026-01-05T00:00:00.000Z',
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
@@ -547,7 +547,7 @@ describe('Test /api/user endpoints', () => {
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(400);
-      expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 
@@ -562,7 +562,7 @@ describe('Test /api/user endpoints', () => {
       const id = 10000;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
-      expect(res.body).toEqual({ error: 'Not Found data' });
+      expect(res.body).toEqual({ error: '데이터를 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to delete a User schedule from the database (Edit Permission Error)', async () => {
@@ -582,11 +582,6 @@ describe('Test /api/user endpoints', () => {
       const tempCookie = res.headers['set-cookie'][0];
       res = await request(app).delete('/api/auth/withdrawal').set('Cookie', tempCookie);
       expect(res.status).toEqual(204);
-    });
-
-    it('Successfully failed to delete a user from user table (UserIsLeader Error)', async () => {
-      const res = await request(app).delete('/api/auth/withdrawal').set('Cookie', cookie);
-      expect(res.status).toEqual(499);
     });
 
     it('Successfully failed to delete a user from user table (BelongToGroup Error)', async () => {

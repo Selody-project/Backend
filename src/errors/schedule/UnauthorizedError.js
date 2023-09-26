@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class UnauthroizedError extends ApiError {
   constructor(message) {
-    super(message || 'Unauthorized access', 403);
+    super(message || '접근 권한이 없습니다.', 403);
   }
 }
 

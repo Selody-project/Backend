@@ -2,7 +2,7 @@ const ApiError = require('../apiError');
 
 class TokenExpireError extends ApiError {
   constructor(message) {
-    super(message || 'Expired Token', 401);
+    super(message || '만료된 토큰입니다.', 401);
   }
 }
 
