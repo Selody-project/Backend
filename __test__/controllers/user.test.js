@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt');
 const request = require('supertest');
 const app = require('../../src/app');
 const {
@@ -128,7 +127,7 @@ describe('Test /api/user endpoints', () => {
       const startDateTime = '2023-04-01T00:00:00.000Z';
       const endDateTime = '2023-04-30T23:59:59.999Z';
       const expectedSchedule = {
-        earliestDate : '2023-01-15T12:00:00.000Z',
+        earliestDate: '2023-01-15T12:00:00.000Z',
         nonRecurrenceSchedule: [
           {
             id: 1,
@@ -507,7 +506,7 @@ describe('Test /api/user endpoints', () => {
       const expectedResult = {
         id: 25,
         userId: 1,
-        message: "Successfully create user schedule",    
+        message: 'Successfully create user schedule',
         title: 'test-title',
         content: 'test-content1',
         startDateTime: '2023-02-03T00:00:00.000Z',
@@ -581,12 +580,12 @@ describe('Test /api/user endpoints', () => {
       });
       // eslint-disable-next-line prefer-destructuring
       const tempCookie = res.headers['set-cookie'][0];
-      res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', tempCookie);
+      res = await request(app).delete('/api/auth/withdrawal').set('Cookie', tempCookie);
       expect(res.status).toEqual(204);
     });
 
     it('Successfully failed to delete a user from user table (UserIsLeader Error)', async () => {
-      const res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', cookie);
+      const res = await request(app).delete('/api/auth/withdrawal').set('Cookie', cookie);
       expect(res.status).toEqual(499);
     });
 
@@ -597,7 +596,7 @@ describe('Test /api/user endpoints', () => {
       });
       // eslint-disable-next-line prefer-destructuring
       const tempCookie = res.headers['set-cookie'][0];
-      res = await request(app).delete(`/api/auth/withdrawal`).set('Cookie', tempCookie);
+      res = await request(app).delete('/api/auth/withdrawal').set('Cookie', tempCookie);
       expect(res.status).toEqual(403);
     });
   });
@@ -606,7 +605,7 @@ describe('Test /api/user endpoints', () => {
     it('Successfully updated a shareScheduleOption', async () => {
       const groupId = 1;
       const res = await request(app).patch(`/api/user/settings/${groupId}`).set('Cookie', cookie).send({
-        shareScheduleOption: 1
+        shareScheduleOption: 1,
       });
 
       expect(res.status).toEqual(200);
@@ -615,7 +614,7 @@ describe('Test /api/user endpoints', () => {
     it('Successfully updated a notificationOption', async () => {
       const groupId = 1;
       const res = await request(app).patch(`/api/user/settings/${groupId}`).set('Cookie', cookie).send({
-        notificationOption: 1
+        notificationOption: 1,
       });
 
       expect(res.status).toEqual(200);
@@ -635,7 +634,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title1',
           author: 'test-user1',
-          content: 'test-content1'
+          content: 'test-content1',
         },
         {
           postId: 2,
@@ -645,7 +644,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 2,
           title: 'test-title2',
           author: 'test-user2',
-          content: 'test-content2'
+          content: 'test-content2',
         },
         {
           postId: 3,
@@ -655,7 +654,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 1,
           title: 'test-title3',
           author: 'test-user1',
-          content: 'test-content3'
+          content: 'test-content3',
         },
         {
           postId: 4,
@@ -665,7 +664,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title4',
           author: 'test-user1',
-          content: 'test-content4'
+          content: 'test-content4',
         },
         {
           postId: 5,
@@ -675,7 +674,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title5',
           author: 'test-user1',
-          content: 'test-content5'
+          content: 'test-content5',
         },
         {
           postId: 6,
@@ -685,7 +684,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title6',
           author: 'test-user2',
-          content: 'test-content6'
+          content: 'test-content6',
         },
         {
           postId: 7,
@@ -695,7 +694,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title7',
           author: 'test-user2',
-          content: 'test-content7'
+          content: 'test-content7',
         },
         {
           postId: 8,
@@ -705,7 +704,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title8',
           author: 'test-user2',
-          content: 'test-content8'
+          content: 'test-content8',
         },
         {
           postId: 9,
@@ -715,7 +714,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           title: 'test-title9',
           author: 'test-user1',
-          content: 'test-content9'
+          content: 'test-content9',
         },
       ];
 

@@ -49,7 +49,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group', () => {
     it('Successfully create group', async () => {
-      const data = `{\"name\": \"test-group1\", \"description\": \"'test-description1'\"}`;
+      const data = '{\"name\": \"test-group1\", \"description\": \"\'test-description1\'\"}';
       const res = await request(app).post('/api/group').set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(200);
@@ -87,7 +87,7 @@ describe('Test /api/group endpoints', () => {
   describe('Test PUT /api/group', () => {
     it('Successfully modified group info ', async () => {
       const groupId = 1;
-      const data = `{\"name\": \"modified-group1\", \"description\": \"modified-description1\"}`;
+      const data = '{\"name\": \"modified-group1\", \"description\": \"modified-description1\"}';
       const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).field('data', data);
 
       const group = await Group.findByPk(groupId);
@@ -99,7 +99,7 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to modified group (group not found)', async () => {
       const groupId = 100;
-      const data = `{\"name\": \"modified-group1\", \"description\": \"'modified-description1'\"}`;
+      const data = '{\"name\": \"modified-group1\", \"description\": \"\'modified-description1\'\"}';
       const res = await request(app).put(`/api/group/${groupId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
@@ -218,8 +218,8 @@ describe('Test /api/group endpoints', () => {
         byweekday: 'MO',
         until: '2026-01-05T00:00:00.000Z',
         groupId: 1,
-        message: "Successfully create group schedule",
-      }
+        message: 'Successfully create group schedule',
+      };
 
       expect(res.status).toEqual(201);
       expect(res.body).toEqual(expectedResult);
@@ -549,7 +549,7 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test POST /api/group/:group_id/members/request', () => {
     it('Successfully completed the application for registration.  ', async () => {
-      const groupId = 1;
+      const groupId = 4;
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
     });
@@ -559,6 +559,13 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: 'Group Not Found' });
+    });
+
+    it('Successfully failed to complete the application for registration. (Member Group Not Found) ', async () => {
+      const groupId = 1;
+      const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: 'You are already a member of this group.' });
     });
   });
 
@@ -719,7 +726,7 @@ describe('Test /api/group endpoints', () => {
         postDetailId: 11,
         postId: 11,
         title: 'testTitle',
-      }
+      };
       delete res.body.updatedAt;
       delete res.body.createdAt;
       expect(res.status).toEqual(201);
@@ -765,7 +772,7 @@ describe('Test /api/group endpoints', () => {
         postId: 1,
         title: 'modified-title',
         userId: 1,
-      }
+      };
       delete res.body.updatedAt;
       delete res.body.createdAt;
       expect(res.status).toEqual(200);
@@ -913,34 +920,34 @@ describe('Test /api/group endpoints', () => {
         isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, image: 'postImage'
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, image: 'postImage',
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, image: 'postImage'
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, image: 'postImage',
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, image: 'postImage'
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, image: 'postImage'
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, image: 'postImage'
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
           },
           {
-            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, image: 'postImage' 
+            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
           },
         ],
       };
       const { accessLevel, isEnd } = res.body;
       const feed = [];
-      for (const post of res.body['feed']) {
+      for (const post of res.body.feed) {
         feed.push({
           postId: post.postId,
           isMine: post.isMine,
@@ -976,20 +983,24 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group', () => {
     it('Successfully retrieved group lists. ', async () => {
-      const res = (await request(app).get('/api/group/list/0').set('Cookie', cookie))
+      const res = (await request(app).get('/api/group/list/0').set('Cookie', cookie));
       const expectedResult = [
         {
-          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1, image: 'groupImageLink'
+          groupId: 4, name: 'test-group4', description: 'test-description4', member: 2, image: 'groupImageLink',
         },
         {
-          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6, image: 'groupImageLink'
+          groupId: 3, name: 'test-group3', description: 'test-description3', member: 1, image: 'groupImageLink',
         },
         {
-          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2, image: 'groupImageLink'
+          groupId: 2, name: 'test-group2', description: 'test-description2', member: 6, image: 'groupImageLink',
         },
+        {
+          groupId: 1, name: 'test-group1', description: 'test-description1', member: 2, image: 'groupImageLink',
+        },
+
       ];
       const groups = [];
-      for (const group of res.body['groups']) {
+      for (const group of res.body.groups) {
         groups.push({
           groupId: group.groupId,
           name: group.name,
@@ -1003,7 +1014,7 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
-      const lastRecordId = 'abc'
+      const lastRecordId = 'abc';
       const res = (await request(app).get(`/api/group/list/${lastRecordId}`).set('Cookie', cookie));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: 'The requested data format is not valid.' });
@@ -1024,7 +1035,7 @@ describe('Test /api/group endpoints', () => {
         depth: 0,
         message: 'Successfully created the comment.',
         postId: 1,
-      }
+      };
       delete res.body.updatedAt;
       delete res.body.createdAt;
       expect(res.status).toEqual(201);
@@ -1082,7 +1093,7 @@ describe('Test /api/group endpoints', () => {
         message: 'Successfully created the comment.',
         postId: 1,
         userId: 1,
-      }
+      };
       delete res.body.updatedAt;
       delete res.body.createdAt;
 
@@ -1445,6 +1456,17 @@ describe('Test /api/group endpoints', () => {
         member: 1,
         leader: 3,
         inviteCode: 'inviteCode03',
+        isPublicGroup: 0,
+        inviteExp: '2099-01-01T00:00:00.000Z',
+        image: 'groupImageLink',
+      },
+      {
+        groupId: 4,
+        name: 'test-group4',
+        description: 'test-description4',
+        member: 2,
+        leader: 3,
+        inviteCode: 'inviteCode04',
         isPublicGroup: 0,
         inviteExp: '2099-01-01T00:00:00.000Z',
         image: 'groupImageLink',
