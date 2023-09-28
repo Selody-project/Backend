@@ -70,7 +70,7 @@ async function verifyToken(req, res, next) {
     req.user = user;
     next();
   } catch (err) {
-    if (err.name === 'TokenExpireError') {
+    if (err.name === 'TokenExpiredError') {
       return next(new TokenExpireError());
     }
     if (err.name === 'InvalidTokenError') {

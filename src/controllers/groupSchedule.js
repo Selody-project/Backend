@@ -30,8 +30,12 @@ async function postGroupSchedule(req, res, next) {
     const { error: bodyError } = validateScheduleSchema(req.body);
     const { error: paramError } = validateGroupIdSchema(req.params);
 
-    if (paramError || bodyError) {
-      return next(new DataFormatError());
+    if (paramError) {
+      return next(new DataFormatError(paramError.details[0].message));
+    }
+
+    if (bodyError) {
+      return next(new DataFormatError(bodyError.details[0].message));
     }
 
     const { group_id: groupId } = req.params;
@@ -128,7 +132,7 @@ async function getGroupSchedule(req, res, next) {
     const { startDateTime, endDateTime } = req.query;
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
-    const groupEvent = await GroupSchedule.getSchedule([groupId], start, end);
+    const groupSchedule = await GroupSchedule.getSchedule([groupId], start, end);
     const users = (await UserGroup.findAll({
       where: {
         groupId,
@@ -136,20 +140,78 @@ async function getGroupSchedule(req, res, next) {
       },
       attributes: ['userId'],
     })).map((member) => member.userId);
-    const userEvent = await PersonalSchedule.getSchedule(users, start, end);
+    const userSchedule = await PersonalSchedule.getSchedule(users, start, end);
     let schedule;
-    if (userEvent.earliestDate > groupEvent.earliestDate) {
-      schedule = { earliestDate: groupEvent.earliestDate };
+    if (userSchedule.earliestDate === null) {
+      schedule = { earliestDate: groupSchedule.earliestDate };
+    } else if (groupSchedule.earliestDate === null) {
+      schedule = { earliestDate: userSchedule.earliestDate };
+    } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
+      schedule = { earliestDate: groupSchedule.earliestDate };
     } else {
-      schedule = { earliestDate: userEvent.earliestDate };
+      schedule = { earliestDate: userSchedule.earliestDate };
     }
     schedule.nonRecurrenceSchedule = [
-      ...userEvent.nonRecurrenceSchedule,
-      ...groupEvent.nonRecurrenceSchedule,
+      ...userSchedule.nonRecurrenceSchedule,
+      ...groupSchedule.nonRecurrenceSchedule,
     ];
     schedule.recurrenceSchedule = [
-      ...userEvent.recurrenceSchedule,
-      ...groupEvent.recurrenceSchedule,
+      ...userSchedule.recurrenceSchedule,
+      ...groupSchedule.recurrenceSchedule,
+    ];
+
+    const accessLevel = await getAccessLevel(user, group);
+    return res.status(200).json({ accessLevel, schedule });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getGroupScheduleSummary(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: queryError } = validateScheduleDateSchema(req.query);
+    if (paramError || queryError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    const { startDateTime, endDateTime } = req.query;
+    const start = moment.utc(startDateTime).toDate();
+    const end = moment.utc(endDateTime).toDate();
+    const groupSchedule = await GroupSchedule.getSchedule([groupId], start, end, true);
+    const users = (await UserGroup.findAll({
+      where: {
+        groupId,
+        shareScheduleOption: 1,
+      },
+      attributes: ['userId'],
+    })).map((member) => member.userId);
+    const userSchedule = await PersonalSchedule.getSchedule(users, start, end, true);
+    let schedule;
+    if (userSchedule.earliestDate === null) {
+      schedule = { earliestDate: groupSchedule.earliestDate };
+    } else if (groupSchedule.earliestDate === null) {
+      schedule = { earliestDate: userSchedule.earliestDate };
+    } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
+      schedule = { earliestDate: groupSchedule.earliestDate };
+    } else {
+      schedule = { earliestDate: userSchedule.earliestDate };
+    }
+    schedule.nonRecurrenceSchedule = [
+      ...userSchedule.nonRecurrenceSchedule,
+      ...groupSchedule.nonRecurrenceSchedule,
+    ];
+    schedule.recurrenceSchedule = [
+      ...userSchedule.recurrenceSchedule,
+      ...groupSchedule.recurrenceSchedule,
     ];
 
     const accessLevel = await getAccessLevel(user, group);
@@ -310,6 +372,7 @@ module.exports = {
   postGroupSchedule,
   getSingleGroupSchedule,
   getGroupSchedule,
+  getGroupScheduleSummary,
   putGroupSchedule,
   deleteGroupSchedule,
   getEventProposal,

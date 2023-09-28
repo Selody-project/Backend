@@ -59,17 +59,17 @@ const scheduleSchema = Joi.object({
   freq: Joi.when('recurrence', {
     is: 0,
     then: Joi.valid(null).required(),
-    otherwise: Joi.string().max(10).required(),
+    otherwise: Joi.string().valid('WEEKLY', 'DAILY', 'MONTHLY', 'YEARLY').required(),
   }),
   interval: Joi.when('recurrence', {
     is: 0,
     then: Joi.valid(null).required(),
     otherwise: Joi.number().required(),
   }),
-  byweekday: Joi.when('recurrence', {
-    is: 0,
-    then: Joi.valid(null).required(),
-    otherwise: Joi.array().items(Joi.string().min(0)).required(),
+  byweekday: Joi.when('freq', {
+    is: 'WEEKLY',
+    then: Joi.array().items(Joi.string().min(0)).required(),
+    otherwise: Joi.valid(null).required(),
   }),
   until: Joi.when('recurrence', {
     is: 0,

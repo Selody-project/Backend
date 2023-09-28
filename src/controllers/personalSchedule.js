@@ -21,7 +21,7 @@ async function postPersonalSchedule(req, res, next) {
   try {
     const { error: bodyError } = validateScheduleSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      return next(new DataFormatError(bodyError.details[0].message));
     }
 
     const { user } = req;
@@ -93,27 +93,74 @@ async function getUserPersonalSchedule(req, res, next) {
     const start = moment.utc(startDateTime).toDate();
     const end = moment.utc(endDateTime).toDate();
 
-    const userEvent = await PersonalSchedule.getSchedule([user.userId], start, end);
+    const userSchedule = await PersonalSchedule.getSchedule([user.userId], start, end);
     const groups = (await user.getGroups()).map((group) => group.groupId);
     if (groups.length) {
-      const groupEvent = await GroupSchedule.getSchedule(groups, start, end);
-      let event;
-      if (userEvent.earliestDate > groupEvent.earliestDate) {
-        event = { earliestDate: groupEvent.earliestDate };
+      const groupSchedule = await GroupSchedule.getSchedule(groups, start, end);
+      let schedule;
+      if (userSchedule.earliestDate === null) {
+        schedule = { earliestDate: groupSchedule.earliestDate };
+      } else if (groupSchedule.earliestDate === null) {
+        schedule = { earliestDate: userSchedule.earliestDate };
+      } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
+        schedule = { earliestDate: groupSchedule.earliestDate };
       } else {
-        event = { earliestDate: userEvent.earliestDate };
+        schedule = { earliestDate: userSchedule.earliestDate };
       }
-      event.nonRecurrenceSchedule = [
-        ...userEvent.nonRecurrenceSchedule,
-        ...groupEvent.nonRecurrenceSchedule,
+      schedule.nonRecurrenceSchedule = [
+        ...userSchedule.nonRecurrenceSchedule,
+        ...groupSchedule.nonRecurrenceSchedule,
       ];
-      event.recurrenceSchedule = [
-        ...userEvent.recurrenceSchedule,
-        ...groupEvent.recurrenceSchedule,
+      schedule.recurrenceSchedule = [
+        ...userSchedule.recurrenceSchedule,
+        ...groupSchedule.recurrenceSchedule,
       ];
-      return res.status(200).json(event);
+      return res.status(200).json(schedule);
     }
-    return res.status(200).json(userEvent);
+    return res.status(200).json(userSchedule);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getUserPersonalScheduleSummary(req, res, next) {
+  try {
+    const { error: queryError } = validateScheduleDateSchema(req.query);
+    if (queryError) {
+      return next(new DataFormatError());
+    }
+
+    const { user } = req;
+
+    const { startDateTime, endDateTime } = req.query;
+    const start = moment.utc(startDateTime).toDate();
+    const end = moment.utc(endDateTime).toDate();
+
+    const userSchedule = await PersonalSchedule.getSchedule([user.userId], start, end, true);
+    const groups = (await user.getGroups()).map((group) => group.groupId);
+    if (groups.length) {
+      const groupSchedule = await GroupSchedule.getSchedule(groups, start, end, true);
+      let schedule;
+      if (userSchedule.earliestDate === null) {
+        schedule = { earliestDate: groupSchedule.earliestDate };
+      } else if (groupSchedule.earliestDate === null) {
+        schedule = { earliestDate: userSchedule.earliestDate };
+      } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
+        schedule = { earliestDate: groupSchedule.earliestDate };
+      } else {
+        schedule = { earliestDate: userSchedule.earliestDate };
+      }
+      schedule.nonRecurrenceSchedule = [
+        ...userSchedule.nonRecurrenceSchedule,
+        ...groupSchedule.nonRecurrenceSchedule,
+      ];
+      schedule.recurrenceSchedule = [
+        ...userSchedule.recurrenceSchedule,
+        ...groupSchedule.recurrenceSchedule,
+      ];
+      return res.status(200).json(schedule);
+    }
+    return res.status(200).json(userSchedule);
   } catch (err) {
     return next(new ApiError());
   }
@@ -183,6 +230,7 @@ module.exports = {
   postPersonalSchedule,
   getSingleUserSchedule,
   getUserPersonalSchedule,
+  getUserPersonalScheduleSummary,
   putPersonalSchedule,
   deletePersonalSchedule,
 };

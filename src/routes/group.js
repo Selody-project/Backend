@@ -14,7 +14,7 @@ const {
 
 // Schedule
 const {
-  getGroupSchedule, getSingleGroupSchedule,
+  getGroupSchedule, getSingleGroupSchedule, getGroupScheduleSummary,
   postGroupSchedule, putGroupSchedule, deleteGroupSchedule,
   getEventProposal,
 } = require('../controllers/groupSchedule');
@@ -52,6 +52,7 @@ router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
+router.get('/:group_id/calendar/summary', getGroupScheduleSummary);
 router.get('/:group_id/calendar/:schedule_id', getSingleGroupSchedule);
 router.put('/:group_id/calendar/:schedule_id', putGroupSchedule);
 router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);

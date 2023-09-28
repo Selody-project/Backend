@@ -212,6 +212,7 @@ describe('Test /api/user endpoints', () => {
           {
             id: 1,
             isGroup: 1,
+            groupId: 1,
             content: 'test-content1',
             endDateTime: '2023-05-15T23:59:59.000Z',
             recurrence: 0,
@@ -221,6 +222,7 @@ describe('Test /api/user endpoints', () => {
           {
             id: 2,
             isGroup: 1,
+            groupId: 1,
             content: 'test-content2',
             endDateTime: '2023-04-30T23:59:59.000Z',
             recurrence: 0,
@@ -230,6 +232,7 @@ describe('Test /api/user endpoints', () => {
           {
             id: 3,
             isGroup: 1,
+            groupId: 2,
             content: 'test-content3',
             endDateTime: '2023-04-15T23:59:59.000Z',
             recurrence: 0,
@@ -239,7 +242,7 @@ describe('Test /api/user endpoints', () => {
         ],
         recurrenceSchedule: [
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content11',
             freq: 'DAILY',
             id: 11,
@@ -255,10 +258,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-05T13:00:00.000Z', startDateTime: '2023-04-05T12:00:00.000Z' },
             ],
             title: 'test-title11',
+            startDateTime: '2020-01-01T12:00:00.000Z',
             until: '2023-04-05T14:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content12',
             freq: 'MONTHLY',
             id: 12,
@@ -270,10 +274,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
             ],
             title: 'test-title12',
+            startDateTime: '2020-01-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: ['WE'],
             content: 'test-content13',
             freq: 'WEEKLY',
             id: 13,
@@ -288,10 +293,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-26T13:00:00.000Z', startDateTime: '2023-04-26T12:00:00.000Z' },
             ],
             title: 'test-title13',
+            startDateTime: '2020-01-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content14',
             freq: 'YEARLY',
             id: 14,
@@ -303,12 +309,13 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-15T13:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
             ],
             title: 'test-title14',
+            startDateTime: '2020-04-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
             byweekday: ['MO','TU'],
             content: 'test-content15',
-            freq: 'DAILY',
+            freq: 'WEEKLY',
             id: 15,
             userId: 1,
             isGroup: 0,
@@ -325,10 +332,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-25T13:00:00.000Z', startDateTime: '2023-04-25T12:00:00.000Z' },
             ],
             title: 'test-title15',
+            startDateTime: '2020-01-13T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content16',
             freq: 'DAILY',
             id: 16,
@@ -343,10 +351,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-05T00:00:00.000Z', startDateTime: '2023-03-19T12:00:00.000Z' },
             ],
             title: 'test-title16',
+            startDateTime: '2020-03-15T12:00:00.000Z',
             until: '2023-03-20T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: ['SU'],
             content: 'test-content17',
             freq: 'WEEKLY',
             id: 17,
@@ -364,10 +373,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-05-17T00:00:00.000Z', startDateTime: '2023-04-30T12:00:00.000Z' },
             ],
             title: 'test-title17',
+            startDateTime: '2020-03-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content18',
             freq: 'MONTHLY',
             id: 18,
@@ -379,10 +389,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-05-02T00:00:00.000Z', startDateTime: '2023-04-15T12:00:00.000Z' },
             ],
             title: 'test-title18',
+            startDateTime: '2020-03-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content19',
             freq: 'YEARLY',
             id: 19,
@@ -394,10 +405,11 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-04-02T00:00:00.000Z', startDateTime: '2023-01-15T12:00:00.000Z' },
             ],
             title: 'test-title19',
+            startDateTime: '2020-01-15T12:00:00.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
           {
-            byweekday: '',
+            byweekday: null,
             content: 'test-content21',
             freq: 'MONTHLY',
             id: 21,
@@ -409,6 +421,7 @@ describe('Test /api/user endpoints', () => {
               { endDateTime: '2023-05-01T23:59:59.000Z', startDateTime: '2023-04-30T23:59:59.000Z' },
             ],
             title: 'test-title21',
+            startDateTime: '2020-04-30T23:59:59.000Z',
             until: '2025-01-01T00:00:00.000Z',
           },
         ],
@@ -547,7 +560,7 @@ describe('Test /api/user endpoints', () => {
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(400);
-      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
+      expect(res.body).toEqual({ error: '\"title\" is required' });
     });
   });
 

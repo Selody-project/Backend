@@ -71,43 +71,51 @@ class GroupSchedule extends Sequelize.Model {
     });
   }
 
-  static async getSchedule(groupID, start, end) {
+  static async getSchedule(groupID, start, end, isSummary = false) {
     try {
       const db = require('.');
       let earliestDate = Number.MAX_SAFE_INTEGER;
+      let nonRecurrenceAttributes;
+      let recurrenceAttributes;
+      if (isSummary) {
+        // title 및 content를 제외한 필드 목록
+        nonRecurrenceAttributes = ['id', 'groupId', 'startDateTime', 'endDateTime', 'recurrence'];
+        // eslint-disable-next-line no-useless-escape
+        recurrenceAttributes = ['id', 'groupId', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+      } else {
+        // title 및 content를 포함한 필드 목록
+        nonRecurrenceAttributes = ['id', 'groupId', 'title', 'content', 'startDateTime', 'endDateTime', 'recurrence'];
+        // eslint-disable-next-line no-useless-escape
+        recurrenceAttributes = ['id', 'groupId', 'title', 'content', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+      }
       const nonRecurrenceStatement = `
-      SELECT 
-        id,
-        title, 
-        content, 
-        startDateTime, 
-        endDateTime, 
-        recurrence,
-        true AS isGroup
-      FROM 
-        groupSchedule
-      WHERE 
-        groupId IN (${groupID.join(',')}) AND (
-        recurrence = 0 AND ( 
-          (startDateTime BETWEEN :start AND :end)
-          OR
-          (endDateTime BETWEEN :start AND :end)
-          OR
-          (startDateTime < :start AND endDateTime > :end)
-        )
-      )`;
+        SELECT 
+          ${nonRecurrenceAttributes.join(', ')}, 
+          true AS isGroup
+        FROM 
+          groupSchedule
+        WHERE 
+          groupId IN (${groupID.join(', ')}) AND (
+          recurrence = 0 AND ( 
+            (startDateTime BETWEEN :start AND :end)
+            OR
+            (endDateTime BETWEEN :start AND :end)
+            OR
+            (startDateTime < :start AND endDateTime > :end)
+          )
+        )`;
       const recurrenceStatement = `
         SELECT 
-          *,
+          ${recurrenceAttributes.join(', ')}, 
           true AS isGroup 
         FROM 
           groupSchedule
         WHERE 
-          groupId IN (${groupID.join(',')}) AND (
-          recurrence = 1 AND 
-          startDateTime <= :end
-        )
-        `;
+          groupId IN (${groupID.join(', ')}) AND (
+          recurrence = 1 AND (
+            startDateTime <= :end
+          )
+        )`;
       const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
         replacements: {
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
@@ -164,19 +172,35 @@ class GroupSchedule extends Sequelize.Model {
           }
         });
         if (possibleDateList.length !== 0) {
-          recurrenceSchedule.push({
-            id: schedule.id,
-            groupId: schedule.groupId,
-            title: schedule.title,
-            content: schedule.content,
-            recurrence: schedule.recurrence,
-            freq: schedule.freq,
-            interval: schedule.interval,
-            byweekday: schedule.byweekday,
-            until: schedule.until,
-            isGroup: schedule.isGroup,
-            recurrenceDateList: possibleDateList,
-          });
+          if (isSummary) {
+            recurrenceSchedule.push({
+              id: schedule.id,
+              groupId: schedule.groupId,
+              recurrence: schedule.recurrence,
+              freq: schedule.freq,
+              interval: schedule.interval,
+              byweekday: schedule.byweekday,
+              startDateTime: schedule.startDateTime,
+              until: schedule.until,
+              isGroup: schedule.isGroup,
+              recurrenceDateList: possibleDateList,
+            });
+          } else {
+            recurrenceSchedule.push({
+              id: schedule.id,
+              groupId: schedule.groupId,
+              title: schedule.title,
+              content: schedule.content,
+              recurrence: schedule.recurrence,
+              freq: schedule.freq,
+              interval: schedule.interval,
+              byweekday: schedule.byweekday,
+              startDateTime: schedule.startDateTime,
+              until: schedule.until,
+              isGroup: schedule.isGroup,
+              recurrenceDateList: possibleDateList,
+            });
+          }
         }
       });
       if (earliestDate === Number.MAX_SAFE_INTEGER) {
