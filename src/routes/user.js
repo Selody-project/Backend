@@ -11,7 +11,7 @@ const {
 
 // Schedule
 const {
-  getUserPersonalSchedule, getSingleUserSchedule,
+  getUserPersonalSchedule, getSingleUserSchedule, getUserPersonalScheduleSummary,
   postPersonalSchedule, putPersonalSchedule, deletePersonalSchedule,
 } = require('../controllers/personalSchedule');
 const {
@@ -35,6 +35,7 @@ router.patch('/settings/:group_id', patchUserSetUp);
 
 // Schedule
 router.get('/calendar', getUserPersonalSchedule);
+router.get('/calendar/summary', getUserPersonalScheduleSummary);
 router.get('/calendar/:schedule_id', getSingleUserSchedule);
 router.post('/calendar', postPersonalSchedule);
 router.put('/calendar/:schedule_id', putPersonalSchedule);

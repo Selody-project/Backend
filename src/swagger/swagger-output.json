@@ -885,7 +885,7 @@
                     "recurrence": 1,
                     "freq": "DAILY",
                     "interval": 1,
-                    "byweekday": "",
+                    "byweekday": null,
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "매일 반복되는 일정 등록 예시"
@@ -899,10 +899,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": "",
+                    "byweekday": ["TH"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "주간 반복 일정 등록 예시"
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
                 },
                 "recurrence3": {
                   "value": {
@@ -913,7 +913,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","FR"],
+                    "byweekday": ["MO","WE","TH"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
@@ -927,7 +927,7 @@
                     "recurrence": 1,
                     "freq": "MONTHLY",
                     "interval": 2,
-                    "byweekday": "",
+                    "byweekday": null,
                     "until": "2100-01-01T00:00:00.000Z"
                   },
                   "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
@@ -954,6 +954,47 @@
       "get": {
         "description": "",
         "summary": "그룹 일정 조회",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2000-01-01T00:00:00.000Z"
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2100-01-01T00:00:00.000Z"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/calendar/summary": {
+      "get": {
+        "description": "title, content를 제외한 일정 정보를 조회합니다.",
+        "summary": "그룹 일정 요약 조회",
         "tags": ["Group Schedule"],
         "parameters": [
           {
@@ -2062,7 +2103,7 @@
                     "recurrence": 1,
                     "freq": "DAILY",
                     "interval": 1,
-                    "byweekday": "",
+                    "byweekday": null,
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "매일 반복되는 일정 등록 예시"
@@ -2076,10 +2117,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": "",
+                    "byweekday": ["TH"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "주간 반복 일정 등록 예시"
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
                 },
                 "recurrence3": {
                   "value": {
@@ -2090,7 +2131,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","FR"],
+                    "byweekday": ["MO","WE","TH"],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
@@ -2104,7 +2145,7 @@
                     "recurrence": 1,
                     "freq": "MONTHLY",
                     "interval": 2,
-                    "byweekday": "",
+                    "byweekday": null,
                     "until": "2100-01-01T00:00:00.000Z"
                   },
                   "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
@@ -2125,6 +2166,43 @@
           },
           "404": {
             "description": "존재하지 않는 유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/user/calendar/summary": {
+      "get": {
+        "description": "title, content를 제외한 일정 정보를 조회합니다.",
+        "summary": "유저 일정 요약 조회",
+        "tags": ["User Schedule"],
+        "parameters": [
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2000-01-01T00:00:00.000Z",
+            "required": true
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "type": "DATETIME",
+            "example": "2100-01-01T00:00:00.000Z",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
           },
           "500": {
             "description": "서버 에러"
