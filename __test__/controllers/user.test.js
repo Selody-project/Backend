@@ -108,9 +108,11 @@ describe('Test /api/user endpoints', () => {
 
   describe('Test PATCH /api/user/profile/password', () => {
     it('Successfully modified user password ', async () => {
+      const currentPassword = 'super_strong_password'
       const newPassword = 'newPassword';
       let res = await request(app).patch('/api/user/profile/password').set('Cookie', cookie).send({
-        password: newPassword,
+        currentPassword,
+        newPassword
       });
       expect(res.status).toEqual(200);
 
