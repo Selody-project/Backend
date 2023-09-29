@@ -16,7 +16,8 @@ const profileSchema = Joi.object({
 });
 
 const passwordSchema = Joi.object({
-  password: Joi.string().min(10).max(100).required(),
+  currentPassword: Joi.string().min(10).max(100).required(),
+  newPassword: Joi.string().min(10).max(100).required(),
 });
 
 const loginSchema = Joi.object({

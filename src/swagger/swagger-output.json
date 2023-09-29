@@ -1960,7 +1960,7 @@
     "/api/user/profile/password": {
       "patch": {
         "description": "",
-        "summary": "유저 비밀번호 수정",
+        "summary": "비밀번호 변경",
         "tags": ["User"],
         "requestBody": {
           "required": true,
@@ -1969,8 +1969,12 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "password": {
+                  "currentPassword": {
                     "example": "super_strong_password",
+                    "type": "VARCHAR(100)"
+                  },
+                  "newPassword": {
+                    "example": "new_strong_password",
                     "type": "VARCHAR(100)"
                   }
                 }
@@ -1986,7 +1990,7 @@
             "description": "형식에 맞지 않는 데이터"
           },
           "401": {
-            "description": "권한 없음"
+            "description": "권한 없음 / 현재 비밀번호가 잘못되었음"
           },
           "404": {
             "description": "존재하지 않는 유저"

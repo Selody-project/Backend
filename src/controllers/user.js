@@ -15,6 +15,7 @@ const {
   ApiError, DataFormatError, BelongToGroupError,
   DuplicateNicknameError, DuplicateEmailError,
   EditPermissionError, GroupNotFoundError,
+  InvalidPasswordError,
 } = require('../errors');
 
 // Validator
@@ -88,11 +89,16 @@ async function patchUserPassword(req, res, next) {
       return next(new DataFormatError());
     }
 
-    const { password } = req.body;
+    const { currentPassword, newPassword } = req.body;
     const { user } = req;
 
+    const result = await bcrypt.compare(currentPassword, user.password);
+    if (!result) {
+      return next(new InvalidPasswordError());
+    }
+
     await user.update({
-      password: await bcrypt.hash(password, 12),
+      password: await bcrypt.hash(newPassword, 12),
     });
 
     return res.status(200).end();
