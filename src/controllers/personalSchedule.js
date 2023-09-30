@@ -45,7 +45,7 @@ async function postPersonalSchedule(req, res, next) {
     });
 
     const response = {
-      ...{ message: 'Successfully create user schedule' },
+      ...{ message: '성공적으로 등록되었습니다.' },
       ...schedule.dataValues,
     };
 
@@ -190,7 +190,7 @@ async function putPersonalSchedule(req, res, next) {
     const modifiedSchedule = await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
 
     const response = {
-      ...{ message: 'Successfully Modified.' },
+      ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedSchedule.dataValues,
     };
 
@@ -221,7 +221,7 @@ async function deletePersonalSchedule(req, res, next) {
 
     await schedule.destroy();
 
-    return res.status(204).json({ message: 'successfully deleted' });
+    return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }

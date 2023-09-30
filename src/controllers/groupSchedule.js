@@ -74,7 +74,7 @@ async function postGroupSchedule(req, res, next) {
       impossible: null,
     });
     const response = {
-      ...{ message: 'Successfully create group schedule' },
+      ...{ message: '성공적으로 등록되었습니다.' },
       ...groupSchedule.dataValues,
     };
 
@@ -252,7 +252,7 @@ async function putGroupSchedule(req, res, next) {
 
     const modifiedSchedule = await schedule.update(req.body);
     const response = {
-      ...{ message: 'Successfully modify group schedule' },
+      ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedSchedule.dataValues,
     };
 
@@ -291,7 +291,7 @@ async function deleteGroupSchedule(req, res, next) {
 
     await schedule.destroy();
 
-    return res.status(204).json({ message: 'Successfully delete group schedule' });
+    return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }

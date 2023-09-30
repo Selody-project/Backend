@@ -71,7 +71,7 @@ async function postGroupPost(req, res, next) {
     await group.addPosts(post);
 
     const response = {
-      ...{ message: 'Successfully created the post.' },
+      ...{ message: '성공적으로 등록되었습니다.' },
       ...post.dataValues,
       ...postDetail.dataValues,
     };
@@ -244,7 +244,7 @@ async function putGroupPost(req, res, next) {
     }
     await deleteBucketImage(previousPostImages);
     const response = {
-      ...{ message: 'Successfully modified the post.' },
+      ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedPost.dataValues,
       ...modifiedDetail.dataValues,
     };
@@ -341,7 +341,7 @@ async function postGroupPostLike(req, res, next) {
     await post.addLikes(like, { transaction });
 
     await transaction.commit();
-    return res.status(201).json({ message: 'Successfully created a Like.' });
+    return res.status(201).json({ message: '성공적으로 등록되었습니다.' });
   } catch (err) {
     await transaction.rollback();
 
@@ -440,7 +440,7 @@ async function postComment(req, res, next) {
     await user.addComments(comment);
 
     const response = {
-      ...{ message: 'Successfully created the comment.' },
+      ...{ message: '성공적으로 등록되었습니다.' },
       ...comment.dataValues,
     };
     return res.status(201).json(response);
@@ -561,7 +561,7 @@ async function putComment(req, res, next) {
     const { content } = req.body;
     const modifiedComment = await comment.update({ content });
     const response = {
-      ...{ message: 'Successfully created the comment.' },
+      ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedComment.dataValues,
     };
 

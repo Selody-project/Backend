@@ -36,6 +36,11 @@ class User extends Sequelize.Model {
         allowNull: false,
         defaultValue: process.env.DEFAULT_USER_IMAGE,
       },
+      introduction: {
+        type: Sequelize.STRING(50),
+        allowNull: true,
+        defaultValue: null,
+      },
     }, {
       sequelize,
       timestamps: true,

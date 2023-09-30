@@ -55,7 +55,7 @@ async function postGroup(req, res, next) {
     await user.addGroup(group, { through: { accessLevel: 'owner' } });
 
     const response = {
-      ...{ message: 'Successfully create group' },
+      ...{ message: '성공적으로 생성되었습니다.' },
       ...group.dataValues,
     };
 
@@ -213,7 +213,7 @@ async function putGroup(req, res, next) {
     }
 
     const response = {
-      ...{ message: 'Successfully modified group info' },
+      ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedGroup.dataValues,
     };
     return res.status(200).json(response);
@@ -249,7 +249,7 @@ async function deleteGroup(req, res, next) {
     const previousGroupImage = [group.image];
     await group.destroy();
     await deleteBucketImage(previousGroupImage);
-    return res.status(204).json({ message: 'Successfully delete group' });
+    return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -284,7 +284,7 @@ async function deleteGroupUser(req, res, next) {
 
     await group.update({ member: group.member - 1 });
 
-    return res.status(204).json({ message: 'Successfully delete group user' });
+    return res.status(204).json({ message: '성공적으로 추방하였습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -397,7 +397,7 @@ async function postGroupJoinRequest(req, res, next) {
 
     await group.addUser(user, { through: { isPendingMember: 1 } });
 
-    return res.status(200).json({ message: 'Successfully completed the application for registration. ' });
+    return res.status(200).json({ message: '성공적으로 신청되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -433,7 +433,7 @@ async function postGroupJoinApprove(req, res, next) {
     await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId } });
     await group.update({ member: (group.member + 1) });
 
-    return res.status(200).json({ message: 'Successfully approved the membership registration. ' });
+    return res.status(200).json({ message: '성공적으로 수락하였습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -468,7 +468,7 @@ async function postGroupJoinReject(req, res, next) {
 
     await UserGroup.destroy({ where: { userId: applicantId } });
 
-    return res.status(200).json({ message: 'Successfully rejected the membership request. ' });
+    return res.status(200).json({ message: '성공적으로 거절하였습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -578,7 +578,7 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
 
-    return res.status(200).json({ message: 'Successfully joined the group.' });
+    return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }

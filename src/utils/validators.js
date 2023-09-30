@@ -16,7 +16,7 @@ const profileSchema = Joi.object({
 });
 
 const passwordSchema = Joi.object({
-  currentPassword: Joi.string().min(10).max(100).required(),
+  currentPassword: Joi.string().max(100).required(),
   newPassword: Joi.string().min(10).max(100).required(),
 });
 
@@ -142,6 +142,10 @@ const userSettingSchema = Joi.object({
   notificationOption: Joi.number(),
 }).or('shareScheduleOption', 'notificationOption');
 
+const userIntroductionSchema = Joi.object({
+  introduction: Joi.string().max(50).required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -167,4 +171,5 @@ module.exports = {
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
   validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
   validateUserSettingSchema: validator(userSettingSchema),
+  validateUserIntroductionSchema: validator(userIntroductionSchema),
 };

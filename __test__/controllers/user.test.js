@@ -521,7 +521,7 @@ describe('Test /api/user endpoints', () => {
       const expectedResult = {
         id: 25,
         userId: 1,
-        message: 'Successfully create user schedule',
+        message: '성공적으로 등록되었습니다.',
         title: 'test-title',
         content: 'test-content1',
         startDateTime: '2023-02-03T00:00:00.000Z',
@@ -746,6 +746,21 @@ describe('Test /api/user endpoints', () => {
       const lastRecordId = 'abc';
       const res = await request(app).get(`/api/user/feed/${lastRecordId}`).set('Cookie', cookie);
       expect(res.status).toEqual(400);
+    });
+  });
+
+  describe('Test PATCH /api/user/introduction', () => {
+    it('Successfully updated a introduction', async () => {
+      const res = await request(app).patch('/api/user/introduction').set('Cookie', cookie).send({
+        introduction: 'modified-introduction',
+      });
+      const expectedResult = {
+        message: '성공적으로 수정되었습니다.',
+        introduction: 'modified-introduction',
+      }
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
     });
   });
 });
