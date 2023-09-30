@@ -152,7 +152,7 @@ async function join(req, res, next) {
       return next(new ApiError());
     }
   } else {
-    return res.status(200).send({ message: "It's possible to use" });
+    return res.status(200).send({ message: '사용가능한 이메일/닉네임 입니다.' });
   }
 }
 
@@ -184,7 +184,7 @@ async function login(req, res, next) {
 
 async function logout(req, res, next) {
   try {
-    return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: 'Logout successful' });
+    return res.status(200).clearCookie('accessToken').clearCookie('refreshToken').json({ message: '로그아웃되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }

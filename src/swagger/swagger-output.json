@@ -2001,6 +2001,46 @@
         }
       }
     },
+    "/api/user/introduction": {
+      "patch": {
+        "description": "유저 소개글을 수정합니다.",
+        "summary": "유저 소개글 수정",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "introduction": {
+                    "example": "test-introduction",
+                    "type": "VARCHAR(50)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/user/calendar": {
       "get": {
         "description": "",

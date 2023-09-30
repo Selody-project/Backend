@@ -21,7 +21,7 @@ const {
 // Validator
 const {
   validateProfileSchema, validateGroupIdSchema, validatePasswordSchema,
-  validateUserSettingSchema,
+  validateUserSettingSchema, validateUserIntroductionSchema,
 } = require('../utils/validators');
 
 async function getUserGroup(req, res, next) {
@@ -120,7 +120,7 @@ async function withdrawal(req, res, next) {
     await user.destroy();
     await deleteBucketImage(previousProfileImage);
 
-    return res.status(204).json({ message: 'Successfully deleted' });
+    return res.status(204).json({ message: '성공적으로 탈퇴되었습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -176,7 +176,27 @@ async function patchUserSetUp(req, res, next) {
 
     await UserGroup.update(req.body, { where: { userId: user.userId, groupId } });
 
-    return res.status(200).json({ message: 'Successfully modified a setting ' });
+    return res.status(200).json({ message: '성공적으로 수정되었습니다.' });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function patchIntroduction(req, res, next) {
+  try {
+    const { error: bodyError } = validateUserIntroductionSchema(req.body);
+    if (bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { user } = req;
+
+    const modifiedUser = await user.update(req.body);
+
+    return res.status(200).json({
+      message: '성공적으로 수정되었습니다.',
+      introduction: modifiedUser.introduction,
+    });
   } catch (err) {
     return next(new ApiError());
   }
@@ -189,4 +209,5 @@ module.exports = {
   withdrawal,
   getUserSetup,
   patchUserSetUp,
+  patchIntroduction,
 };

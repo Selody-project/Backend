@@ -6,7 +6,7 @@ const { uploadProfileMiddleware } = require('../middleware/s3');
 const {
   getUserGroup,
   patchUserProfile, patchUserPassword,
-  getUserSetup, patchUserSetUp,
+  getUserSetup, patchUserSetUp, patchIntroduction,
 } = require('../controllers/user');
 
 // Schedule
@@ -32,6 +32,7 @@ router.patch('/profile', uploadProfileMiddleware, patchUserProfile, createToken)
 router.patch('/profile/password', patchUserPassword);
 router.get('/settings', getUserSetup);
 router.patch('/settings/:group_id', patchUserSetUp);
+router.patch('/introduction', patchIntroduction);
 
 // Schedule
 router.get('/calendar', getUserPersonalSchedule);

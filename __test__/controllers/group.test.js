@@ -218,7 +218,7 @@ describe('Test /api/group endpoints', () => {
         byweekday: ['MO'],
         until: '2026-01-05T00:00:00.000Z',
         groupId: 1,
-        message: 'Successfully create group schedule',
+        message: '성공적으로 등록되었습니다.',
       };
 
       expect(res.status).toEqual(201);
@@ -607,7 +607,7 @@ describe('Test /api/group endpoints', () => {
       const inviteCode = 'inviteCode03';
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(200);
-      expect(res.body).toEqual({ message: 'Successfully joined the group.' });
+      expect(res.body).toEqual({ message: '성공적으로 가입되었습니다.' });
     });
 
     it('Successfully failed to join the group (Group Not Found) ', async () => {
@@ -739,7 +739,7 @@ describe('Test /api/group endpoints', () => {
         author: 'test-user1',
         content: 'testContent',
         image: null,
-        message: 'Successfully created the post.',
+        message: '성공적으로 등록되었습니다.',
         postDetailId: 11,
         postId: 11,
         title: 'testTitle',
@@ -784,7 +784,7 @@ describe('Test /api/group endpoints', () => {
         content: 'modified-content',
         groupId: 1,
         image: null,
-        message: 'Successfully modified the post.',
+        message: '성공적으로 수정되었습니다.',
         postDetailId: 1,
         postId: 1,
         title: 'modified-title',
@@ -1050,7 +1050,7 @@ describe('Test /api/group endpoints', () => {
         commentId: 5,
         content: 'testComment',
         depth: 0,
-        message: 'Successfully created the comment.',
+        message: '성공적으로 등록되었습니다.',
         postId: 1,
       };
       delete res.body.updatedAt;
@@ -1107,7 +1107,7 @@ describe('Test /api/group endpoints', () => {
         commentId: 1,
         content: 'testComment',
         depth: 0,
-        message: 'Successfully created the comment.',
+        message: '성공적으로 수정되었습니다.',
         postId: 1,
         userId: 1,
       };
@@ -1557,7 +1557,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(201);
-      expect(res.body).toEqual({ message: 'Successfully created a Like.' });
+      expect(res.body).toEqual({ message: '성공적으로 등록되었습니다.' });
     });
 
     it('Successfully failed to create a Like (Group Not Found) ', async () => {
