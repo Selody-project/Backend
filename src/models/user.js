@@ -41,6 +41,11 @@ class User extends Sequelize.Model {
         allowNull: true,
         defaultValue: null,
       },
+      lastNotificationId: {
+        type: Sequelize.BIGINT,
+        allowNull: true,
+        defaultValue: null,
+      },
     }, {
       sequelize,
       timestamps: true,

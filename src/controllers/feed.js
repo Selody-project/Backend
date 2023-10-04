@@ -8,6 +8,9 @@ const {
   isLike,
   getAccessLevel,
 } = require('../utils/accessLevel');
+const {
+  sendGroupSSE,
+} = require('../utils/sse');
 
 // Model
 const Group = require('../models/group');
@@ -75,6 +78,9 @@ async function postGroupPost(req, res, next) {
       ...post.dataValues,
       ...postDetail.dataValues,
     };
+
+    await sendGroupSSE(`새로운 그룹 피드가 올라왔습니다.(postId: ${post.postId})`, user, group.groupId);
+
     return res.status(201).json(response);
   } catch (err) {
     await deleteBucketImage(req.fileUrl);

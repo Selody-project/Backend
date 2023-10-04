@@ -187,7 +187,8 @@ async function putPersonalSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    const modifiedSchedule = await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
+    await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
+    const modifiedSchedule = await PersonalSchedule.findByPk(scheduleId);
 
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },

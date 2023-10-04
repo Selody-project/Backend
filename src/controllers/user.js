@@ -1,5 +1,4 @@
 const { Sequelize } = require('sequelize');
-
 const { Op } = Sequelize;
 const bcrypt = require('bcrypt');
 const { deleteBucketImage } = require('../middleware/s3');

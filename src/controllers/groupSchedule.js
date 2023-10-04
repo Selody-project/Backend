@@ -250,7 +250,8 @@ async function putGroupSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    const modifiedSchedule = await schedule.update(req.body);
+    await schedule.update(req.body);
+    const modifiedSchedule = await GroupSchedule.findByPk(scheduleId);
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedSchedule.dataValues,

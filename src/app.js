@@ -17,10 +17,6 @@ const apiError = require('./middleware/apiError');
 const indexRouter = require('./routes');
 const { sequelize } = require('./models');
 
-process.env.TZ = 'Etc/Universal';
-const appUrl = config.APP_URL;
-const port = config.PORT || 8000;
-
 const app = express();
 
 app.use(fileUpload());
@@ -51,7 +47,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
 // router
 app.use('/api', indexRouter);
 
+// 오류 처리 미들웨어
 app.use(apiError);
+
+// 서버 시작
+process.env.TZ = 'Etc/Universal';
+const appUrl = config.APP_URL;
+const port = config.PORT || 8000;
 
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, async () => {

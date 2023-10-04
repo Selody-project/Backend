@@ -2,6 +2,9 @@ const { Sequelize } = require('sequelize');
 
 const { Op } = Sequelize;
 const { deleteBucketImage } = require('../middleware/s3');
+const {
+  sseGroupJoin, sseGroupLeave, sseGroupRemove,
+} = require('../utils/sse');
 
 // Model
 const User = require('../models/user');
@@ -53,6 +56,8 @@ async function postGroup(req, res, next) {
     }
 
     await user.addGroup(group, { through: { accessLevel: 'owner' } });
+
+    await sseGroupJoin(group.groupId, user);
 
     const response = {
       ...{ message: '성공적으로 생성되었습니다.' },
@@ -249,6 +254,9 @@ async function deleteGroup(req, res, next) {
     const previousGroupImage = [group.image];
     await group.destroy();
     await deleteBucketImage(previousGroupImage);
+
+    await sseGroupRemove(group.groupId);
+
     return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
     return next(new ApiError());
@@ -284,7 +292,9 @@ async function deleteGroupUser(req, res, next) {
 
     await group.update({ member: group.member - 1 });
 
-    return res.status(204).json({ message: '성공적으로 추방하였습니다.' });
+    await sseGroupLeave(group.groupId, user);
+
+    return res.status(204).json({ message: '성공적으로 탈퇴하였습니다.' });
   } catch (err) {
     return next(new ApiError());
   }
@@ -433,6 +443,8 @@ async function postGroupJoinApprove(req, res, next) {
     await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId } });
     await group.update({ member: (group.member + 1) });
 
+    await sseGroupJoin(group.groupId, applicant);
+
     return res.status(200).json({ message: '성공적으로 수락하였습니다.' });
   } catch (err) {
     return next(new ApiError());
@@ -578,6 +590,8 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
 
+    await sseGroupJoin(groupId, user);
+
     return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
     return next(new ApiError());
@@ -620,8 +634,11 @@ async function deleteGroupMember(req, res, next) {
     await group.removeUser(member);
     await group.update({ member: (group.member - 1) });
 
+    await sseGroupLeave(group.groupId, member);
+
     return res.status(204).end();
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
