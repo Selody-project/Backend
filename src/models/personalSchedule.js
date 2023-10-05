@@ -136,6 +136,7 @@ class PersonalSchedule extends Sequelize.Model {
         },
         type: Sequelize.QueryTypes.SELECT,
       });
+
       const recurrenceSchedule = [];
       recurrenceScheduleList.forEach((schedule) => {
         const byweekday = getRRuleByWeekDay(schedule.byweekday);
@@ -181,9 +182,9 @@ class PersonalSchedule extends Sequelize.Model {
               interval: schedule.interval,
               byweekday: schedule.byweekday,
               startDateTime: schedule.startDateTime,
+              endDateTime: schedule.endDateTime,
               until: schedule.until,
               isGroup: schedule.isGroup,
-              recurrenceDateList: possibleDateList,
             });
           } else {
             recurrenceSchedule.push({
@@ -196,6 +197,7 @@ class PersonalSchedule extends Sequelize.Model {
               interval: schedule.interval,
               byweekday: schedule.byweekday,
               startDateTime: schedule.startDateTime,
+              endDateTime: schedule.endDateTime,
               until: schedule.until,
               isGroup: schedule.isGroup,
               recurrenceDateList: possibleDateList,
@@ -206,7 +208,9 @@ class PersonalSchedule extends Sequelize.Model {
       if (earliestDate === Number.MAX_SAFE_INTEGER) {
         earliestDate = null;
       }
-      return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
+      return {
+        earliestDate, nonRecurrenceSchedule, recurrenceSchedule, recurrenceScheduleList,
+      };
     } catch (err) {
       throw new ApiError();
     }

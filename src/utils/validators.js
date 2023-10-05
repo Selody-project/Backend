@@ -13,6 +13,7 @@ const joinSchema = Joi.object({
 const profileSchema = Joi.object({
   email: Joi.string().email().min(1).max(40).required(),
   nickname: Joi.string().min(1).max(15).required(),
+  introduction: Joi.string().max(50).required(),
 });
 
 const passwordSchema = Joi.object({

@@ -46,7 +46,7 @@ async function patchUserProfile(req, res, next) {
       throw (new DataFormatError());
     }
 
-    const { nickname, email } = req.body;
+    const { nickname, email, introduction } = req.body;
     const { user } = req;
 
     const nicknameDuplicate = await User.findAll({
@@ -66,10 +66,12 @@ async function patchUserProfile(req, res, next) {
     const previousProfileImage = [user.profileImage];
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      await user.update({ nickname, email, profileImage: fileUrl });
+      await user.update({
+        nickname, email, introduction, profileImage: fileUrl,
+      });
       await deleteBucketImage(previousProfileImage);
     } else {
-      await user.update({ nickname, email });
+      await user.update({ nickname, email, introduction });
     }
     req.user = user;
     return next();
