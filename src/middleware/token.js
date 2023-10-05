@@ -48,6 +48,7 @@ async function createToken(req, res, next) {
       provider: user.provider,
       snsId: user.snsId,
       profileImage: user.profileImage,
+      introduction: user.introduction,
     });
   } catch (error) {
     return next(new ApiError());

@@ -181,9 +181,9 @@ class GroupSchedule extends Sequelize.Model {
               interval: schedule.interval,
               byweekday: schedule.byweekday,
               startDateTime: schedule.startDateTime,
+              endDateTime: schedule.endDateTime,
               until: schedule.until,
               isGroup: schedule.isGroup,
-              recurrenceDateList: possibleDateList,
             });
           } else {
             recurrenceSchedule.push({
@@ -196,6 +196,7 @@ class GroupSchedule extends Sequelize.Model {
               interval: schedule.interval,
               byweekday: schedule.byweekday,
               startDateTime: schedule.startDateTime,
+              endDateTime: schedule.endDateTime,
               until: schedule.until,
               isGroup: schedule.isGroup,
               recurrenceDateList: possibleDateList,
