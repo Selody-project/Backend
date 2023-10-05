@@ -387,6 +387,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title11',
               startDateTime: '2020-01-01T12:00:00.000Z',
+              endDateTime: '2020-01-01T13:00:00.000Z',
               until: '2023-04-05T14:00:00.000Z',
             },
             {
@@ -403,6 +404,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title12',
               startDateTime: '2020-01-15T12:00:00.000Z',
+              endDateTime: '2020-01-15T13:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -422,6 +424,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title13',
               startDateTime: '2020-01-15T12:00:00.000Z',
+              endDateTime: '2020-01-15T13:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -438,6 +441,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title14',
               startDateTime: '2020-04-15T12:00:00.000Z',
+              endDateTime: '2020-04-15T13:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -461,6 +465,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title15',
               startDateTime: '2020-01-13T12:00:00.000Z',
+              endDateTime: '2020-01-13T13:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -480,6 +485,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title16',
               startDateTime: '2020-03-15T12:00:00.000Z',
+              endDateTime: '2020-04-01T00:00:00.000Z',
               until: '2023-03-20T00:00:00.000Z',
             },
             {
@@ -502,6 +508,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title17',
               startDateTime: '2020-03-15T12:00:00.000Z',
+              endDateTime: '2020-04-01T00:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -518,6 +525,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title18',
               startDateTime: '2020-03-15T12:00:00.000Z',
+              endDateTime: '2020-04-01T00:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -534,6 +542,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title19',
               startDateTime: '2020-01-15T12:00:00.000Z',
+              endDateTime: '2020-04-01T00:00:00.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
             {
@@ -550,6 +559,7 @@ describe('Test /api/group endpoints', () => {
               ],
               title: 'test-title21',
               startDateTime: '2020-04-30T23:59:59.000Z',
+              endDateTime: '2020-05-01T23:59:59.000Z',
               until: '2025-01-01T00:00:00.000Z',
             },
           ],
