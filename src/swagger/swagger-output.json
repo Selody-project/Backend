@@ -1234,7 +1234,7 @@
         }
       }
     },
-    "/api/group/{group_id}/feed/{last_record_id}": {
+    "/api/group/{group_id}/post": {
       "get": {
         "description": "현재 마지막 레코드의 id 값을 last_record_id에 넣어 요청하면, 해당 레코드 이전에 생성된 9개의 시간순 레코드를 얻어옵니다. 첫 호출시에는 0을 넣어주세요.",
         "summary": "그룹 피드 조회(9개 단위)",
@@ -1248,7 +1248,7 @@
           },
           {
             "name": "last_record_id",
-            "in": "path",
+            "in": "query",
             "required": true,
             "type": "integer"
           }
@@ -1267,9 +1267,7 @@
             "description": "서버 에러"
           }
         }
-      }
-    },
-    "/api/group/{group_id}/post": {
+      },
       "post": {
         "description": "",
         "summary": "그룹 포스트 작성",
@@ -1772,7 +1770,7 @@
         }
       }
     },
-    "/api/user/feed/{last_record_id}": {
+    "/api/user/post": {
       "get": {
         "description": "가입된 모든 그룹의 피드를 시간순으로 가져옵니다 ( 9개 단위 )",
         "summary": "최신 피드 조회",
@@ -1780,8 +1778,7 @@
         "parameters": [
           {
             "name": "last_record_id",
-            "in": "path",
-            "required": true,
+            "in": "query",
             "type": "integer"
           }
         ],

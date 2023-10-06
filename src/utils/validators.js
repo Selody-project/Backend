@@ -104,11 +104,6 @@ const postIdSchema = Joi.object({
   post_id: Joi.number().min(0).required(),
 });
 
-const pageSchema = Joi.object({
-  group_id: Joi.number().min(0).required(),
-  last_record_id: Joi.number().min(0).required(),
-});
-
 const lastRecordIdSchema = Joi.object({
   last_record_id: Joi.number().min(0).required(),
 });
@@ -163,7 +158,6 @@ module.exports = {
   validateEventProposalSchema: validator(eventPoroposalSchema),
   validatePostSchema: validator(postSchema),
   validatePostIdSchema: validator(postIdSchema),
-  validatePageSchema: validator(pageSchema),
   validateLastRecordIdSchema: validator(lastRecordIdSchema),
   validateCommentSchema: validator(commentSchema),
   validateCommentIdSchema: validator(commentIdSchema),
