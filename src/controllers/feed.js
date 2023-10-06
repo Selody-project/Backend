@@ -26,7 +26,7 @@ const {
 // Validator
 const {
   validateGroupIdSchema,
-  validatePostSchema, validatePostIdSchema, validatePageSchema,
+  validatePostSchema, validatePostIdSchema,
   validateCommentSchema, validateCommentIdSchema, validateLastRecordIdSchema,
 } = require('../utils/validators');
 
@@ -133,13 +133,14 @@ async function getSinglePost(req, res, next) {
 
 async function getGroupPosts(req, res, next) {
   try {
-    const { error: paramError } = validatePageSchema(req.params);
-    if (paramError) {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (paramError || queryError) {
       return next(new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }
@@ -613,15 +614,15 @@ async function deleteComment(req, res, next) {
 
 async function getUserFeed(req, res, next) {
   try {
-    const { error: paramError } = validateLastRecordIdSchema(req.params);
-    if (paramError) {
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (queryError) {
       return next(new DataFormatError());
     }
 
     const { user } = req;
     const groups = (await user.getGroups()).map((group) => group.groupId);
 
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }

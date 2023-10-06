@@ -60,7 +60,7 @@ router.get('/:group_id/proposal', getEventProposal);
 
 // Feed
 router.post('/:group_id/post', uploadPostMiddleware, postGroupPost);
-router.get('/:group_id/feed/:last_record_id', getGroupPosts);
+router.get('/:group_id/post', getGroupPosts);
 router.get('/:group_id/post/:post_id', getSinglePost);
 router.put('/:group_id/post/:post_id', uploadPostMiddleware, putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);

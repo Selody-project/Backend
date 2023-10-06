@@ -43,6 +43,6 @@ router.put('/calendar/:schedule_id', putPersonalSchedule);
 router.delete('/calendar/:schedule_id', deletePersonalSchedule);
 
 // Feed
-router.get('/feed/:last_record_id', getUserFeed);
+router.get('/post', getUserFeed);
 
 module.exports = router;

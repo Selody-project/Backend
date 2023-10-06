@@ -937,11 +937,13 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group/:group_id/feed/:last_record_id', () => {
+  describe('Test GET /api/group/:group_id/post', () => {
     it('Successfully retrieved the posts. ', async () => {
       const groupId = 1;
       const lastRecordId = 0;
-      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       const expectedResult = {
         accessLevel: 'owner',
         isEnd: true,
@@ -994,7 +996,9 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to retrieved the posts. (Group Not Found) ', async () => {
       const groupId = 10000;
       const lastRecordId = 0;
-      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
@@ -1002,7 +1006,9 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to retrieved the posts. (DataFormat Error) ', async () => {
       const groupId = 'abc';
       const lastRecordId = 0;
-      const res = (await request(app).get(`/api/group/${groupId}/feed/${lastRecordId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/${groupId}/post`).set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
