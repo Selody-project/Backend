@@ -1,17 +1,3 @@
-// 일정 추천을 위한 계산을 하기위해 Event에서 startDateTime, endDateTime만을 추출
-function parseEventDates(nonRecurrenceEvent, recurrenceEvent) {
-  const events = [];
-  nonRecurrenceEvent.forEach((event) => {
-    events.push({ startDateTime: event.startDateTime, endDateTime: event.endDateTime });
-  });
-  recurrenceEvent.forEach((event) => {
-    event.recurrenceDateList.forEach((date) => {
-      events.push(date);
-    });
-  });
-  return events;
-}
-
 // duration 계산 (분 단위의 결과값)
 function getDuration(start, end) {
   return Math.round((end.getTime() - start.getTime()) / (1000 * 60));
@@ -59,6 +45,5 @@ function eventProposal(events, start, end) {
 }
 
 module.exports = {
-  parseEventDates,
   eventProposal,
 };
