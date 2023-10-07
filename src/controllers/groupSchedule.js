@@ -141,27 +141,23 @@ async function getGroupSchedule(req, res, next) {
       attributes: ['userId'],
     })).map((member) => member.userId);
     const userSchedule = await PersonalSchedule.getSchedule(users, start, end);
-    let schedule;
+    let response;
     if (userSchedule.earliestDate === null) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else if (groupSchedule.earliestDate === null) {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     }
-    schedule.nonRecurrenceSchedule = [
-      ...userSchedule.nonRecurrenceSchedule,
-      ...groupSchedule.nonRecurrenceSchedule,
-    ];
-    schedule.recurrenceSchedule = [
-      ...userSchedule.recurrenceSchedule,
-      ...groupSchedule.recurrenceSchedule,
+    response.schedules = [
+      ...userSchedule.schedules,
+      ...groupSchedule.schedules,
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, schedule });
+    return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
     return next(new ApiError());
   }
@@ -195,27 +191,23 @@ async function getGroupScheduleSummary(req, res, next) {
       attributes: ['userId'],
     })).map((member) => member.userId);
     const userSchedule = await PersonalSchedule.getSchedule(users, start, end, true);
-    let schedule;
+    let response;
     if (userSchedule.earliestDate === null) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else if (groupSchedule.earliestDate === null) {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     }
-    schedule.nonRecurrenceSchedule = [
-      ...userSchedule.nonRecurrenceSchedule,
-      ...groupSchedule.nonRecurrenceSchedule,
-    ];
-    schedule.recurrenceSchedule = [
-      ...userSchedule.recurrenceSchedule,
-      ...groupSchedule.recurrenceSchedule,
+    response.schedules = [
+      ...userSchedule.schedules,
+      ...groupSchedule.schedules,
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, schedule });
+    return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
     return next(new ApiError());
   }

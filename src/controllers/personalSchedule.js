@@ -97,25 +97,21 @@ async function getUserPersonalSchedule(req, res, next) {
     const groups = (await user.getGroups()).map((group) => group.groupId);
     if (groups.length) {
       const groupSchedule = await GroupSchedule.getSchedule(groups, start, end);
-      let schedule;
+      let response;
       if (userSchedule.earliestDate === null) {
-        schedule = { earliestDate: groupSchedule.earliestDate };
+        response = { earliestDate: groupSchedule.earliestDate };
       } else if (groupSchedule.earliestDate === null) {
-        schedule = { earliestDate: userSchedule.earliestDate };
+        response = { earliestDate: userSchedule.earliestDate };
       } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-        schedule = { earliestDate: groupSchedule.earliestDate };
+        response = { earliestDate: groupSchedule.earliestDate };
       } else {
-        schedule = { earliestDate: userSchedule.earliestDate };
+        response = { earliestDate: userSchedule.earliestDate };
       }
-      schedule.nonRecurrenceSchedule = [
-        ...userSchedule.nonRecurrenceSchedule,
-        ...groupSchedule.nonRecurrenceSchedule,
+      response.schedules = [
+        ...userSchedule.schedules,
+        ...groupSchedule.schedules,
       ];
-      schedule.recurrenceSchedule = [
-        ...userSchedule.recurrenceSchedule,
-        ...groupSchedule.recurrenceSchedule,
-      ];
-      return res.status(200).json(schedule);
+      return res.status(200).json(response);
     }
     return res.status(200).json(userSchedule);
   } catch (err) {
@@ -140,25 +136,21 @@ async function getUserPersonalScheduleSummary(req, res, next) {
     const groups = (await user.getGroups()).map((group) => group.groupId);
     if (groups.length) {
       const groupSchedule = await GroupSchedule.getSchedule(groups, start, end, true);
-      let schedule;
+      let response;
       if (userSchedule.earliestDate === null) {
-        schedule = { earliestDate: groupSchedule.earliestDate };
+        response = { earliestDate: groupSchedule.earliestDate };
       } else if (groupSchedule.earliestDate === null) {
-        schedule = { earliestDate: userSchedule.earliestDate };
+        response = { earliestDate: userSchedule.earliestDate };
       } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-        schedule = { earliestDate: groupSchedule.earliestDate };
+        response = { earliestDate: groupSchedule.earliestDate };
       } else {
-        schedule = { earliestDate: userSchedule.earliestDate };
+        response = { earliestDate: userSchedule.earliestDate };
       }
-      schedule.nonRecurrenceSchedule = [
-        ...userSchedule.nonRecurrenceSchedule,
-        ...groupSchedule.nonRecurrenceSchedule,
+      response.schedules = [
+        ...userSchedule.schedules,
+        ...groupSchedule.schedules,
       ];
-      schedule.recurrenceSchedule = [
-        ...userSchedule.recurrenceSchedule,
-        ...groupSchedule.recurrenceSchedule,
-      ];
-      return res.status(200).json(schedule);
+      return res.status(200).json(response);
     }
     return res.status(200).json(userSchedule);
   } catch (err) {

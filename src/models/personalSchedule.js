@@ -76,22 +76,17 @@ class PersonalSchedule extends Sequelize.Model {
     try {
       const db = require('.');
       let earliestDate = Number.MAX_SAFE_INTEGER;
-      let nonRecurrenceAttributes;
-      let recurrenceAttributes;
+      let attributes;
       if (isSummary) {
-        // title 및 content를 제외한 필드 목록
-        nonRecurrenceAttributes = ['id', 'userId', 'startDateTime', 'endDateTime', 'recurrence'];
         // eslint-disable-next-line no-useless-escape
-        recurrenceAttributes = ['id', 'userId', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+        attributes = ['id', 'userId', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
       } else {
-        // title 및 content를 포함한 필드 목록
-        nonRecurrenceAttributes = ['id', 'userId', 'title', 'content', 'startDateTime', 'endDateTime', 'recurrence'];
         // eslint-disable-next-line no-useless-escape
-        recurrenceAttributes = ['id', 'userId', 'title', 'content', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+        attributes = ['id', 'userId', 'title', 'content', 'startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
       }
       const nonRecurrenceStatement = `
         SELECT 
-          ${nonRecurrenceAttributes.join(', ')},
+          ${attributes.join(', ')},
           false AS isGroup
         FROM 
           personalSchedule
@@ -107,7 +102,7 @@ class PersonalSchedule extends Sequelize.Model {
         )`;
       const recurrenceStatement = `
         SELECT 
-          ${recurrenceAttributes.join(', ')}, 
+          ${attributes.join(', ')}, 
           false AS isGroup
         FROM 
           personalSchedule
@@ -136,7 +131,6 @@ class PersonalSchedule extends Sequelize.Model {
         },
         type: Sequelize.QueryTypes.SELECT,
       });
-
       const recurrenceSchedule = [];
       recurrenceScheduleList.forEach((schedule) => {
         const byweekday = getRRuleByWeekDay(schedule.byweekday);
@@ -162,53 +156,52 @@ class PersonalSchedule extends Sequelize.Model {
           new Date(start.getTime() - scheduleLength),
           new Date(end.getTime() + 1),
         );
-        const possibleDateList = [];
-        scheduleDateList.forEach((scheduleDate) => {
+        if (scheduleDateList.length !== 0) {
+          const scheduleDate = scheduleDateList[0];
           const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
           if (endDateTime >= start) {
             if (earliestDate > scheduleDate) {
               earliestDate = scheduleDate;
             }
-            possibleDateList.push({ startDateTime: scheduleDate, endDateTime });
-          }
-        });
-        if (possibleDateList.length !== 0) {
-          if (isSummary) {
-            recurrenceSchedule.push({
-              id: schedule.id,
-              userId: schedule.userId,
-              recurrence: schedule.recurrence,
-              freq: schedule.freq,
-              interval: schedule.interval,
-              byweekday: schedule.byweekday,
-              startDateTime: schedule.startDateTime,
-              endDateTime: schedule.endDateTime,
-              until: schedule.until,
-              isGroup: schedule.isGroup,
-            });
-          } else {
-            recurrenceSchedule.push({
-              id: schedule.id,
-              userId: schedule.userId,
-              title: schedule.title,
-              content: schedule.content,
-              recurrence: schedule.recurrence,
-              freq: schedule.freq,
-              interval: schedule.interval,
-              byweekday: schedule.byweekday,
-              startDateTime: schedule.startDateTime,
-              endDateTime: schedule.endDateTime,
-              until: schedule.until,
-              isGroup: schedule.isGroup,
-              recurrenceDateList: possibleDateList,
-            });
+            if (isSummary) {
+              recurrenceSchedule.push({
+                id: schedule.id,
+                userId: schedule.userId,
+                startDateTime: schedule.startDateTime,
+                endDatetime: schedule.endDateTime,
+                recurrence: schedule.recurrence,
+                freq: schedule.freq,
+                interval: schedule.interval,
+                byweekday: schedule.byweekday,
+                isGroup: schedule.isGroup,
+                startRecur: schedule.startDateTime,
+                endRecur: schedule.until,
+              });
+            } else {
+              recurrenceSchedule.push({
+                id: schedule.id,
+                userId: schedule.userId,
+                title: schedule.title,
+                content: schedule.content,
+                startDateTime: schedule.startDateTime,
+                endDatetime: schedule.endDateTime,
+                recurrence: schedule.recurrence,
+                freq: schedule.freq,
+                interval: schedule.interval,
+                byweekday: schedule.byweekday,
+                isGroup: schedule.isGroup,
+                startRecur: schedule.startDateTime,
+                endRecur: schedule.until,
+              });
+            }
           }
         }
       });
       if (earliestDate === Number.MAX_SAFE_INTEGER) {
         earliestDate = null;
       }
-      return { earliestDate, nonRecurrenceSchedule, recurrenceSchedule };
+      const schedules = [...nonRecurrenceSchedule, ...recurrenceSchedule];
+      return { earliestDate, schedules };
     } catch (err) {
       throw new ApiError();
     }
