@@ -75,6 +75,7 @@ class GroupSchedule extends Sequelize.Model {
     try {
       const db = require('.');
       let earliestDate = Number.MAX_SAFE_INTEGER;
+      const groupIds = groupID.join(', ');
       let attributes;
       if (isSummary) {
         // eslint-disable-next-line no-useless-escape
@@ -90,7 +91,7 @@ class GroupSchedule extends Sequelize.Model {
         FROM 
           groupSchedule
         WHERE 
-          groupId IN (${groupID.join(', ')}) AND (
+          groupId IN (${groupIds}) AND (
           recurrence = 0 AND ( 
             (startDateTime BETWEEN :start AND :end)
             OR
@@ -106,7 +107,7 @@ class GroupSchedule extends Sequelize.Model {
         FROM 
           groupSchedule
         WHERE 
-          groupId IN (${groupID.join(', ')}) AND (
+          groupId IN (${groupIds}) AND (
           recurrence = 1 AND
           startDateTime <= :end
         )`;
@@ -129,6 +130,7 @@ class GroupSchedule extends Sequelize.Model {
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
         type: Sequelize.QueryTypes.SELECT,
+        logging: true,
       });
       const recurrenceSchedule = [];
       recurrenceScheduleList.forEach((schedule) => {
@@ -201,6 +203,92 @@ class GroupSchedule extends Sequelize.Model {
       }
       const schedules = [...nonRecurrenceSchedule, ...recurrenceSchedule];
       return { earliestDate, schedules };
+    } catch (err) {
+      throw new ApiError();
+    }
+  }
+
+  static async getProposalSchedule(groupID, start, end) {
+    try {
+      const db = require('.');
+      const groupIds = groupID.join(', ');
+      const nonRecurrenceAttributes = ['startDateTime', 'endDateTime'];
+      // eslint-disable-next-line no-useless-escape
+      const recurrenceAttributes = ['startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+      const nonRecurrenceStatement = `
+        SELECT 
+          ${nonRecurrenceAttributes.join(', ')}
+        FROM 
+          groupSchedule
+        WHERE 
+          groupId IN (${groupIds}) AND (
+          recurrence = 0 AND ( 
+            (startDateTime BETWEEN :start AND :end)
+            OR
+            (endDateTime BETWEEN :start AND :end)
+            OR
+            (startDateTime < :start AND endDateTime > :end)
+          )
+        )`;
+      const recurrenceStatement = `
+        SELECT 
+          ${recurrenceAttributes.join(', ')}
+        FROM 
+          groupSchedule
+        WHERE 
+          groupId IN (${groupIds}) AND (
+          recurrence = 1 AND
+          startDateTime <= :end
+        )`;
+      const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
+        replacements: {
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
+        type: Sequelize.QueryTypes.SELECT,
+      });
+      const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
+        replacements: {
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
+        type: Sequelize.QueryTypes.SELECT,
+      });
+      const recurrenceSchedule = [];
+      recurrenceScheduleList.forEach((schedule) => {
+        const byweekday = getRRuleByWeekDay(schedule.byweekday);
+        let rrule;
+        if (byweekday.length === 0) {
+          rrule = new RRule({
+            freq: getRRuleFreq(schedule.freq),
+            interval: schedule.interval,
+            dtstart: schedule.startDateTime,
+            until: schedule.until,
+          });
+        } else {
+          rrule = new RRule({
+            freq: getRRuleFreq(schedule.freq),
+            interval: schedule.interval,
+            byweekday: getRRuleByWeekDay(schedule.byweekday),
+            dtstart: schedule.startDateTime,
+            until: schedule.until,
+          });
+        }
+        const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
+        const scheduleDateList = rrule.between(
+          new Date(start.getTime() - scheduleLength),
+          new Date(end.getTime() + 1),
+        );
+        if (scheduleDateList.length !== 0) {
+          const scheduleDate = scheduleDateList[0];
+          const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+          if (endDateTime >= start) {
+            recurrenceSchedule.push({ startDateTime: scheduleDate, endDateTime });
+          }
+        }
+      });
+      const result = [...nonRecurrenceSchedule, ...recurrenceSchedule];
+      return result;
     } catch (err) {
       throw new ApiError();
     }

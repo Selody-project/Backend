@@ -76,6 +76,7 @@ class PersonalSchedule extends Sequelize.Model {
     try {
       const db = require('.');
       let earliestDate = Number.MAX_SAFE_INTEGER;
+      const userIds = userID.join(',');
       let attributes;
       if (isSummary) {
         // eslint-disable-next-line no-useless-escape
@@ -91,7 +92,7 @@ class PersonalSchedule extends Sequelize.Model {
         FROM 
           personalSchedule
         WHERE 
-          userId IN (${userID.join(',')}) AND (
+          userId IN (${userIds}) AND (
           recurrence = 0 AND ( 
             (startDateTime BETWEEN :start AND :end)
             OR
@@ -107,7 +108,7 @@ class PersonalSchedule extends Sequelize.Model {
         FROM 
           personalSchedule
         WHERE 
-          userId IN (${userID.join(',')}) AND (
+          userId IN (${userIds}) AND (
           recurrence = 1 AND 
           startDateTime <= :end
         )`;
@@ -202,6 +203,92 @@ class PersonalSchedule extends Sequelize.Model {
       }
       const schedules = [...nonRecurrenceSchedule, ...recurrenceSchedule];
       return { earliestDate, schedules };
+    } catch (err) {
+      throw new ApiError();
+    }
+  }
+
+  static async getProposalSchedule(userID, start, end) {
+    try {
+      const db = require('.');
+      const userIds = userID.join(',');
+      const nonRecurrenceAttributes = ['startDateTime', 'endDateTime'];
+      // eslint-disable-next-line no-useless-escape
+      const recurrenceAttributes = ['startDateTime', 'endDateTime', 'recurrence', 'freq', '\`interval\`', 'byweekday', 'until'];
+      const nonRecurrenceStatement = `
+        SELECT 
+          ${nonRecurrenceAttributes.join(', ')}
+        FROM 
+          personalSchedule
+        WHERE 
+          userId IN (${userIds}) AND (
+          recurrence = 0 AND ( 
+            (startDateTime BETWEEN :start AND :end)
+            OR
+            (endDateTime BETWEEN :start AND :end)
+            OR
+            (startDateTime < :start AND endDateTime > :end)
+          )
+        )`;
+      const recurrenceStatement = `
+        SELECT 
+          ${recurrenceAttributes.join(', ')}
+        FROM 
+          personalSchedule
+        WHERE 
+          userId IN (${userIds}) AND (
+          recurrence = 1 AND 
+          startDateTime <= :end
+        )`;
+      const nonRecurrenceSchedule = await db.sequelize.query(nonRecurrenceStatement, {
+        replacements: {
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
+        type: Sequelize.QueryTypes.SELECT,
+      });
+      const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
+        replacements: {
+          start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
+          end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
+        },
+        type: Sequelize.QueryTypes.SELECT,
+      });
+
+      const recurrenceSchedule = [];
+      recurrenceScheduleList.forEach((schedule) => {
+        const byweekday = getRRuleByWeekDay(schedule.byweekday);
+        let rrule;
+        if (byweekday.length === 0) {
+          rrule = new RRule({
+            freq: getRRuleFreq(schedule.freq),
+            interval: schedule.interval,
+            dtstart: schedule.startDateTime,
+            until: schedule.until,
+          });
+        } else {
+          rrule = new RRule({
+            freq: getRRuleFreq(schedule.freq),
+            interval: schedule.interval,
+            byweekday: getRRuleByWeekDay(schedule.byweekday),
+            dtstart: schedule.startDateTime,
+            until: schedule.until,
+          });
+        }
+        const scheduleLength = (new Date(schedule.endDateTime) - new Date(schedule.startDateTime));
+        const scheduleDateList = rrule.between(
+          new Date(start.getTime() - scheduleLength),
+          new Date(end.getTime() + 1),
+        );
+        scheduleDateList.forEach((scheduleDate) => {
+          const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+          if (endDateTime >= start) {
+            recurrenceSchedule.push({ startDateTime: scheduleDate, endDateTime });
+          }
+        });
+      });
+      const result = [...nonRecurrenceSchedule, ...recurrenceSchedule];
+      return result;
     } catch (err) {
       throw new ApiError();
     }

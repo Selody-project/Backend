@@ -1,7 +1,5 @@
 const moment = require('moment');
-const {
-  parseEventDates, eventProposal,
-} = require('../utils/event');
+const { eventProposal } = require('../utils/event');
 const {
   getAccessLevel,
 } = require('../utils/accessLevel');
@@ -207,7 +205,7 @@ async function getGroupScheduleSummary(req, res, next) {
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, ...response });
+    return res.status(200).json({ accessLevel, response });
   } catch (err) {
     return next(new ApiError());
   }
@@ -323,22 +321,13 @@ async function getEventProposal(req, res, next) {
 
     /* eslint-disable no-restricted-syntax */
     for (const date of Object.values(req.query)) {
-      let events = [];
       const start = moment.utc(date).toDate();
       const end = moment.utc(date).add(24, 'hours').add(-1, 's').toDate();
-      const {
-        nonRecurrenceSchedule: userNonRecEvent,
-        recurrenceSchedule: userRecEvent,
-        /* eslint-disable-next-line no-await-in-loop */
-      } = await PersonalSchedule.getSchedule(groupMembers, start, end);
-      events.push(parseEventDates(userNonRecEvent, userRecEvent));
-      const {
-        nonRecurrenceSchedule: groupNonRecEvent,
-        recurrenceSchedule: groupRecEvent,
-        /* eslint-disable-next-line no-await-in-loop */
-      } = await GroupSchedule.getSchedule([groupId], start, end);
-      events.push(parseEventDates(groupNonRecEvent, groupRecEvent));
-      events = events.flat(1);
+      /* eslint-disable-next-line no-await-in-loop */
+      const userSchedules = await PersonalSchedule.getProposalSchedule(groupMembers, start, end);
+      /* eslint-disable-next-line no-await-in-loop */
+      const groupSchedules = await GroupSchedule.getProposalSchedule([groupId], start, end);
+      const events = [...userSchedules, ...groupSchedules];
       events.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
 
       // 결과값에서 9시~22시 사이의 값들을 먼저 추천할 수 있도록 정렬.
