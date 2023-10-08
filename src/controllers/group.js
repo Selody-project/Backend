@@ -21,7 +21,7 @@ const {
 const {
   validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
-  validateGroupdSearchKeyword,
+  validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
 } = require('../utils/validators');
 const { getAccessLevel } = require('../utils/accessLevel');
 
@@ -553,6 +553,36 @@ async function postInviteLink(req, res, next) {
   }
 }
 
+async function getGroupPreviewWithInviteCode(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupInviteCodeSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { inviteCode } = req.params;
+    const group = await Group.findOne({ where: { inviteCode } });
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (group.inviteExp < new Date()) {
+      return next(new ExpiredCodeError());
+    }
+
+    return res.status(200).json({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postJoinGroupWithInviteCode(req, res, next) {
   try {
     const { error: paramError } = validateGroupJoinInviteCodeSchema(req.params);
@@ -668,6 +698,7 @@ module.exports = {
   postGroupJoinReject,
   getInviteLink,
   postInviteLink,
+  getGroupPreviewWithInviteCode,
   postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,

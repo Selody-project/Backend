@@ -7,7 +7,8 @@ const {
   putGroup, deleteGroup,
   getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
-  getInviteLink, postInviteLink, postJoinGroupWithInviteCode,
+  getInviteLink, postInviteLink,
+  getGroupPreviewWithInviteCode, postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,
 } = require('../controllers/group');
@@ -45,6 +46,7 @@ router.post('/:group_id/members/request', postGroupJoinRequest);
 router.post('/:group_id/members/:user_id/approve', postGroupJoinApprove);
 router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
 router.delete('/:group_id/members/:user_id', deleteGroupMember);
+router.get('/invite-link/:inviteCode', getGroupPreviewWithInviteCode);
 router.get('/:group_id/join/invite-link', getInviteLink);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
