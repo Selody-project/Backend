@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 
 // Model
 const User = require('../models/user');
+const Post = require('../models/post');
 
 // Error
 const {
@@ -40,6 +41,8 @@ async function createToken(req, res, next) {
     const refreshToken = token().access(user.nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
+    const postCount = await Post.getUserPostCount(user.userId);
+    const groupCount = await user.countGroups();
     return res.status(200).json({
       message: 'JWT 발급에 성공하였습니다',
       userId: user.userId,
@@ -49,6 +52,8 @@ async function createToken(req, res, next) {
       snsId: user.snsId,
       profileImage: user.profileImage,
       introduction: user.introduction,
+      postCount,
+      groupCount,
     });
   } catch (error) {
     return next(new ApiError());
@@ -90,6 +95,8 @@ async function renewToken(req, res, next) {
     const accessToken = token().access(nickname);
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     const user = await User.findOne({ where: { nickname } });
+    const postCount = await Post.getUserPostCount(user.userId);
+    const groupCount = await user.countGroups();
     return res.status(200).json({
       message: 'JWT 갱신에 성공하였습니다',
       userId: user.userId,
@@ -97,7 +104,10 @@ async function renewToken(req, res, next) {
       nickname,
       provider: user.provider,
       snsId: user.snsId,
-      image: user.profileImage,
+      profileImage: user.profileImage,
+      introduction: user.introduction,
+      postCount,
+      groupCount,
     });
   } catch (err) {
     if (err.name === 'TokenExpireError') {
