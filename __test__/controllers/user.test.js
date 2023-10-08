@@ -102,6 +102,8 @@ describe('Test /api/user endpoints', () => {
         snsId: null,
         introduction: newIntroduction,
         userId: 1,
+        postCount: 6,
+        groupCount: 2,
       };
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);

@@ -130,7 +130,6 @@ class GroupSchedule extends Sequelize.Model {
           end: moment.utc(end).format('YYYY-MM-DDTHH:mm:ssZ'),
         },
         type: Sequelize.QueryTypes.SELECT,
-        logging: true,
       });
       const recurrenceSchedule = [];
       recurrenceScheduleList.forEach((schedule) => {

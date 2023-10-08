@@ -45,6 +45,19 @@ class Post extends Sequelize.Model {
       foreignKey: 'userId',
     });
   }
+
+  static async getUserPostCount(userId) {
+    try {
+      const count = await Post.count({
+        where: {
+          userId,
+        },
+      });
+      return count;
+    } catch (err) {
+      throw new Error();
+    }
+  }
 }
 
 module.exports = Post;
