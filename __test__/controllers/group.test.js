@@ -600,6 +600,36 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test GET /api/group/invite-link/:inviteCode', () => {
+    it('Successfully retrieved the group ', async () => {
+      const inviteCode = 'inviteCode03';
+      const res = (await request(app).get(`/api/group/invite-link/${inviteCode}`).set('Cookie', cookie));
+      const expectedResult = {
+        groupId: 3,
+        name: 'test-group3',
+        description: 'test-description3',
+        member: 1,
+        image: 'groupImageLink'
+      }
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieve the group (Group Not Found) ', async () => {
+      const inviteCode = 'isWrongInviteCode';
+      const res = (await request(app).get(`/api/group/invite-link/${inviteCode}`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to retrieve the group (Expired Code Error) ', async () => {
+      const inviteCode = 'expiredCode02';
+      const res = (await request(app).get(`/api/group/invite-link/${inviteCode}`).set('Cookie', cookie));
+      expect(res.status).toEqual(410);
+      expect(res.body).toEqual({ error: '만료된 초대 링크입니다.' });
+    });
+  });
+
   describe('Test POST /api/group/:group_id/join/:inviteCode', () => {
     it('Successfully joined the group ', async () => {
       const groupId = 3;
