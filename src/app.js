@@ -53,6 +53,8 @@ app.use('/api', indexRouter);
 
 app.use(apiError);
 
+require('./utils/cron');
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, async () => {
     console.log(`Server is up on port ${appUrl}:${port}`);

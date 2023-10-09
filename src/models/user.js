@@ -38,8 +38,8 @@ class User extends Sequelize.Model {
       },
       introduction: {
         type: Sequelize.STRING(50),
-        allowNull: true,
-        defaultValue: null,
+        allowNull: false,
+        defaultValue: '',
       },
     }, {
       sequelize,

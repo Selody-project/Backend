@@ -6,6 +6,15 @@ const {
   setUpGroupDB, setUpGroupScheduleDB, setUpUserDB,
 } = require('../dbSetup');
 
+// ./utils/cron.js 모듈을 모킹합니다.
+jest.mock('../../src/utils/cron', () => {
+  return {
+    // 모듈 내부의 함수나 객체를 모킹합니다.
+    start: jest.fn(), // start 함수를 스파이 함수로 대체
+  };
+});
+
+
 describe('Test /api/group endpoints', () => {
   let cookie;
   beforeAll(async () => {

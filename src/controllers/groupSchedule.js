@@ -39,6 +39,9 @@ async function postGroupSchedule(req, res, next) {
     const { group_id: groupId } = req.params;
     const { user } = req;
     const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
