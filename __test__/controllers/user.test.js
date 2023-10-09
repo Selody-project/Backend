@@ -8,6 +8,15 @@ const {
 } = require('../dbSetup');
 const PersonalSchedule = require('../../src/models/personalSchedule');
 
+// ./utils/cron.js 모듈을 모킹합니다.
+jest.mock('../../src/utils/cron', () => {
+  return {
+    // 모듈 내부의 함수나 객체를 모킹합니다.
+    start: jest.fn(), // start 함수를 스파이 함수로 대체
+  };
+});
+
+
 describe('Test /api/user endpoints', () => {
   let cookie;
   beforeAll(async () => {
@@ -95,7 +104,6 @@ describe('Test /api/user endpoints', () => {
       const res = await request(app).patch('/api/user/profile').set('Cookie', cookie).field('data', data);
       const expectedResult = {
         email: newEmail,
-        message: 'JWT 발급에 성공하였습니다',
         nickname: newNickname,
         profileImage: 'profileImageLink',
         provider: 'local',

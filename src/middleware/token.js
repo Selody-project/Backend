@@ -44,7 +44,6 @@ async function createToken(req, res, next) {
     const postCount = await Post.getUserPostCount(user.userId);
     const groupCount = await user.countGroups();
     return res.status(200).json({
-      message: 'JWT 발급에 성공하였습니다',
       userId: user.userId,
       email: user.email,
       nickname: user.nickname,
@@ -98,7 +97,6 @@ async function renewToken(req, res, next) {
     const postCount = await Post.getUserPostCount(user.userId);
     const groupCount = await user.countGroups();
     return res.status(200).json({
-      message: 'JWT 갱신에 성공하였습니다',
       userId: user.userId,
       email: user.email,
       nickname,

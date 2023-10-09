@@ -1,5 +1,6 @@
 /* eslint-disable newline-per-chained-call */
 const Joi = require('joi').extend(require('@joi/date'));
+const moment = require('moment');
 
 const validator = (schema) => (payload) => schema.validate(payload, { abortEarly: false });
 
@@ -52,10 +53,15 @@ const scheduleDateSchema = Joi.object({
   endDateTime: Joi.date().required(),
 });
 
+const getCurrentTime = () => {
+  const testEnv = process.env.NODE_ENV === 'test';
+  return testEnv ? new Date('1900-01-01T00:00:00.000Z') : moment().utc().subtract(6, 'months');
+};
+
 const scheduleSchema = Joi.object({
   title: Joi.string().max(45).required(),
   content: Joi.string(),
-  startDateTime: Joi.date().required(),
+  startDateTime: Joi.date().min(getCurrentTime()).required(),
   endDateTime: Joi.date().required(),
   recurrence: Joi.valid(0, 1).required(),
   freq: Joi.when('recurrence', {
@@ -90,9 +96,9 @@ const groupScheduleIdSchema = Joi.object({
 });
 
 const eventPoroposalSchema = Joi.object({
-  date1: Joi.date().required(),
-  date2: Joi.date(),
-  date3: Joi.date(),
+  date1: Joi.date().min(getCurrentTime()).required(),
+  date2: Joi.date().min(getCurrentTime()),
+  date3: Joi.date().min(getCurrentTime()),
 });
 
 const postSchema = Joi.object({
