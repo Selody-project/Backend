@@ -119,12 +119,6 @@ class PersonalSchedule extends Sequelize.Model {
         },
         type: Sequelize.QueryTypes.SELECT,
       });
-      nonRecurrenceSchedule.forEach((schedule) => {
-        const scheduleDate = new Date(schedule.startDateTime);
-        if (earliestDate > scheduleDate) {
-          earliestDate = scheduleDate;
-        }
-      });
       const recurrenceScheduleList = await db.sequelize.query(recurrenceStatement, {
         replacements: {
           start: moment.utc(start).format('YYYY-MM-DDTHH:mm:ssZ'),
@@ -158,34 +152,18 @@ class PersonalSchedule extends Sequelize.Model {
           new Date(end.getTime() + 1),
         );
         if (scheduleDateList.length !== 0) {
-          const scheduleDate = scheduleDateList[0];
-          const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
-          if (endDateTime >= start) {
-            if (earliestDate > scheduleDate) {
-              earliestDate = scheduleDate;
-            }
-            if (isSummary) {
+          if (isSummary) {
+            const scheduleDate = scheduleDateList[0];
+            const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+            if (endDateTime >= start) {
+              if (isSummary && earliestDate > scheduleDate) {
+                earliestDate = scheduleDate;
+              }
               recurrenceSchedule.push({
                 id: schedule.id,
                 userId: schedule.userId,
                 startDateTime: schedule.startDateTime,
-                endDatetime: schedule.endDateTime,
-                recurrence: schedule.recurrence,
-                freq: schedule.freq,
-                interval: schedule.interval,
-                byweekday: schedule.byweekday,
-                isGroup: schedule.isGroup,
-                startRecur: schedule.startDateTime,
-                endRecur: schedule.until,
-              });
-            } else {
-              recurrenceSchedule.push({
-                id: schedule.id,
-                userId: schedule.userId,
-                title: schedule.title,
-                content: schedule.content,
-                startDateTime: schedule.startDateTime,
-                endDatetime: schedule.endDateTime,
+                endDateTime: schedule.endDateTime,
                 recurrence: schedule.recurrence,
                 freq: schedule.freq,
                 interval: schedule.interval,
@@ -195,14 +173,47 @@ class PersonalSchedule extends Sequelize.Model {
                 endRecur: schedule.until,
               });
             }
+          } else {
+            scheduleDateList.forEach((scheduleDate) => {
+              const endDateTime = new Date(scheduleDate.getTime() + scheduleLength);
+              if (endDateTime >= start) {
+                if (isSummary && earliestDate > scheduleDate) {
+                  earliestDate = scheduleDate;
+                }
+                recurrenceSchedule.push({
+                  id: schedule.id,
+                  userId: schedule.userId,
+                  title: schedule.title,
+                  content: schedule.content,
+                  startDateTime: scheduleDate,
+                  endDateTime,
+                  recurrence: schedule.recurrence,
+                  freq: schedule.freq,
+                  interval: schedule.interval,
+                  byweekday: schedule.byweekday,
+                  isGroup: schedule.isGroup,
+                  startRecur: schedule.startDateTime,
+                  endRecur: schedule.until,
+                });
+              }
+            });
           }
         }
       });
-      if (earliestDate === Number.MAX_SAFE_INTEGER) {
-        earliestDate = null;
-      }
       const schedules = [...nonRecurrenceSchedule, ...recurrenceSchedule];
-      return { earliestDate, schedules };
+      if (isSummary) {
+        nonRecurrenceSchedule.forEach((schedule) => {
+          const scheduleDate = new Date(schedule.startDateTime);
+          if (earliestDate > scheduleDate) {
+            earliestDate = scheduleDate;
+          }
+        });
+        if (earliestDate === Number.MAX_SAFE_INTEGER) {
+          earliestDate = null;
+        }
+        return { earliestDate, schedules };
+      }
+      return { schedules };
     } catch (err) {
       throw new ApiError();
     }

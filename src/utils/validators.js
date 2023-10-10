@@ -59,6 +59,8 @@ const getCurrentTime = () => {
 };
 
 const scheduleSchema = Joi.object({
+  requestStartDateTime: Joi.date().required(),
+  requestEndDateTime: Joi.date().required(),
   title: Joi.string().max(45).required(),
   content: Joi.string(),
   startDateTime: Joi.date().min(getCurrentTime()).required(),

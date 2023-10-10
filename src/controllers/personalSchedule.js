@@ -1,5 +1,6 @@
 const moment = require('moment');
 const { isMine } = require('../utils/accessLevel');
+const { getScheduleResponse } = require('../utils/rrule');
 
 // Model
 const PersonalSchedule = require('../models/personalSchedule');
@@ -27,6 +28,7 @@ async function postPersonalSchedule(req, res, next) {
     const { user } = req;
 
     const {
+      requestStartDateTime, requestEndDateTime,
       title, content, startDateTime, endDateTime,
       recurrence, freq, interval, byweekday, until,
     } = req.body;
@@ -44,13 +46,11 @@ async function postPersonalSchedule(req, res, next) {
       until,
     });
 
-    const response = {
-      ...{ message: '성공적으로 등록되었습니다.' },
-      ...schedule.dataValues,
-    };
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, schedule.dataValues);
 
     return res.status(201).json(response);
   } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
@@ -97,16 +97,7 @@ async function getUserPersonalSchedule(req, res, next) {
     const groups = (await user.getGroups()).map((group) => group.groupId);
     if (groups.length) {
       const groupSchedule = await GroupSchedule.getSchedule(groups, start, end);
-      let response;
-      if (userSchedule.earliestDate === null) {
-        response = { earliestDate: groupSchedule.earliestDate };
-      } else if (groupSchedule.earliestDate === null) {
-        response = { earliestDate: userSchedule.earliestDate };
-      } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-        response = { earliestDate: groupSchedule.earliestDate };
-      } else {
-        response = { earliestDate: userSchedule.earliestDate };
-      }
+      const response = {};
       response.schedules = [
         ...userSchedule.schedules,
         ...groupSchedule.schedules,
@@ -179,12 +170,27 @@ async function putPersonalSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    await PersonalSchedule.update(req.body, { where: { id: scheduleId } });
+    const {
+      requestStartDateTime, requestEndDateTime,
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
+    } = req.body;
+
+    await PersonalSchedule.update({
+      title,
+      content,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
+    }, { where: { id: scheduleId } });
+
     const modifiedSchedule = await PersonalSchedule.findByPk(scheduleId);
-    const response = {
-      ...{ message: '성공적으로 수정되었습니다.' },
-      ...modifiedSchedule.dataValues,
-    };
+
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, modifiedSchedule.dataValues);
 
     return res.status(201).json(response);
   } catch (err) {
