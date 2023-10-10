@@ -99,7 +99,6 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
         if (scheduleEndTime >= requestStart) {
           schedule.startDateTime = scheduleStartTime;
           schedule.endDateTime = scheduleEndTime;
-          console.log(schedule);
           // 오늘 일정
           if (scheduleStartTime < requestEnd) {
             response.todaySchedule.push({ ...schedule });

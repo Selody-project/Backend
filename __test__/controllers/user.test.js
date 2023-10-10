@@ -259,8 +259,68 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title11',
             content: 'test-content11',
-            startDateTime: '2020-01-01T12:00:00.000Z',
-            endDateTime: '2020-01-01T13:00:00.000Z',
+            startDateTime: '2023-04-01T12:00:00.000Z',
+            endDateTime: '2023-04-01T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-01-01T12:00:00.000Z',
+            endRecur: '2023-04-05T14:00:00.000Z'
+          },
+          {
+            id: 11,
+            userId: 1,
+            title: 'test-title11',
+            content: 'test-content11',
+            startDateTime: '2023-04-02T12:00:00.000Z',
+            endDateTime: '2023-04-02T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-01-01T12:00:00.000Z',
+            endRecur: '2023-04-05T14:00:00.000Z'
+          },
+          {
+            id: 11,
+            userId: 1,
+            title: 'test-title11',
+            content: 'test-content11',
+            startDateTime: '2023-04-03T12:00:00.000Z',
+            endDateTime: '2023-04-03T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-01-01T12:00:00.000Z',
+            endRecur: '2023-04-05T14:00:00.000Z'
+          },
+          {
+            id: 11,
+            userId: 1,
+            title: 'test-title11',
+            content: 'test-content11',
+            startDateTime: '2023-04-04T12:00:00.000Z',
+            endDateTime: '2023-04-04T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-01-01T12:00:00.000Z',
+            endRecur: '2023-04-05T14:00:00.000Z'
+          },
+          {
+            id: 11,
+            userId: 1,
+            title: 'test-title11',
+            content: 'test-content11',
+            startDateTime: '2023-04-05T12:00:00.000Z',
+            endDateTime: '2023-04-05T13:00:00.000Z',
             recurrence: 1,
             freq: 'DAILY',
             interval: 1,
@@ -274,8 +334,8 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title12',
             content: 'test-content12',
-            startDateTime: '2020-01-15T12:00:00.000Z',
-            endDateTime: '2020-01-15T13:00:00.000Z',
+            startDateTime: '2023-04-15T12:00:00.000Z',
+            endDateTime: '2023-04-15T13:00:00.000Z',
             recurrence: 1,
             freq: 'MONTHLY',
             interval: 1,
@@ -289,8 +349,53 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title13',
             content: 'test-content13',
-            startDateTime: '2020-01-15T12:00:00.000Z',
-            endDateTime: '2020-01-15T13:00:00.000Z',
+            startDateTime: '2023-04-05T12:00:00.000Z',
+            endDateTime: '2023-04-05T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["WE"],
+            isGroup: 0,
+            startRecur: '2020-01-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 13,
+            userId: 1,
+            title: 'test-title13',
+            content: 'test-content13',
+            startDateTime: '2023-04-12T12:00:00.000Z',
+            endDateTime: '2023-04-12T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["WE"],
+            isGroup: 0,
+            startRecur: '2020-01-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 13,
+            userId: 1,
+            title: 'test-title13',
+            content: 'test-content13',
+            startDateTime: '2023-04-19T12:00:00.000Z',
+            endDateTime: '2023-04-19T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["WE"],
+            isGroup: 0,
+            startRecur: '2020-01-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 13,
+            userId: 1,
+            title: 'test-title13',
+            content: 'test-content13',
+            startDateTime: '2023-04-26T12:00:00.000Z',
+            endDateTime: '2023-04-26T13:00:00.000Z',
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
@@ -304,8 +409,8 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title14',
             content: 'test-content14',
-            startDateTime: '2020-04-15T12:00:00.000Z',
-            endDateTime: '2020-04-15T13:00:00.000Z',
+            startDateTime: '2023-04-15T12:00:00.000Z',
+            endDateTime: '2023-04-15T13:00:00.000Z',
             recurrence: 1,
             freq: 'YEARLY',
             interval: 1,
@@ -319,8 +424,113 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title15',
             content: 'test-content15',
-            startDateTime: '2020-01-13T12:00:00.000Z',
-            endDateTime: '2020-01-13T13:00:00.000Z',
+            startDateTime: '2023-04-03T12:00:00.000Z',
+            endDateTime: '2023-04-03T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-04T12:00:00.000Z',
+            endDateTime: '2023-04-04T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-10T12:00:00.000Z',
+            endDateTime: '2023-04-10T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-11T12:00:00.000Z',
+            endDateTime: '2023-04-11T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-17T12:00:00.000Z',
+            endDateTime: '2023-04-17T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-18T12:00:00.000Z',
+            endDateTime: '2023-04-18T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-24T12:00:00.000Z',
+            endDateTime: '2023-04-24T13:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["MO", "TU"],
+            isGroup: 0,
+            startRecur: '2020-01-13T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 15,
+            userId: 1,
+            title: 'test-title15',
+            content: 'test-content15',
+            startDateTime: '2023-04-25T12:00:00.000Z',
+            endDateTime: '2023-04-25T13:00:00.000Z',
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
@@ -334,8 +544,53 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title16',
             content: 'test-content16',
-            startDateTime: '2020-03-15T12:00:00.000Z',
-            endDateTime: '2020-04-01T00:00:00.000Z',
+            startDateTime: '2023-03-16T12:00:00.000Z',
+            endDateTime: '2023-04-02T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2023-03-20T00:00:00.000Z'
+          },
+          {
+            id: 16,
+            userId: 1,
+            title: 'test-title16',
+            content: 'test-content16',
+            startDateTime: '2023-03-17T12:00:00.000Z',
+            endDateTime: '2023-04-03T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2023-03-20T00:00:00.000Z'
+          },
+          {
+            id: 16,
+            userId: 1,
+            title: 'test-title16',
+            content: 'test-content16',
+            startDateTime: '2023-03-18T12:00:00.000Z',
+            endDateTime: '2023-04-04T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2023-03-20T00:00:00.000Z'
+          },
+          {
+            id: 16,
+            userId: 1,
+            title: 'test-title16',
+            content: 'test-content16',
+            startDateTime: '2023-03-19T12:00:00.000Z',
+            endDateTime: '2023-04-05T00:00:00.000Z',
             recurrence: 1,
             freq: 'DAILY',
             interval: 1,
@@ -349,8 +604,98 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title17',
             content: 'test-content17',
-            startDateTime: '2020-03-15T12:00:00.000Z',
-            endDateTime: '2020-04-01T00:00:00.000Z',
+            startDateTime: '2023-03-19T12:00:00.000Z',
+            endDateTime: '2023-04-05T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-03-26T12:00:00.000Z',
+            endDateTime: '2023-04-12T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-04-02T12:00:00.000Z',
+            endDateTime: '2023-04-19T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-04-09T12:00:00.000Z',
+            endDateTime: '2023-04-26T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-04-16T12:00:00.000Z',
+            endDateTime: '2023-05-03T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-04-23T12:00:00.000Z',
+            endDateTime: '2023-05-10T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'WEEKLY',
+            interval: 1,
+            byweekday: ["SU"],
+            isGroup: 0,
+            startRecur: '2020-03-15T12:00:00.000Z',
+            endRecur: '2025-01-01T00:00:00.000Z'
+          },
+          {
+            id: 17,
+            userId: 1,
+            title: 'test-title17',
+            content: 'test-content17',
+            startDateTime: '2023-04-30T12:00:00.000Z',
+            endDateTime: '2023-05-17T00:00:00.000Z',
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
@@ -364,8 +709,8 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title18',
             content: 'test-content18',
-            startDateTime: '2020-03-15T12:00:00.000Z',
-            endDateTime: '2020-04-01T00:00:00.000Z',
+            startDateTime: '2023-04-15T12:00:00.000Z',
+            endDateTime: '2023-05-02T00:00:00.000Z',
             recurrence: 1,
             freq: 'MONTHLY',
             interval: 1,
@@ -379,8 +724,8 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title19',
             content: 'test-content19',
-            startDateTime: '2020-01-15T12:00:00.000Z',
-            endDateTime: '2020-04-01T00:00:00.000Z',
+            startDateTime: '2023-01-15T12:00:00.000Z',
+            endDateTime: '2023-04-02T00:00:00.000Z',
             recurrence: 1,
             freq: 'YEARLY',
             interval: 1,
@@ -394,8 +739,8 @@ describe('Test /api/user endpoints', () => {
             userId: 1,
             title: 'test-title21',
             content: 'test-content21',
-            startDateTime: '2020-04-30T23:59:59.000Z',
-            endDateTime: '2020-05-01T23:59:59.000Z',
+            startDateTime: '2023-04-30T23:59:59.000Z',
+            endDateTime: '2023-05-01T23:59:59.000Z',
             recurrence: 1,
             freq: 'MONTHLY',
             interval: 1,
@@ -446,12 +791,14 @@ describe('Test /api/user endpoints', () => {
             until: null,
             isGroup: 1
           }
-        ],
+        ]
       };
+
       const res = await request(app).get('/api/user/calendar').set('Cookie', cookie).query({
         startDateTime,
         endDateTime,
       });
+      
       expect(res.statusCode).toEqual(200);
       expect(res.body).toEqual(expectedSchedule);
     });
@@ -497,21 +844,112 @@ describe('Test /api/user endpoints', () => {
     it('Successfully modified user schedule ', async () => {
       const id = 1;
       const res = await request(app).put(`/api/user/calendar/${id}`).set('Cookie', cookie).send({
+        requestStartDateTime: '2023-05-05T12:00:00.000Z',
+        requestEndDateTime: '2023-05-06T12:00:00.000Z',
         title: 'modified-title',
         content: 'modified-content',
-        startDateTime: '2099-01-01T12:00:00.000Z',
-        endDateTime: '2099-01-01T12:00:00.000Z',
-        recurrence: 0,
-        freq: null,
-        interval: null,
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'DAILY',
+        interval: 2,
         byweekday: null,
-        until: null,
+        until: '2026-01-05T00:00:00.000Z',
       });
+      const expectedResult = {
+        scheduleSummary: {
+          id: 1,
+          userId: 1,
+          startDateTime: '2023-05-06T00:00:00.000Z',
+          endDateTime: '2023-05-07T00:00:00.000Z',
+          recurrence: 1,
+          freq: 'DAILY',
+          interval: 2,
+          byweekday: null,
+          until: '2026-01-05T00:00:00.000Z',
+          isGroup: 0
+        },
+        todaySchedule: [
+          {
+            id: 1,
+            userId: 1,
+            title: 'modified-title',
+            content: 'modified-content',
+            startDateTime: '2023-05-06T00:00:00.000Z',
+            endDateTime: '2023-05-07T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 2,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          }
+        ],
+        schedulesForTheWeek: [
+          {
+            id: 1,
+            userId: 1,
+            title: 'modified-title',
+            content: 'modified-content',
+            startDateTime: '2023-05-06T00:00:00.000Z',
+            endDateTime: '2023-05-07T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 2,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 1,
+            userId: 1,
+            title: 'modified-title',
+            content: 'modified-content',
+            startDateTime: '2023-05-08T00:00:00.000Z',
+            endDateTime: '2023-05-09T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 2,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 1,
+            userId: 1,
+            title: 'modified-title',
+            content: 'modified-content',
+            startDateTime: '2023-05-10T00:00:00.000Z',
+            endDateTime: '2023-05-11T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 2,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 1,
+            userId: 1,
+            title: 'modified-title',
+            content: 'modified-content',
+            startDateTime: '2023-05-12T00:00:00.000Z',
+            endDateTime: '2023-05-13T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 2,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          }
+        ]
+      };
       const modifiedSchedule = await PersonalSchedule.findOne({
         where: { title: 'modified-title', content: 'modified-content' },
       });
       expect(res.status).toEqual(201);
       expect(modifiedSchedule.id).toEqual(1);
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully fail to modified user schedule (long name)', async () => {
@@ -526,6 +964,8 @@ describe('Test /api/user endpoints', () => {
   describe('Test POST /api/user/calendar', () => {
     it('Successfully insert a user schedule into the database (non-recurrence)', async () => {
       const schedule = {
+        requestStartDateTime: '2023-02-03T12:00:00.000Z',
+        requestEndDateTime: '2023-02-04T12:00:00.000Z',
         title: 'test-title',
         content: 'test-content1',
         startDateTime: '2023-02-03T00:00:00.000Z',
@@ -539,18 +979,50 @@ describe('Test /api/user endpoints', () => {
 
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       const expectedResult = {
-        id: 25,
-        userId: 1,
-        message: '성공적으로 등록되었습니다.',
-        title: 'test-title',
-        content: 'test-content1',
-        startDateTime: '2023-02-03T00:00:00.000Z',
-        endDateTime: '2023-05-15T00:00:00.000Z',
-        recurrence: 0,
-        freq: null,
-        interval: null,
-        byweekday: null,
-        until: null,
+        scheduleSummary: {
+          id: 25,
+          userId: 1,
+          startDateTime: '2023-02-03T00:00:00.000Z',
+          endDateTime: '2023-05-15T00:00:00.000Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
+          byweekday: null,
+          until: null,
+          isGroup: 0
+        },
+        todaySchedule: [
+          {
+            id: 25,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            recurrence: 0,
+            freq: null,
+            interval: null,
+            byweekday: null,
+            until: null,
+            isGroup: 0
+          }
+        ],
+        schedulesForTheWeek: [
+          {
+            id: 25,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            recurrence: 0,
+            freq: null,
+            interval: null,
+            byweekday: null,
+            until: null,
+            isGroup: 0
+          }
+        ]
       };
 
       expect(res.statusCode).toEqual(201);
@@ -559,17 +1031,179 @@ describe('Test /api/user endpoints', () => {
 
     it('Successfully insert a user schedule into the database (recurrence)', async () => {
       const schedule = {
+        requestStartDateTime: '2023-02-03T12:00:00.000Z',
+        requestEndDateTime: '2023-02-04T12:00:00.000Z',
         title: 'test-title',
         content: 'test-content1',
         startDateTime: '2023-02-03T00:00:00.000Z',
         endDateTime: '2023-05-15T00:00:00.000Z',
         recurrence: 1,
-        freq: 'WEEKLY',
+        freq: 'DAILY',
         interval: 1,
-        byweekday: ['MO'],
+        byweekday: null,
         until: '2026-01-05T00:00:00.000Z',
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
+      const expectedResult = {
+        scheduleSummary: {
+          id: 26,
+          userId: 1,
+          startDateTime: '2023-02-03T00:00:00.000Z',
+          endDateTime: '2023-05-15T00:00:00.000Z',
+          recurrence: 1,
+          freq: 'DAILY',
+          interval: 1,
+          byweekday: null,
+          until: '2026-01-05T00:00:00.000Z',
+          isGroup: 0
+        },
+        todaySchedule: [
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-04T00:00:00.000Z',
+            endDateTime: '2023-05-16T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          }
+        ],
+        schedulesForTheWeek: [
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-04T00:00:00.000Z',
+            endDateTime: '2023-05-16T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-05T00:00:00.000Z',
+            endDateTime: '2023-05-17T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-06T00:00:00.000Z',
+            endDateTime: '2023-05-18T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-07T00:00:00.000Z',
+            endDateTime: '2023-05-19T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-08T00:00:00.000Z',
+            endDateTime: '2023-05-20T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-09T00:00:00.000Z',
+            endDateTime: '2023-05-21T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          },
+          {
+            id: 26,
+            userId: 1,
+            title: 'test-title',
+            content: 'test-content1',
+            startDateTime: '2023-02-10T00:00:00.000Z',
+            endDateTime: '2023-05-22T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            until: '2026-01-05T00:00:00.000Z',
+            isGroup: 0
+          }
+        ]
+      };
+
+      expect(res.body).toEqual(expectedResult);
       expect(res.statusCode).toEqual(201);
     });
 
@@ -582,7 +1216,7 @@ describe('Test /api/user endpoints', () => {
       };
       const res = await request(app).post('/api/user/calendar').set('Cookie', cookie).send(schedule);
       expect(res.statusCode).toEqual(400);
-      expect(res.body).toEqual({ error: '\"title\" is required' });
+      expect(res.body).toEqual({ error: '\"requestStartDateTime\" is required' });
     });
   });
 
