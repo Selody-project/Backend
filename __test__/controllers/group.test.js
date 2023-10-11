@@ -1545,6 +1545,7 @@ describe('Test /api/group endpoints', () => {
           isMine: true,
           isLiked: false,
           likesCount: 0,
+          commentCount: 4,
           postId: 1,
           image: 'postImage',
         },
@@ -1590,28 +1591,28 @@ describe('Test /api/group endpoints', () => {
         isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, image: 'postImage',
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, image: 'postImage',
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
         ],
       };
@@ -1623,6 +1624,7 @@ describe('Test /api/group endpoints', () => {
           isMine: post.isMine,
           isLiked: post.isLiked,
           likesCount: post.likesCount,
+          commentCount: post.commentCount,
           title: post.title,
           author: post.author,
           content: post.content,
@@ -1657,7 +1659,10 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group', () => {
     it('Successfully retrieved group lists. ', async () => {
-      const res = (await request(app).get('/api/group/list/0').set('Cookie', cookie));
+      const lastRecordId = 0;
+      const res = (await request(app).get('/api/group/list').set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       const expectedResult = [
         {
           groupId: 4, name: 'test-group4', description: 'test-description4', member: 2, image: 'groupImageLink',
@@ -1673,6 +1678,7 @@ describe('Test /api/group endpoints', () => {
         },
 
       ];
+
       const groups = [];
       for (const group of res.body.groups) {
         groups.push({
@@ -1689,7 +1695,9 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
       const lastRecordId = 'abc';
-      const res = (await request(app).get(`/api/group/list/${lastRecordId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/list`).set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
@@ -2096,65 +2104,57 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group/search', () => {
     it('Successfully retrieved the group. ', async () => {
+      const lastRecordId = 0
       const keyword = 'test';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
 
-      const expectedResult = [{
-        groupId: 1,
-        name: 'test-group1',
-        description: 'test-description1',
-        member: 2,
-        leader: 1,
-        inviteCode: 'inviteCode01',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 2,
-        name: 'test-group2',
-        description: 'test-description2',
-        member: 6,
-        leader: 2,
-        inviteCode: 'expiredCode02',
-        isPublicGroup: 0,
-        inviteExp: '2000-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 3,
-        name: 'test-group3',
-        description: 'test-description3',
-        member: 1,
-        leader: 3,
-        inviteCode: 'inviteCode03',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 4,
-        name: 'test-group4',
-        description: 'test-description4',
-        member: 2,
-        leader: 3,
-        inviteCode: 'inviteCode04',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      ];
+      const expectedResult = {
+        isEnd: true,
+        groups: [
+          {
+            groupId: 4,
+            name: 'test-group4',
+            description: 'test-description4',
+            member: 2,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 3,
+            name: 'test-group3',
+            description: 'test-description3',
+            member: 1,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 2,
+            name: 'test-group2',
+            description: 'test-description2',
+            member: 6,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 1,
+            name: 'test-group1',
+            description: 'test-description1',
+            member: 2,
+            image: 'groupImageLink'
+          }
+        ]
+      };
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully retrieved the group. ', async () => {
+      const lastRecordId = 0
       const keyword = 1;
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
 
       expect(res.status).toEqual(400);
@@ -2162,18 +2162,23 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
+      const lastRecordId = 0
       const keyword = 'abcd';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
-      expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+      const expectedResult = { isEnd: true, groups: [] };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the group (Keyword Length Range) ', async () => {
+      const lastRecordId = 0
       const keyword = 'a';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });

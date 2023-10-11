@@ -139,12 +139,12 @@ async function getGroupDetail(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { error: paramError } = validateLastRecordIdSchema(req.params);
-    if (paramError) {
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (queryError) {
       return next(new DataFormatError());
     }
 
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }
@@ -664,20 +664,40 @@ async function searchGroup(req, res, next) {
     }
 
     const { keyword } = req.query;
+    let { last_record_id: lastRecordId } = req.query;
 
-    const group = await Group.findAll({
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
+
+    const pageSize = 9;
+
+    let groups = await Group.findAll({
       where: {
         name: {
           [Op.like]: `%${keyword}%`,
         },
+        groupId: { [Sequelize.Op.lt]: lastRecordId },
       },
+      limit: pageSize,
+      order: [['groupId', 'DESC']],
     });
-
-    if (!group || group.length == 0) {
-      return next(new GroupNotFoundError());
+    let isEnd;
+    if (groups.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
     }
 
-    return res.status(200).json(group);
+    groups = groups.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    }));
+
+    return res.status(200).json({ isEnd, groups });
   } catch (err) {
     return next(new ApiError());
   }
