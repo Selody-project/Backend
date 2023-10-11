@@ -113,6 +113,7 @@ async function getSinglePost(req, res, next) {
     const accessLevel = await getAccessLevel(user, group);
     const isMineValue = isMine(user, post);
     const { likesCount, isLikedValue } = (await isLike(user, post));
+    const commentCount = await post.countComments();
     return res.status(200).json({
       accessLevel,
       post: {
@@ -120,6 +121,7 @@ async function getSinglePost(req, res, next) {
         isMine: isMineValue,
         isLiked: isLikedValue,
         likesCount,
+        commentCount,
         author,
         title,
         content,
@@ -177,11 +179,13 @@ async function getGroupPosts(req, res, next) {
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
         const { likesCount, isLikedValue } = (await isLike(user, post));
+        const commentCount = await post.countComments();
         return {
           postId: post.postId,
           isMine: isMineValue,
           isLiked: isLikedValue,
           likesCount,
+          commentCount,
           title: post.title,
           author: post.author,
           createdAt: post.createdAt,
@@ -662,12 +666,14 @@ async function getUserFeed(req, res, next) {
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
         const { likesCount, isLikedValue } = (await isLike(user, post));
+        const commentCount = await post.countComments();
         return {
           postId: post.postId,
           groupId: post.groupId,
           isMine: isMineValue,
           isLiked: isLikedValue,
           likesCount,
+          commentCount,
           title: post.title,
           author: post.author,
           createdAt: post.createdAt,

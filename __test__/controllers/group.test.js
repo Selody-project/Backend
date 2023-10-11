@@ -1545,6 +1545,7 @@ describe('Test /api/group endpoints', () => {
           isMine: true,
           isLiked: false,
           likesCount: 0,
+          commentCount: 4,
           postId: 1,
           image: 'postImage',
         },
@@ -1590,28 +1591,28 @@ describe('Test /api/group endpoints', () => {
         isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, image: 'postImage',
+            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, image: 'postImage',
+            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, image: 'postImage',
+            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
         ],
       };
@@ -1623,6 +1624,7 @@ describe('Test /api/group endpoints', () => {
           isMine: post.isMine,
           isLiked: post.isLiked,
           likesCount: post.likesCount,
+          commentCount: post.commentCount,
           title: post.title,
           author: post.author,
           content: post.content,
