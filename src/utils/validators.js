@@ -143,6 +143,7 @@ const groupJoinRequestSchema = Joi.object({
 
 const groupSearchKeywordSchema = Joi.object({
   keyword: Joi.string().min(2).max(45).required(),
+  last_record_id: Joi.number().min(0).required(),
 });
 
 const userSettingSchema = Joi.object({

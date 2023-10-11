@@ -1675,6 +1675,7 @@ describe('Test /api/group endpoints', () => {
         },
 
       ];
+      console.log(res.body);
       const groups = [];
       for (const group of res.body.groups) {
         groups.push({
@@ -2098,9 +2099,11 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group/search', () => {
     it('Successfully retrieved the group. ', async () => {
+      const lastRecordId = 0
       const keyword = 'test';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
 
       const expectedResult = [{
@@ -2154,9 +2157,11 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully retrieved the group. ', async () => {
+      const lastRecordId = 0
       const keyword = 1;
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
 
       expect(res.status).toEqual(400);
@@ -2164,18 +2169,22 @@ describe('Test /api/group endpoints', () => {
     });
 
     it('Successfully failed to retrieved the group (Group Not Found) ', async () => {
+      const lastRecordId = 0
       const keyword = 'abcd';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
 
     it('Successfully failed to retrieved the group (Keyword Length Range) ', async () => {
+      const lastRecordId = 0
       const keyword = 'a';
       const res = (await request(app).get('/api/group/search').set('Cookie', cookie).query({
         keyword,
+        last_record_id: lastRecordId,
       }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });

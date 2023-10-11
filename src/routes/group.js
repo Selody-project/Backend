@@ -34,7 +34,7 @@ const router = express.Router();
 
 // Group
 router.post('/', uploadGroupMiddleware, postGroup);
-router.get('/list/:last_record_id', getGroupList);
+router.get('/list', getGroupList);
 router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
