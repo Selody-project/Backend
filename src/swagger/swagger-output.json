@@ -1969,6 +1969,7 @@
                           "isMine": "작성자가 본인이라면 true, 아니라면 false",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
+                          "commentCount": "댓글 개수",
                           "title": "포스트 제목",
                           "content": "포스트 내용",
                           "createdAt": "생성 일자",
@@ -1980,6 +1981,7 @@
                           "isMine": "작성자가 본인이라면 true, 아니라면 false",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
+                          "commentCount": "댓글 개수",
                           "title": "포스트 제목",
                           "content": "포스트 내용",
                           "createdAt": "생성 일자",
@@ -2113,6 +2115,7 @@
                         "isMine": "작성자가 본인이라면 true, 아니라면 false",
                         "isLiked": "좋아요 여부",
                         "likesCount": "좋아요 개수",
+                        "commentCount": "댓글 개수",
                         "author": "작성자",
                         "title": "포스트 제목",
                         "content": "포스트 내용",
@@ -2683,6 +2686,7 @@
                           "content": "포스트 내용",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
+                          "commentCount": "댓글 개수",
                           "isMine": "작성자가 본인이라면 true, 아니라면 false",
                           "createdAt": "생성 일자"
                         },
@@ -2694,6 +2698,7 @@
                           "content": "포스트 내용",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
+                          "commentCount": "댓글 개수",
                           "isMine": "작성자가 본인이라면 true, 아니라면 false",
                           "createdAt": "생성 일자"
                         }

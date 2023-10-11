@@ -1659,7 +1659,10 @@ describe('Test /api/group endpoints', () => {
 
   describe('Test GET /api/group', () => {
     it('Successfully retrieved group lists. ', async () => {
-      const res = (await request(app).get('/api/group/list/0').set('Cookie', cookie));
+      const lastRecordId = 0;
+      const res = (await request(app).get('/api/group/list').set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       const expectedResult = [
         {
           groupId: 4, name: 'test-group4', description: 'test-description4', member: 2, image: 'groupImageLink',
@@ -1675,7 +1678,7 @@ describe('Test /api/group endpoints', () => {
         },
 
       ];
-      console.log(res.body);
+
       const groups = [];
       for (const group of res.body.groups) {
         groups.push({
@@ -1692,7 +1695,9 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to retrieve group lists.  (DataFormat Error) ', async () => {
       const lastRecordId = 'abc';
-      const res = (await request(app).get(`/api/group/list/${lastRecordId}`).set('Cookie', cookie));
+      const res = (await request(app).get(`/api/group/list`).set('Cookie', cookie).query({
+        last_record_id: lastRecordId,
+      }));
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
@@ -2106,51 +2111,39 @@ describe('Test /api/group endpoints', () => {
         last_record_id: lastRecordId,
       }));
 
-      const expectedResult = [{
-        groupId: 1,
-        name: 'test-group1',
-        description: 'test-description1',
-        member: 2,
-        leader: 1,
-        inviteCode: 'inviteCode01',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 2,
-        name: 'test-group2',
-        description: 'test-description2',
-        member: 6,
-        leader: 2,
-        inviteCode: 'expiredCode02',
-        isPublicGroup: 0,
-        inviteExp: '2000-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 3,
-        name: 'test-group3',
-        description: 'test-description3',
-        member: 1,
-        leader: 3,
-        inviteCode: 'inviteCode03',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      {
-        groupId: 4,
-        name: 'test-group4',
-        description: 'test-description4',
-        member: 2,
-        leader: 3,
-        inviteCode: 'inviteCode04',
-        isPublicGroup: 0,
-        inviteExp: '2099-01-01T00:00:00.000Z',
-        image: 'groupImageLink',
-      },
-      ];
+      const expectedResult = {
+        isEnd: true,
+        groups: [
+          {
+            groupId: 4,
+            name: 'test-group4',
+            description: 'test-description4',
+            member: 2,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 3,
+            name: 'test-group3',
+            description: 'test-description3',
+            member: 1,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 2,
+            name: 'test-group2',
+            description: 'test-description2',
+            member: 6,
+            image: 'groupImageLink'
+          },
+          {
+            groupId: 1,
+            name: 'test-group1',
+            description: 'test-description1',
+            member: 2,
+            image: 'groupImageLink'
+          }
+        ]
+      };
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedResult);
@@ -2175,8 +2168,9 @@ describe('Test /api/group endpoints', () => {
         keyword,
         last_record_id: lastRecordId,
       }));
-      expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+      const expectedResult = { isEnd: true, groups: [] };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedResult);
     });
 
     it('Successfully failed to retrieved the group (Keyword Length Range) ', async () => {
