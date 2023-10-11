@@ -50,22 +50,25 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
     schedule.isGroup = 0;
   }
   const response = {
-    scheduleSummary: { ...schedule },
+    scheduleSummary: {},
     todaySchedule: [],
     schedulesForTheWeek: [],
   };
-  delete response.scheduleSummary.title;
-  delete response.scheduleSummary.content;
   // 일반 일정인 경우
-  if (schedule.recurrence === 0 && requestStart < new Date(startDateTime.getTime() + scheduleLength)) {
-    // 일주일 이내 일정
-    if (startDateTime < sixDaysLater) {
-      response.schedulesForTheWeek.push({ ...schedule });
-    }
+  if (schedule.recurrence === 0) {
+    response.scheduleSummary = { ...schedule };
+    delete response.scheduleSummary.title;
+    delete response.scheduleSummary.content;
+    if (requestStart < new Date(startDateTime.getTime() + scheduleLength)) {
+      // 일주일 이내 일정
+      if (startDateTime < sixDaysLater) {
+        response.schedulesForTheWeek.push({ ...schedule });
+      }
 
-    // 오늘 일정
-    if (startDateTime < requestEnd) {
-      response.todaySchedule.push({ ...schedule });
+      // 오늘 일정
+      if (startDateTime < requestEnd) {
+        response.todaySchedule.push({ ...schedule });
+      }
     }
   } else { // 반복 일정인 경우
     // rrule 객체 생성
@@ -94,11 +97,18 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
       new Date(sixDaysLater.getTime() + 1),
     );
     if (scheduleStartTimeList.length !== 0) {
+      schedule.startRecur = schedule.startDateTime;
+      schedule.endRecur = schedule.until;
+      delete schedule.until;
+      response.scheduleSummary = { ...schedule };
+      delete response.scheduleSummary.title;
+      delete response.scheduleSummary.content;
       scheduleStartTimeList.forEach((scheduleStartTime) => {
         const scheduleEndTime = new Date(scheduleStartTime.getTime() + scheduleLength);
         if (scheduleEndTime >= requestStart) {
           schedule.startDateTime = scheduleStartTime;
           schedule.endDateTime = scheduleEndTime;
+
           // 오늘 일정
           if (scheduleStartTime < requestEnd) {
             response.todaySchedule.push({ ...schedule });

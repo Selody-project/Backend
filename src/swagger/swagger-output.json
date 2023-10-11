@@ -1157,6 +1157,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "test-title",
                     "type": "VARCHAR(45)"
@@ -1198,6 +1206,8 @@
               "examples": {
                 "non-recurrence": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1211,6 +1221,8 @@
                 },
                 "recurrence1": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1225,6 +1237,8 @@
                 },
                 "recurrence2": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1239,6 +1253,8 @@
                 },
                 "recurrence3": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1253,6 +1269,8 @@
                 },
                 "recurrence4": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1277,18 +1295,56 @@
                 "examples": {
                   "successExample": {
                     "value": {
-                      "message": "성공적으로 등록되었습니다.",
-                      "id": "일정 식별자",
-                      "groupId": "그룹 식별자",
-                      "title": "일정 제목",
-                      "content": "일정 내용",
-                      "startDateTime": "일정 시작 일자",
-                      "endDateTime": "일정 종료 일자",
-                      "recurrence": "반복 여부",
-                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                      "interval": "반복 간격",
-                      "byweekday": "반복 요일",
-                      "until": "반복 종료일"
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "groupId": "그룹 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 1
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ]
                     }
                   }
                 }
@@ -1551,6 +1607,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "modified-title"
                   },
@@ -1584,6 +1648,87 @@
                     "type": "DATETIME"
                   }
                 }
+              },
+              "examples": {
+                "non-recurrence": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
+                },
+                "recurrence1": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": null,
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
+                },
+                "recurrence2": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
+                },
+                "recurrence3": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["MO","WE","TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                },
+                "recurrence4": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": null,
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
               }
             }
           }
@@ -1596,18 +1741,56 @@
                 "examples": {
                   "successExample": {
                     "value": {
-                      "message": "성공적으로 수정되었습니다.",
-                      "id": "일정 식별자",
-                      "groupId": "그룹 식별자",
-                      "title": "일정 제목",
-                      "content": "일정 내용",
-                      "startDateTime": "일정 시작 일자",
-                      "endDateTime": "일정 종료 일자",
-                      "recurrence": "반복 여부",
-                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                      "interval": "반복 간격",
-                      "byweekday": "반복 요일",
-                      "until": "반복 종료일"
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "groupId": "그룹 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 1
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ]
                     }
                   }
                 }
@@ -3111,18 +3294,56 @@
                 "examples": {
                   "successExample": {
                     "value": {
-                      "message": "성공적으로 등록되었습니다.",
-                      "id": "일정 식별자",
-                      "userId": "유저 식별자",
-                      "title": "일정 제목",
-                      "content": "일정 내용",
-                      "startDateTime": "일정 시작 일자",
-                      "endDateTime": "일정 종료 일자",
-                      "recurrence": "반복 여부",
-                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                      "interval": "반복 간격",
-                      "byweekday": "반복 요일",
-                      "until": "반복 종료일"
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "userId": "유저 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 0
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ]
                     }
                   }
                 }
@@ -3301,6 +3522,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "modified-title",
                     "type": "VARCHAR(45)"
@@ -3338,6 +3567,87 @@
                     "type": "DATETIME"
                   }
                 }
+              },
+              "examples": {
+                "non-recurrence": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
+                },
+                "recurrence1": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": null,
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
+                },
+                "recurrence2": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
+                },
+                "recurrence3": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["MO","WE","TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                },
+                "recurrence4": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": null,
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
               }
             }
           }
@@ -3350,18 +3660,56 @@
                 "examples": {
                   "successExample": {
                     "value": {
-                      "message": "성공적으로 수정되었습니다.",
-                      "id": "일정 식별자",
-                      "userId": "유저 식별자",
-                      "title": "일정 제목",
-                      "content": "일정 내용",
-                      "startDateTime": "일정 시작 일자",
-                      "endDateTime": "일정 종료 일자",
-                      "recurrence": "반복 여부",
-                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                      "interval": "반복 간격",
-                      "byweekday": "반복 요일",
-                      "until": "반복 종료일"
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "userId": "유저 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 0
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ]
                     }
                   }
                 }

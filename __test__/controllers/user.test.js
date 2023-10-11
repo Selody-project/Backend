@@ -866,7 +866,8 @@ describe('Test /api/user endpoints', () => {
           freq: 'DAILY',
           interval: 2,
           byweekday: null,
-          until: '2026-01-05T00:00:00.000Z',
+          startRecur: '2023-05-06T00:00:00.000Z',
+          endRecur: '2026-01-05T00:00:00.000Z',
           isGroup: 0
         },
         todaySchedule: [
@@ -881,7 +882,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 2,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           }
         ],
@@ -897,7 +899,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 2,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -911,7 +914,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 2,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -925,7 +929,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 2,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -939,7 +944,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 2,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           }
         ]
@@ -1054,7 +1060,8 @@ describe('Test /api/user endpoints', () => {
           freq: 'DAILY',
           interval: 1,
           byweekday: null,
-          until: '2026-01-05T00:00:00.000Z',
+          startRecur: '2023-02-03T00:00:00.000Z',
+          endRecur: '2026-01-05T00:00:00.000Z',
           isGroup: 0
         },
         todaySchedule: [
@@ -1069,7 +1076,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1083,7 +1091,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           }
         ],
@@ -1099,7 +1108,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1113,7 +1123,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1127,7 +1138,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1141,7 +1153,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1155,7 +1168,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1169,7 +1183,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1183,7 +1198,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           },
           {
@@ -1197,7 +1213,8 @@ describe('Test /api/user endpoints', () => {
             freq: 'DAILY',
             interval: 1,
             byweekday: null,
-            until: '2026-01-05T00:00:00.000Z',
+            startRecur: '2023-02-03T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
             isGroup: 0
           }
         ]
