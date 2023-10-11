@@ -40,7 +40,25 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "userId": "유저 식별자",
+                      "email": "유저 이메일",
+                      "nickname": "유저 닉네임",
+                      "provider": "local, naver, google 등의 정보 제공자",
+                      "profileImage": "프로필 이미지 주소",
+                      "introduction": "유저 소개글",
+                      "postCount": "유저가 작성한 피드 수",
+                      "groupCount": "유저가 가입한 그룹 수"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -81,7 +99,25 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "userId": "유저 식별자",
+                      "email": "유저 이메일",
+                      "nickname": "유저 닉네임",
+                      "provider": "local, naver, google 등의 정보 제공자",
+                      "profileImage": "프로필 이미지 주소",
+                      "introduction": "유저 소개글",
+                      "postCount": "유저가 작성한 피드 수",
+                      "groupCount": "유저가 가입한 그룹 수"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -203,7 +239,25 @@
         "tags": ["Auth"],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "userId": "유저 식별자",
+                      "email": "유저 이메일",
+                      "nickname": "유저 닉네임",
+                      "provider": "local, naver, google 등의 정보 제공자",
+                      "profileImage": "프로필 이미지 주소",
+                      "introduction": "유저 소개글",
+                      "postCount": "유저가 작성한 피드 수",
+                      "groupCount": "유저가 가입한 그룹 수"
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "권한 없음"
@@ -259,7 +313,25 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 생성되었습니다.",
+                      "groupId": "그룹 식별자",
+                      "name": "그룹 이름",
+                      "description": "그룹 소개",
+                      "member": "멤버 수",
+                      "leader": "리더 식별자",
+                      "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                      "image": "그룹 대표 이미지 주소"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -287,7 +359,34 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "isEnd": "마지막 페이지라면 true, 아니라면 false",
+                      "groups": [
+                        {
+                          "groupId": "그룹 식별자",
+                          "name": "그룹 이름",
+                          "description": "그룹 소개",
+                          "member": "멤버 수",
+                          "image": "그룹 대표 이미지 주소"
+                        },
+                        {
+                          "groupId": "그룹 식별자",
+                          "name": "그룹 이름",
+                          "description": "그룹 소개",
+                          "member": "멤버 수",
+                          "image": "그룹 대표 이미지 주소"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -314,20 +413,52 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 그룹"
-          },
-          "500": {
-            "description": "서버 에러"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": [
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "leader": "리더 식별자",
+                        "inviteCode": "그룹 초대 코드",
+                        "inviteExp": "초대 코드 만료일",
+                        "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                        "image": "그룹 대표 이미지 주소"
+                      },
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "leader": "리더 식별자",
+                        "inviteCode": "그룹 초대 코드",
+                        "inviteExp": "초대 코드 만료일",
+                        "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                        "image": "그룹 대표 이미지 주소"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           }
+        },
+        "400": {
+          "description": "형식에 맞지 않는 데이터"
+        },
+        "401": {
+          "description": "권한 없음"
+        },
+        "404": {
+          "description": "존재하지 않는 그룹"
+        },
+        "500": {
+          "description": "서버 에러"
         }
       }
     },
@@ -346,7 +477,45 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "information": {
+                        "group": {
+                          "groupId": "그룹 식별자",
+                          "name": "그룹 이름",
+                          "description": "그룹 소개",
+                          "member": "멤버 수",
+                          "leader": "리더 식별자",
+                          "inviteCode": "그룹 초대 코드",
+                          "inviteExp": "초대 코드 만료일",
+                          "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                          "image": "그룹 대표 이미지 주소"
+                        },
+                        "leaderInfo": {
+                          "userId": "유저 식별자",
+                          "nickname": "유저 닉네임"
+                        },
+                        "memberInfo": [
+                          {
+                            "userId": "유저 식별자",
+                            "nickname": "유저 닉네임"
+                          },
+                          {
+                            "userId": "유저 식별자",
+                            "nickname": "유저 닉네임"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -396,7 +565,27 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 수정되었습니다.",
+                      "groupId": "그룹 식별자",
+                      "name": "그룹 이름",
+                      "description": "그룹 소개",
+                      "member": "멤버 수",
+                      "leader": "리더 식별자",
+                      "inviteCode": "그룹 초대 코드",
+                      "inviteExp": "초대 코드 만료일",
+                      "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                      "image": "그룹 대표 이미지 주소"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -464,7 +653,25 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "information": {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "feed": "그룹 피드 개수"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -496,7 +703,33 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": [
+                      {
+                        "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                        "member": {
+                          "userId": "유저 식별자",
+                          "nickname": "유저 닉네임",
+                          "isPendingMember": 0
+                        }
+                      },
+                      {
+                        "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                        "member": { 
+                          "userId": "유저 식별자",
+                          "nickname": "유저 닉네임",
+                          "isPendingMember": 0
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -528,7 +761,33 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": [
+                      {
+                        "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                        "member": {
+                          "userId": "유저 식별자",
+                          "nickname": "유저 닉네임",
+                          "isPendingMember": 1
+                        }
+                      },
+                      {
+                        "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                        "member": {
+                          "userId": "유저 식별자",
+                          "nickname": "유저 닉네임",
+                          "isPendingMember": 1
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -716,7 +975,22 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "groupId": "그룹 식별자",
+                      "name": "그룹 이름",
+                      "description": "그룹 소개",
+                      "member": "멤버 수",
+                      "image": "그룹 대표 이미지 주소"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -751,7 +1025,19 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "inviteCode": "그룹 초대 코드",
+                      "exp": "초대 코드 만료일"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -781,7 +1067,19 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "inviteCode": "그룹 초대 코드",
+                      "exp": "초대 코드 만료일"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -859,6 +1157,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "test-title",
                     "type": "VARCHAR(45)"
@@ -900,6 +1206,8 @@
               "examples": {
                 "non-recurrence": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -913,6 +1221,8 @@
                 },
                 "recurrence1": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -927,6 +1237,8 @@
                 },
                 "recurrence2": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -941,6 +1253,8 @@
                 },
                 "recurrence3": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -955,6 +1269,8 @@
                 },
                 "recurrence4": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -973,7 +1289,67 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "groupId": "그룹 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 1
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1012,7 +1388,48 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "schedules": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자(그룹 일정인 경우)",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 1
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자(개인 일정인 경우)",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1053,7 +1470,44 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "schedules": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자(그룹 일정인 경우)",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 1
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자(개인 일정인 경우)",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1088,7 +1542,31 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "schedule": {
+                        "id": "일정 식별자",
+                        "groupId": "그룹 식별자",
+                        "title": "일정 제목",
+                        "content": "일정 내용",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1129,6 +1607,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "modified-title"
                   },
@@ -1162,13 +1648,154 @@
                     "type": "DATETIME"
                   }
                 }
+              },
+              "examples": {
+                "non-recurrence": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
+                },
+                "recurrence1": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": null,
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
+                },
+                "recurrence2": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
+                },
+                "recurrence3": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["MO","WE","TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                },
+                "recurrence4": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": null,
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "groupId": "그룹 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 1
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1255,7 +1882,43 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "2099-01-01T00:00:00.000Z": [
+                        {
+                          "startDateTime": "2099-01-01T00:00:00.000Z",
+                          "endDateTime": "2099-01-01T12:00:00.000Z",
+                          "duration": 720
+                        },
+                        {
+                          "startDateTime": "2099-01-01T13:00:00.000Z",
+                          "endDateTime": "2099-01-01T23:59:59.000Z",
+                          "duration": 660
+                        }
+                      ],
+                      "2099-02-01T00:00:00.000Z": [
+                        {
+                          "startDateTime": "2099-02-01T00:00:00.000Z",
+                          "endDateTime": "2099-02-01T23:59:59.000Z",
+                          "duration": 1440
+                        }
+                      ],
+                      "2099-03-01T00:00:00.000Z": [
+                        {
+                          "startDateTime": "2099-03-01T00:00:00.000Z",
+                          "endDateTime": "2099-03-01T23:59:59.000Z",
+                          "duration": 1440
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1290,7 +1953,43 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "isEnd": "마지막 페이지라면 true, 아니라면 false",
+                      "feed": [
+                        {
+                          "postId": "포스트 식별자",
+                          "author": "작성자",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "isLiked": "좋아요 여부",
+                          "likesCount": "좋아요 개수",
+                          "title": "포스트 제목",
+                          "content": "포스트 내용",
+                          "createdAt": "생성 일자",
+                          "image": "포스트 이미지 주소 배열"
+                        },
+                        {
+                          "postId": "포스트 식별자",
+                          "author": "작성자",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "isLiked": "좋아요 여부",
+                          "likesCount": "좋아요 개수",
+                          "title": "포스트 제목",
+                          "content": "포스트 내용",
+                          "createdAt": "생성 일자",
+                          "image": "포스트 이미지 주소 배열"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1345,7 +2044,25 @@
         },
         "responses": {
           "201": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 등록되었습니다.",
+                      "postId": "포스트 식별자",
+                      "author": "작성자",
+                      "title": "포스트 제목",
+                      "content": "포스트 내용",
+                      "updatedAt": "마지막 업데이트 일자",
+                      "createdAt": "생성 일자",
+                      "image": "포스트 이미지 주소 배열"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1383,7 +2100,28 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "post": {
+                        "postId": "포스트 식별자",
+                        "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                        "isLiked": "좋아요 여부",
+                        "likesCount": "좋아요 개수",
+                        "author": "작성자",
+                        "title": "포스트 제목",
+                        "content": "포스트 내용",
+                        "image": "포스트 이미지 주소 배열"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1444,7 +2182,27 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 수정되었습니다.",
+                      "postId": "포스트 식별자",
+                      "groupId": "그룹 식별자",
+                      "userId": "유저 식별자",
+                      "author": "작성자",
+                      "title": "포스트 제목",
+                      "content": "포스트 내용",
+                      "image": "포스트 이미지 주소 배열",
+                      "createdAt": "생성 일자",
+                      "updatedAt": "마지막 업데이트 일자"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1601,7 +2359,40 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "comments": [
+                        {
+                          "commentId": "댓글 식별자",
+                          "postId": "포스트 식별자",
+                          "userId": "유저 식별자",
+                          "content": "댓글 내용",
+                          "depth": "댓글 깊이",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "createdAt": "생성 일자",
+                          "updatedAt": "마지막 업데이트 일자"
+                        },
+                        {
+                          "commentId": "댓글 식별자",
+                          "postId": "포스트 식별자",
+                          "userId": "유저 식별자",
+                          "content": "댓글 내용",
+                          "depth": "댓글 깊이",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "createdAt": "생성 일자",
+                          "updatedAt": "마지막 업데이트 일자"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1650,7 +2441,24 @@
         },
         "responses": {
           "201": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 등록되었습니다.",
+                      "postId": "포스트 식별자",
+                      "commentId": "댓글 식별자",
+                      "content": "댓글 내용",
+                      "depth": "댓글 깊이",
+                      "updatedAt": "마지막 업데이트 일자",
+                      "createdAt": "생성 일자"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1691,7 +2499,28 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "comment": {
+                        "commentId": "댓글 식별자",
+                        "postId": "포스트 식별자",
+                        "userId": "유저 식별자",
+                        "content": "댓글 내용",
+                        "depth": "댓글 깊이",
+                        "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                        "createdAt": "생성 일자",
+                        "updatedAt": "마지막 업데이트 일자"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1746,7 +2575,25 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 수정되었습니다.",
+                      "commentId": "댓글 식별자",
+                      "postId": "포스트 식별자",
+                      "userId": "유저 식별자",
+                      "content": "댓글 내용",
+                      "depth": "댓글 깊이",
+                      "createdAt": "생성 일자",
+                      "updatedAt": "마지막 업데이트 일자"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1819,7 +2666,42 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "isEnd": "마지막 페이지라면 true, 아니라면 false",
+                      "feed": [
+                        {
+                          "postId": "포스트 식별자",
+                          "groupId": "그룹 식별자",
+                          "author": "작성자",
+                          "title": "포스트 제목",
+                          "content": "포스트 내용",
+                          "isLiked": "좋아요 여부",
+                          "likesCount": "좋아요 개수",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "createdAt": "생성 일자"
+                        },
+                        {
+                          "postId": "포스트 식별자",
+                          "groupId": "그룹 식별자",
+                          "author": "작성자",
+                          "title": "포스트 제목",
+                          "content": "포스트 내용",
+                          "isLiked": "좋아요 여부",
+                          "likesCount": "좋아요 개수",
+                          "isMine": "작성자가 본인이라면 true, 아니라면 false",
+                          "createdAt": "생성 일자"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -1843,7 +2725,57 @@
         "tags": ["User"],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "groupList": [
+                        {
+                          "groupId": "그룹 식별자",
+                          "name": "그룹 이름",
+                          "description": "그룹 소개",
+                          "member": "멤버 수",
+                          "leader": "리더 식별자",
+                          "inviteCode": "그룹 초대 코드",
+                          "inviteExp": "초대 코드 만료일",
+                          "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                          "image": "그룹 대표 이미지 주소",
+                          "UserGroup": {
+                            "userId": "유저 식별자",
+                            "groupId": "그룹 식별자",
+                            "shareScheduleOption": "일정 공유 여부",
+                            "notificationOption": "그룹 알림 여부",
+                            "isPendingMember": "가입 대기 여부",
+                            "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴"
+                          }
+                        },
+                        {
+                          "groupId": "그룹 식별자",
+                          "name": "그룹 이름",
+                          "description": "그룹 소개",
+                          "member": "멤버 수",
+                          "leader": "리더 식별자",
+                          "inviteCode": "그룹 초대 코드",
+                          "inviteExp": "초대 코드 만료일",
+                          "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
+                          "image": "그룹 대표 이미지 주소",
+                          "UserGroup": {
+                            "userId": "유저 식별자",
+                            "groupId": "그룹 식별자",
+                            "shareScheduleOption": "일정 공유 여부",
+                            "notificationOption": "그룹 알림 여부",
+                            "isPendingMember": "가입 대기 여부",
+                            "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "권한 없음"
@@ -1861,7 +2793,29 @@
         "tags": ["User"],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": [
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "shareScheduleOption": "일정 공유 여부",
+                        "notificationOption": "그룹 알림 여부"
+                      },
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "shareScheduleOption": "일정 공유 여부",
+                        "notificationOption": "그룹 알림 여부"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
           },
           "401": {
             "description": "권한 없음"
@@ -1966,7 +2920,25 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "userId": "유저 식별자",
+                      "email": "유저 이메일",
+                      "nickname": "유저 닉네임",
+                      "provider": "local, naver, google 등의 정보 제공자",
+                      "profileImage": "프로필 이미지 주소",
+                      "introduction": "유저 소개글",
+                      "postCount": "유저가 작성한 피드 수",
+                      "groupCount": "유저가 가입한 그룹 수"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2056,7 +3028,19 @@
         },
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "message": "성공적으로 수정되었습니다.",
+                      "introduction": "유저 소개글"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2094,7 +3078,61 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "schedules": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자(그룹 일정인 경우)",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 1
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자(개인 일정인 경우)",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 0
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "isGroup": "그룹 일정 여부",
+                          "startRecur": "반복 시작 일자",
+                          "endRecur": "반복 종료 일자"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2118,6 +3156,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "test-title",
                     "type": "VARCHAR(45)"
@@ -2159,6 +3205,8 @@
               "examples": {
                 "non-recurrence": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -2172,6 +3220,8 @@
                 },
                 "recurrence1": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -2186,6 +3236,8 @@
                 },
                 "recurrence2": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -2200,6 +3252,8 @@
                 },
                 "recurrence3": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -2214,6 +3268,8 @@
                 },
                 "recurrence4": {
                   "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -2232,7 +3288,67 @@
         },
         "responses": {
           "201": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "userId": "유저 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 0
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2272,7 +3388,56 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "earliestDate": "가장 빠른 일정 시간",
+                      "schedules": [
+                        {
+                          "id": "일정 식별자",
+                          "groupId": "그룹 식별자(그룹 일정인 경우)",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 1
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자(개인 일정인 경우)",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일",
+                          "isGroup": 0
+                        },
+                        {
+                          "id": "일정 식별자",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "isGroup": "그룹 일정 여부",
+                          "startRecur": "반복 시작 일자",
+                          "endRecur": "반복 종료 일자"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2301,7 +3466,28 @@
         ],
         "responses": {
           "200": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "id": "일정 식별자",
+                      "userId": "유저 식별자",
+                      "title": "일정 제목",
+                      "content": "일정 내용",
+                      "startDateTime": "일정 시작 일자",
+                      "endDateTime": "일정 종료 일자",
+                      "recurrence": "반복 여부",
+                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                      "interval": "반복 간격",
+                      "byweekday": "반복 요일",
+                      "until": "반복 종료일"
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"
@@ -2336,6 +3522,14 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
                   "title": {
                     "example": "modified-title",
                     "type": "VARCHAR(45)"
@@ -2373,13 +3567,154 @@
                     "type": "DATETIME"
                   }
                 }
+              },
+              "examples": {
+                "non-recurrence": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 0,
+                    "freq": null,
+                    "interval": null,
+                    "byweekday": null,
+                    "until": null
+                  }
+                },
+                "recurrence1": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "DAILY",
+                    "interval": 1,
+                    "byweekday": null,
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "매일 반복되는 일정 등록 예시"
+                },
+                "recurrence2": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
+                },
+                "recurrence3": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "WEEKLY",
+                    "interval": 1,
+                    "byweekday": ["MO","WE","TH"],
+                    "until": "2099-02-01T00:00:00.000Z"
+                  },
+                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                },
+                "recurrence4": {
+                  "value": {
+                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
+                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
+                    "title": "test-title",
+                    "content": "test-content",
+                    "startDateTime": "2099-01-01T12:00:00.000Z",
+                    "endDateTime": "2099-01-01T13:00:00.000Z",
+                    "recurrence": 1,
+                    "freq": "MONTHLY",
+                    "interval": 2,
+                    "byweekday": null,
+                    "until": "2100-01-01T00:00:00.000Z"
+                  },
+                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
               }
             }
           }
         },
         "responses": {
           "201": {
-            "description": "성공"
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "scheduleSummary": {
+                        "id": "일정 식별자",
+                        "userId": "유저 식별자",
+                        "startDateTime": "일정 시작 일자",
+                        "endDateTime": "일정 종료 일자",
+                        "recurrence": "반복 여부",
+                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                        "interval": "반복 간격",
+                        "byweekday": "반복 요일",
+                        "until": "반복 종료일 (일반 일정인 경우)",
+                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                        "isGroup": 0
+                      },
+                      "todaySchedule": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ],
+                      "schedulesForTheWeek": [
+                        {
+                          "id": "일정 식별자",
+                          "userId": "유저 식별자",
+                          "title": "일정 제목",
+                          "content": "일정 내용",
+                          "startDateTime": "일정 시작 일자",
+                          "endDateTime": "일정 종료 일자",
+                          "recurrence": "반복 여부",
+                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                          "interval": "반복 간격",
+                          "byweekday": "반복 요일",
+                          "until": "반복 종료일 (일반 일정인 경우)",
+                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
+                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
+                          "isGroup": 0
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "형식에 맞지 않는 데이터"

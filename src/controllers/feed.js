@@ -461,8 +461,8 @@ async function getSingleComment(req, res, next) {
     const { user } = req;
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
-      Comment.findByPk(commentId),
+      Post.findOne({ where: { postId, groupId } }),
+      Comment.findOne({ where: { commentId, postId } }),
     ]);
 
     if (!group) {

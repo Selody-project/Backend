@@ -22,6 +22,7 @@ const {
   validateScheduleSchema, validateScheduleDateSchema,
   validateGroupScheduleIdSchema,
 } = require('../utils/validators');
+const { getScheduleResponse } = require('../utils/rrule');
 
 async function postGroupSchedule(req, res, next) {
   try {
@@ -49,15 +50,9 @@ async function postGroupSchedule(req, res, next) {
     }
 
     const {
-      title,
-      content,
-      startDateTime,
-      endDateTime,
-      recurrence,
-      freq,
-      interval,
-      byweekday,
-      until,
+      requestStartDateTime, requestEndDateTime,
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
     } = req.body;
 
     const groupSchedule = await GroupSchedule.create({
@@ -71,13 +66,9 @@ async function postGroupSchedule(req, res, next) {
       interval,
       byweekday,
       until,
-      possible: null,
-      impossible: null,
     });
-    const response = {
-      ...{ message: '성공적으로 등록되었습니다.' },
-      ...groupSchedule.dataValues,
-    };
+
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, groupSchedule.dataValues, true);
 
     return res.status(201).json(response);
   } catch (err) {
@@ -96,7 +87,7 @@ async function getSingleGroupSchedule(req, res, next) {
     const { user } = req;
     const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
-      GroupSchedule.findByPk(scheduleId),
+      GroupSchedule.findOne({ where: { groupId, id: scheduleId } }),
     ]);
 
     if (!group) {
@@ -142,16 +133,7 @@ async function getGroupSchedule(req, res, next) {
       attributes: ['userId'],
     })).map((member) => member.userId);
     const userSchedule = await PersonalSchedule.getSchedule(users, start, end);
-    let response;
-    if (userSchedule.earliestDate === null) {
-      response = { earliestDate: groupSchedule.earliestDate };
-    } else if (groupSchedule.earliestDate === null) {
-      response = { earliestDate: userSchedule.earliestDate };
-    } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-      response = { earliestDate: groupSchedule.earliestDate };
-    } else {
-      response = { earliestDate: userSchedule.earliestDate };
-    }
+    const response = {};
     response.schedules = [
       ...userSchedule.schedules,
       ...groupSchedule.schedules,
@@ -208,7 +190,7 @@ async function getGroupScheduleSummary(req, res, next) {
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, response });
+    return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
     return next(new ApiError());
   }
@@ -227,7 +209,7 @@ async function putGroupSchedule(req, res, next) {
     const { user } = req;
     const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
-      GroupSchedule.findByPk(scheduleId),
+      GroupSchedule.findOne({ where: { groupId, id: scheduleId } }),
     ]);
 
     if (!group) {
@@ -243,12 +225,26 @@ async function putGroupSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    await schedule.update(req.body);
+    const {
+      requestStartDateTime, requestEndDateTime,
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
+    } = req.body;
+
+    await schedule.update({
+      groupId: group.groupId,
+      title,
+      content,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
+    });
     const modifiedSchedule = await GroupSchedule.findByPk(scheduleId);
-    const response = {
-      ...{ message: '성공적으로 수정되었습니다.' },
-      ...modifiedSchedule.dataValues,
-    };
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, modifiedSchedule.dataValues, true);
 
     return res.status(201).json(response);
   } catch (err) {
