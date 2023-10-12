@@ -221,19 +221,19 @@ async function setUpGroupScheduleDB() {
       id: 12, groupId: 1, title: 'test-title12', content: 'test-content12', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 13, groupId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["WE"], until: '2025-01-01',
+      id: 13, groupId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [3], until: '2025-01-01',
     },
     {
       id: 14, groupId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["MO", "TU"], until: '2025-01-01',
+      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [1, 2], until: '2025-01-01',
     },
     {
       id: 16, groupId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: null, until: '2023-03-20',
     },
     {
-      id: 17, groupId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["SU"], until: '2025-01-01',
+      id: 17, groupId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [0], until: '2025-01-01',
     },
     {
       id: 18, groupId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
@@ -295,19 +295,19 @@ async function setUpPersonalScheduleDB() {
       id: 12, userId: 1, title: 'test-title12', content: 'test-content12', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 13, userId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["WE"], until: '2025-01-01',
+      id: 13, userId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [3], until: '2025-01-01',
     },
     {
       id: 14, userId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["MO", "TU"], until: '2025-01-01',
+      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [1, 2], until: '2025-01-01',
     },
     {
       id: 16, userId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: null, until: '2023-03-20',
     },
     {
-      id: 17, userId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["SU"], until: '2025-01-01',
+      id: 17, userId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [0], until: '2025-01-01',
     },
     {
       id: 18, userId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',

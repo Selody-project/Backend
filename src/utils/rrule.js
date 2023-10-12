@@ -20,13 +20,13 @@ function getRRuleByWeekDay(byweekday) {
   }
   const arr = byweekday;
   const RRuleWeekDay = {
-    MO: RRule.MO,
-    TU: RRule.TU,
-    WE: RRule.WE,
-    TH: RRule.TH,
-    FR: RRule.FR,
-    SA: RRule.SA,
-    SU: RRule.SU,
+    0: RRule.SU,
+    1: RRule.MO,
+    2: RRule.TU,
+    3: RRule.WE,
+    4: RRule.TH,
+    5: RRule.FR,
+    6: RRule.SA,
   };
 
   if (arr[0] === '') {
@@ -51,7 +51,7 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
   }
   const response = {
     scheduleSummary: {},
-    todaySchedule: [],
+    todaySchedules: [],
     schedulesForTheWeek: [],
   };
   // 일반 일정인 경우
@@ -67,7 +67,7 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
 
       // 오늘 일정
       if (startDateTime < requestEnd) {
-        response.todaySchedule.push({ ...schedule });
+        response.todaySchedules.push({ ...schedule });
       }
     }
   } else { // 반복 일정인 경우
@@ -96,13 +96,13 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
       new Date(requestStart.getTime() - scheduleLength),
       new Date(sixDaysLater.getTime() + 1),
     );
+    schedule.startRecur = schedule.startDateTime;
+    schedule.endRecur = schedule.until;
+    delete schedule.until;
+    response.scheduleSummary = { ...schedule };
+    delete response.scheduleSummary.title;
+    delete response.scheduleSummary.content;
     if (scheduleStartTimeList.length !== 0) {
-      schedule.startRecur = schedule.startDateTime;
-      schedule.endRecur = schedule.until;
-      delete schedule.until;
-      response.scheduleSummary = { ...schedule };
-      delete response.scheduleSummary.title;
-      delete response.scheduleSummary.content;
       scheduleStartTimeList.forEach((scheduleStartTime) => {
         const scheduleEndTime = new Date(scheduleStartTime.getTime() + scheduleLength);
         if (scheduleEndTime >= requestStart) {
@@ -111,7 +111,7 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
 
           // 오늘 일정
           if (scheduleStartTime < requestEnd) {
-            response.todaySchedule.push({ ...schedule });
+            response.todaySchedules.push({ ...schedule });
           }
 
           // 일주일 이내 일정
