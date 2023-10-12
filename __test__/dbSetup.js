@@ -5,7 +5,6 @@ const GroupSchedule = require('../src/models/groupSchedule');
 const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
 const Post = require('../src/models/post');
-const PostDetail = require('../src/models/postDetail');
 const Comment = require('../src/models/comment');
 const Like = require('../src/models/like');
 
@@ -391,67 +390,34 @@ async function setUpGroupScheduleDB2() {
 async function setUpGroupPostDB() {
   await Post.bulkCreate([
     {
-      postId: 1, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title1',
+      postId: 1, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content1', image: 'postImage',
     },
     {
-      postId: 2, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title2',
+      postId: 2, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content2', image: 'postImage',
     },
     {
-      postId: 3, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title3',
+      postId: 3, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content3', image: 'postImage',
     },
     {
-      postId: 4, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title4',
+      postId: 4, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content4', image: 'postImage',
     },
     {
-      postId: 5, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title5',
+      postId: 5, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content5', image: 'postImage',
     },
     {
-      postId: 6, userId: 2, groupId: 2, author: 'test-user2', title: 'test-title6',
+      postId: 6, userId: 2, groupId: 2, author: 'test-user2', content: 'test-content6', image: 'postImage',
     },
     {
-      postId: 7, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title7',
+      postId: 7, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content7', image: 'postImage',
     },
     {
-      postId: 8, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title8',
+      postId: 8, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content8', image: 'postImage',
     },
     {
-      postId: 9, userId: 1, groupId: 2, author: 'test-user1', title: 'test-title9',
+      postId: 9, userId: 1, groupId: 2, author: 'test-user1', content: 'test-content9', image: 'postImage',
     },
     {
-      postId: 10, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title10',
-    },
-  ]);
-
-  await PostDetail.bulkCreate([
-    {
-      postDetailId: 1, postId: 1, content: 'test-content1', image: 'postImage',
-    },
-    {
-      postDetailId: 2, postId: 2, content: 'test-content2', image: 'postImage',
-    },
-    {
-      postDetailId: 3, postId: 3, content: 'test-content3', image: 'postImage',
-    },
-    {
-      postDetailId: 4, postId: 4, content: 'test-content4', image: 'postImage',
-    },
-    {
-      postDetailId: 5, postId: 5, content: 'test-content5', image: 'postImage',
-    },
-    {
-      postDetailId: 6, postId: 6, content: 'test-content6', image: 'postImage',
-    },
-    {
-      postDetailId: 7, postId: 7, content: 'test-content7', image: 'postImage',
-    },
-    {
-      postDetailId: 8, postId: 8, content: 'test-content8', image: 'postImage',
-    },
-    {
-      postDetailId: 9, postId: 9, content: 'test-content9', image: 'postImage',
-    },
-    {
-      postDetailId: 10, postId: 10, content: 'test-content10', image: 'postImage',
+      postId: 10, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content10', image: 'postImage',
     },
   ]);
 
@@ -504,7 +470,6 @@ async function tearDownPersonalScheduleDB() {
 async function tearDownGroupPostDB() {
   await db.sequelize.query('DELETE FROM `comments`');
   await db.sequelize.query('DELETE FROM `posts`');
-  await db.sequelize.query('DELETE FROM `postDetails`');
 }
 
 async function tearDownLikeDB() {

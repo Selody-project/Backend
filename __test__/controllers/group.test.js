@@ -1382,18 +1382,15 @@ describe('Test /api/group endpoints', () => {
   describe('Test POST /api/group/:group_id/post', () => {
     it('Successfully created the post ', async () => {
       const groupId = 1;
-      const title = 'testTitle';
       const content = 'testContent';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       const expectedResult = {
         author: 'test-user1',
         content: 'testContent',
         image: null,
         message: '성공적으로 등록되었습니다.',
-        postDetailId: 11,
         postId: 11,
-        title: 'testTitle',
       };
       delete res.body.updatedAt;
       delete res.body.createdAt;
@@ -1403,9 +1400,8 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to create the post (Group Not Found) ', async () => {
       const groupId = 10000;
-      const title = 'testTitle';
       const content = 'testContent';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(404);
       expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
@@ -1413,9 +1409,8 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to create the post (DataFormat Error) ', async () => {
       const groupId = 1;
-      const title = 123;
       const content = 123;
-      const data = `{\"title\": \"${title}\", \"test\": \"${content}\"}`;
+      const data = `{\"wrong\": \"${content}\"}`;
       const res = await request(app).post(`/api/group/${groupId}/post`).set('Cookie', cookie).field('data', data);
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
@@ -1426,9 +1421,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully modified the post ', async () => {
       const groupId = 1;
       const postId = 1;
-      const title = 'modified-title';
       const content = 'modified-content';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
       const expectedResult = {
         author: 'test-user1',
@@ -1436,9 +1430,7 @@ describe('Test /api/group endpoints', () => {
         groupId: 1,
         image: null,
         message: '성공적으로 수정되었습니다.',
-        postDetailId: 1,
         postId: 1,
-        title: 'modified-title',
         userId: 1,
       };
       delete res.body.updatedAt;
@@ -1450,9 +1442,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Group Not Found) ', async () => {
       const groupId = 10000;
       const postId = 1;
-      const title = 'testTitle';
       const content = 'testContent';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
@@ -1462,9 +1453,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Post Not Found) ', async () => {
       const groupId = 1;
       const postId = 10000;
-      const title = 'testTitle';
       const content = 'testContent';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(404);
@@ -1474,9 +1464,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (DataFormat Error) ', async () => {
       const groupId = 1;
       const postId = 1;
-      const title = 123;
       const content = 123;
-      const data = `{\"title\": \"${title}\", \"test\": \"${content}\"}`;
+      const data = `{\"wrong\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(400);
@@ -1486,9 +1475,8 @@ describe('Test /api/group endpoints', () => {
     it('Successfully failed to modified the post (Edit Permission Error) ', async () => {
       const groupId = 1;
       const postId = 2;
-      const title = 'modified-title';
       const content = 'modified-content';
-      const data = `{\"title\": \"${title}\", \"content\": \"${content}\"}`;
+      const data = `{\"content\": \"${content}\"}`;
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
 
       expect(res.status).toEqual(403);
@@ -1541,7 +1529,6 @@ describe('Test /api/group endpoints', () => {
         post: {
           author: 'test-user1',
           content: 'test-content1',
-          title: 'test-title1',
           isMine: true,
           isLiked: false,
           likesCount: 0,
@@ -1591,28 +1578,28 @@ describe('Test /api/group endpoints', () => {
         isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', title: 'test-title1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
+            postId: 1, author: 'test-user1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
           },
           {
-            postId: 2, author: 'test-user2', title: 'test-title2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
+            postId: 2, author: 'test-user2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 3, author: 'test-user1', title: 'test-title3', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
+            postId: 3, author: 'test-user1', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 4, author: 'test-user1', title: 'test-title4', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 4, author: 'test-user1', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 5, author: 'test-user1', title: 'test-title5', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 5, author: 'test-user1', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 7, author: 'test-user2', title: 'test-title7', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 7, author: 'test-user2', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 8, author: 'test-user2', title: 'test-title8', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 8, author: 'test-user2', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 10, author: 'test-user1', title: 'test-title10', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 10, author: 'test-user1', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
         ],
       };
@@ -1625,7 +1612,6 @@ describe('Test /api/group endpoints', () => {
           isLiked: post.isLiked,
           likesCount: post.likesCount,
           commentCount: post.commentCount,
-          title: post.title,
           author: post.author,
           content: post.content,
           image: post.image,

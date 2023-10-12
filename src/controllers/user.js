@@ -3,6 +3,7 @@ const { Sequelize } = require('sequelize');
 const { Op } = Sequelize;
 const bcrypt = require('bcrypt');
 const { deleteBucketImage } = require('../middleware/s3');
+const { getAccessLevel } = require('../utils/accessLevel');
 
 // Model
 const User = require('../models/user');
@@ -144,12 +145,18 @@ async function getUserSetup(req, res, next) {
       ],
       where: { userId: user.userId },
     });
-    const parsedOptions = options[0].Groups.map((option) => ({
-      groupId: option.dataValues.groupId,
-      name: option.dataValues.name,
-      shareScheduleOption: option.UserGroup.dataValues.shareScheduleOption,
-      notificationOption: option.UserGroup.dataValues.notificationOption,
-    }));
+    const parsedOptions = await Promise.all(
+      options[0].Groups.map(async (option) => {
+        const accessLevel = await getAccessLevel(user, option.dataValues);
+        return {
+          groupId: option.dataValues.groupId,
+          name: option.dataValues.name,
+          shareScheduleOption: option.UserGroup.dataValues.shareScheduleOption,
+          notificationOption: option.UserGroup.dataValues.notificationOption,
+          accessLevel,
+        };
+      }),
+    );
     return res.status(200).json(parsedOptions);
   } catch (err) {
     return next(new ApiError());
