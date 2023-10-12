@@ -1,14 +1,48 @@
 const {
-  sseJoin, sseLeave, sendSSE, sendGroupSSE, getMissedNotifications,
+  sseJoin, sseLeave, sendSSE, loadNotifications,
 } = require('../utils/sse');
 
 // Model
-const User = require('../models/user');
+const Notification = require('../models/notifications');
 
 // Error
 const {
-  ApiError,
+  DataFormatError, ApiError, NotFoundError,
 } = require('../errors');
+
+// Validator
+const {
+  validateNotificationIdSchema,
+} = require('../utils/validators');
+
+async function getNotifications(req, res, next) {
+  try {
+    const { error: paramError } = validateNotificationIdSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { notification_id: notificationId } = req.params;
+    const { user } = req;
+
+    const notification = await Notification.findOne({
+      where: {
+        id: notificationId,
+        userId: user.userId,
+      },
+    });
+    if (!notification) {
+      return next(new NotFoundError());
+    }
+
+    const response = { ...notification.dataValues };
+    await notification.destroy();
+
+    return res.status(200).json(response);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
 
 async function sseController(req, res, next) {
   try {
@@ -31,21 +65,15 @@ async function sseController(req, res, next) {
     sseJoin(groupIds, userId, res);
 
     // 현재 클라이언트에 SSE 연결 메시지를 전송
-    sendSSE(`Connected user${userId}! 현재 서버 시간: ${new Date()}`, res);
+    sendSSE(`Connected ${user.nickname}! 현재 서버 시간: ${new Date()}`, res);
 
     // 오프라인 중에 받지 못한 메시지를 재전송
-    await getMissedNotifications(groupIds, user);
+    await loadNotifications(user);
 
     // 클라이언트 연결 종료 시 자신을 클라이언트 목록에서 제거
     // 마지막을 받은 메시지의 id를 저장
     req.on('close', async () => {
-      try {
-        const lastNotificationId = res.lastNotificationId;
-        if (lastNotificationId) {
-          await user.update({ lastNotificationId });
-        }
-        sseLeave(groupIds, userId);
-      } catch(err) { }
+      sseLeave(groupIds, userId);
     });
   } catch (err) {
     console.log(err);
@@ -53,4 +81,7 @@ async function sseController(req, res, next) {
   }
 }
 
-module.exports = sseController;
+module.exports = {
+  getNotifications,
+  sseController,
+};

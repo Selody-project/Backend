@@ -1,7 +1,5 @@
 const moment = require('moment');
-const {
-  parseEventDates, eventProposal,
-} = require('../utils/event');
+const { eventProposal } = require('../utils/event');
 const {
   getAccessLevel,
 } = require('../utils/accessLevel');
@@ -24,6 +22,7 @@ const {
   validateScheduleSchema, validateScheduleDateSchema,
   validateGroupScheduleIdSchema,
 } = require('../utils/validators');
+const { getScheduleResponse } = require('../utils/rrule');
 
 async function postGroupSchedule(req, res, next) {
   try {
@@ -41,6 +40,9 @@ async function postGroupSchedule(req, res, next) {
     const { group_id: groupId } = req.params;
     const { user } = req;
     const group = await Group.findByPk(groupId);
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
@@ -48,15 +50,9 @@ async function postGroupSchedule(req, res, next) {
     }
 
     const {
-      title,
-      content,
-      startDateTime,
-      endDateTime,
-      recurrence,
-      freq,
-      interval,
-      byweekday,
-      until,
+      requestStartDateTime, requestEndDateTime,
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
     } = req.body;
 
     const groupSchedule = await GroupSchedule.create({
@@ -70,13 +66,9 @@ async function postGroupSchedule(req, res, next) {
       interval,
       byweekday,
       until,
-      possible: null,
-      impossible: null,
     });
-    const response = {
-      ...{ message: '성공적으로 등록되었습니다.' },
-      ...groupSchedule.dataValues,
-    };
+
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, groupSchedule.dataValues, true);
 
     return res.status(201).json(response);
   } catch (err) {
@@ -95,7 +87,7 @@ async function getSingleGroupSchedule(req, res, next) {
     const { user } = req;
     const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
-      GroupSchedule.findByPk(scheduleId),
+      GroupSchedule.findOne({ where: { groupId, id: scheduleId } }),
     ]);
 
     if (!group) {
@@ -141,27 +133,14 @@ async function getGroupSchedule(req, res, next) {
       attributes: ['userId'],
     })).map((member) => member.userId);
     const userSchedule = await PersonalSchedule.getSchedule(users, start, end);
-    let schedule;
-    if (userSchedule.earliestDate === null) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
-    } else if (groupSchedule.earliestDate === null) {
-      schedule = { earliestDate: userSchedule.earliestDate };
-    } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
-    } else {
-      schedule = { earliestDate: userSchedule.earliestDate };
-    }
-    schedule.nonRecurrenceSchedule = [
-      ...userSchedule.nonRecurrenceSchedule,
-      ...groupSchedule.nonRecurrenceSchedule,
-    ];
-    schedule.recurrenceSchedule = [
-      ...userSchedule.recurrenceSchedule,
-      ...groupSchedule.recurrenceSchedule,
+    const response = {};
+    response.schedules = [
+      ...userSchedule.schedules,
+      ...groupSchedule.schedules,
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, schedule });
+    return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
     return next(new ApiError());
   }
@@ -195,27 +174,23 @@ async function getGroupScheduleSummary(req, res, next) {
       attributes: ['userId'],
     })).map((member) => member.userId);
     const userSchedule = await PersonalSchedule.getSchedule(users, start, end, true);
-    let schedule;
+    let response;
     if (userSchedule.earliestDate === null) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else if (groupSchedule.earliestDate === null) {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     } else if (userSchedule.earliestDate > groupSchedule.earliestDate) {
-      schedule = { earliestDate: groupSchedule.earliestDate };
+      response = { earliestDate: groupSchedule.earliestDate };
     } else {
-      schedule = { earliestDate: userSchedule.earliestDate };
+      response = { earliestDate: userSchedule.earliestDate };
     }
-    schedule.nonRecurrenceSchedule = [
-      ...userSchedule.nonRecurrenceSchedule,
-      ...groupSchedule.nonRecurrenceSchedule,
-    ];
-    schedule.recurrenceSchedule = [
-      ...userSchedule.recurrenceSchedule,
-      ...groupSchedule.recurrenceSchedule,
+    response.schedules = [
+      ...userSchedule.schedules,
+      ...groupSchedule.schedules,
     ];
 
     const accessLevel = await getAccessLevel(user, group);
-    return res.status(200).json({ accessLevel, schedule });
+    return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
     return next(new ApiError());
   }
@@ -234,7 +209,7 @@ async function putGroupSchedule(req, res, next) {
     const { user } = req;
     const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
-      GroupSchedule.findByPk(scheduleId),
+      GroupSchedule.findOne({ where: { groupId, id: scheduleId } }),
     ]);
 
     if (!group) {
@@ -250,12 +225,26 @@ async function putGroupSchedule(req, res, next) {
       return next(new EditPermissionError());
     }
 
-    await schedule.update(req.body);
+    const {
+      requestStartDateTime, requestEndDateTime,
+      title, content, startDateTime, endDateTime,
+      recurrence, freq, interval, byweekday, until,
+    } = req.body;
+
+    await schedule.update({
+      groupId: group.groupId,
+      title,
+      content,
+      startDateTime,
+      endDateTime,
+      recurrence,
+      freq,
+      interval,
+      byweekday,
+      until,
+    });
     const modifiedSchedule = await GroupSchedule.findByPk(scheduleId);
-    const response = {
-      ...{ message: '성공적으로 수정되었습니다.' },
-      ...modifiedSchedule.dataValues,
-    };
+    const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, modifiedSchedule.dataValues, true);
 
     return res.status(201).json(response);
   } catch (err) {
@@ -331,22 +320,13 @@ async function getEventProposal(req, res, next) {
 
     /* eslint-disable no-restricted-syntax */
     for (const date of Object.values(req.query)) {
-      let events = [];
       const start = moment.utc(date).toDate();
       const end = moment.utc(date).add(24, 'hours').add(-1, 's').toDate();
-      const {
-        nonRecurrenceSchedule: userNonRecEvent,
-        recurrenceSchedule: userRecEvent,
-        /* eslint-disable-next-line no-await-in-loop */
-      } = await PersonalSchedule.getSchedule(groupMembers, start, end);
-      events.push(parseEventDates(userNonRecEvent, userRecEvent));
-      const {
-        nonRecurrenceSchedule: groupNonRecEvent,
-        recurrenceSchedule: groupRecEvent,
-        /* eslint-disable-next-line no-await-in-loop */
-      } = await GroupSchedule.getSchedule([groupId], start, end);
-      events.push(parseEventDates(groupNonRecEvent, groupRecEvent));
-      events = events.flat(1);
+      /* eslint-disable-next-line no-await-in-loop */
+      const userSchedules = await PersonalSchedule.getProposalSchedule(groupMembers, start, end);
+      /* eslint-disable-next-line no-await-in-loop */
+      const groupSchedules = await GroupSchedule.getProposalSchedule([groupId], start, end);
+      const events = [...userSchedules, ...groupSchedules];
       events.sort((a, b) => a.startDateTime.getTime() - b.startDateTime.getTime());
 
       // 결과값에서 9시~22시 사이의 값들을 먼저 추천할 수 있도록 정렬.

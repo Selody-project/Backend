@@ -55,6 +55,8 @@ process.env.TZ = 'Etc/Universal';
 const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
 
+require('./utils/cron');
+
 if (process.env.NODE_ENV !== 'test') {
   app.listen(port, async () => {
     console.log(`Server is up on port ${appUrl}:${port}`);

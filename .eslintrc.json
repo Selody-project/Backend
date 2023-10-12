@@ -10,6 +10,7 @@
     "sourceType": "module"
   },
   "rules": {
+    "max-len": "off",
     "global-require": "off",
     "import/no-dynamic-require" : 1,
     "consistent-return" : 1,

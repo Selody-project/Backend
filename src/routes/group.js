@@ -7,7 +7,8 @@ const {
   putGroup, deleteGroup,
   getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
-  getInviteLink, postInviteLink, postJoinGroupWithInviteCode,
+  getInviteLink, postInviteLink,
+  getGroupPreviewWithInviteCode, postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,
 } = require('../controllers/group');
@@ -33,7 +34,7 @@ const router = express.Router();
 
 // Group
 router.post('/', uploadGroupMiddleware, postGroup);
-router.get('/list/:last_record_id', getGroupList);
+router.get('/list', getGroupList);
 router.get('/search', searchGroup);
 router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
@@ -45,6 +46,7 @@ router.post('/:group_id/members/request', postGroupJoinRequest);
 router.post('/:group_id/members/:user_id/approve', postGroupJoinApprove);
 router.post('/:group_id/members/:user_id/reject', postGroupJoinReject);
 router.delete('/:group_id/members/:user_id', deleteGroupMember);
+router.get('/invite-link/:inviteCode', getGroupPreviewWithInviteCode);
 router.get('/:group_id/join/invite-link', getInviteLink);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
@@ -60,7 +62,7 @@ router.get('/:group_id/proposal', getEventProposal);
 
 // Feed
 router.post('/:group_id/post', uploadPostMiddleware, postGroupPost);
-router.get('/:group_id/feed/:last_record_id', getGroupPosts);
+router.get('/:group_id/post', getGroupPosts);
 router.get('/:group_id/post/:post_id', getSinglePost);
 router.put('/:group_id/post/:post_id', uploadPostMiddleware, putGroupPost);
 router.delete('/:group_id/post/:post_id', deleteGroupPost);

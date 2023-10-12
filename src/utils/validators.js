@@ -1,5 +1,6 @@
 /* eslint-disable newline-per-chained-call */
 const Joi = require('joi').extend(require('@joi/date'));
+const moment = require('moment');
 
 const validator = (schema) => (payload) => schema.validate(payload, { abortEarly: false });
 
@@ -13,6 +14,7 @@ const joinSchema = Joi.object({
 const profileSchema = Joi.object({
   email: Joi.string().email().min(1).max(40).required(),
   nickname: Joi.string().min(1).max(15).required(),
+  introduction: Joi.string().max(50).required(),
 });
 
 const passwordSchema = Joi.object({
@@ -51,10 +53,17 @@ const scheduleDateSchema = Joi.object({
   endDateTime: Joi.date().required(),
 });
 
+const getCurrentTime = () => {
+  const testEnv = process.env.NODE_ENV === 'test';
+  return testEnv ? new Date('1900-01-01T00:00:00.000Z') : moment().utc().subtract(6, 'months');
+};
+
 const scheduleSchema = Joi.object({
+  requestStartDateTime: Joi.date().required(),
+  requestEndDateTime: Joi.date().required(),
   title: Joi.string().max(45).required(),
   content: Joi.string(),
-  startDateTime: Joi.date().required(),
+  startDateTime: Joi.date().min(getCurrentTime()).required(),
   endDateTime: Joi.date().required(),
   recurrence: Joi.valid(0, 1).required(),
   freq: Joi.when('recurrence', {
@@ -65,17 +74,17 @@ const scheduleSchema = Joi.object({
   interval: Joi.when('recurrence', {
     is: 0,
     then: Joi.valid(null).required(),
-    otherwise: Joi.number().required(),
+    otherwise: Joi.number().min(1).required(),
   }),
   byweekday: Joi.when('freq', {
     is: 'WEEKLY',
-    then: Joi.array().items(Joi.string().min(0)).required(),
+    then: Joi.array().items(Joi.number().min(0).max(6)).required(),
     otherwise: Joi.valid(null).required(),
   }),
   until: Joi.when('recurrence', {
     is: 0,
     then: Joi.valid(null).required(),
-    otherwise: Joi.date().required(),
+    otherwise: Joi.date().allow(null).required(),
   }),
 });
 
@@ -89,24 +98,18 @@ const groupScheduleIdSchema = Joi.object({
 });
 
 const eventPoroposalSchema = Joi.object({
-  date1: Joi.date().required(),
-  date2: Joi.date(),
-  date3: Joi.date(),
+  date1: Joi.date().min(getCurrentTime()).required(),
+  date2: Joi.date().min(getCurrentTime()),
+  date3: Joi.date().min(getCurrentTime()),
 });
 
 const postSchema = Joi.object({
-  title: Joi.string().max(45).required(),
   content: Joi.string().max(1000).required(),
 });
 
 const postIdSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
   post_id: Joi.number().min(0).required(),
-});
-
-const pageSchema = Joi.object({
-  group_id: Joi.number().min(0).required(),
-  last_record_id: Joi.number().min(0).required(),
 });
 
 const lastRecordIdSchema = Joi.object({
@@ -128,6 +131,10 @@ const groupJoinInviteCodeSchema = Joi.object({
   inviteCode: Joi.string().min(0).required(),
 });
 
+const groupInviteCodeSchema = Joi.object({
+  inviteCode: Joi.string().min(0).required(),
+});
+
 const groupJoinRequestSchema = Joi.object({
   group_id: Joi.number().min(0).required(),
   user_id: Joi.number().min(0).required(),
@@ -135,6 +142,7 @@ const groupJoinRequestSchema = Joi.object({
 
 const groupSearchKeywordSchema = Joi.object({
   keyword: Joi.string().min(2).max(45).required(),
+  last_record_id: Joi.number().min(0).required(),
 });
 
 const userSettingSchema = Joi.object({
@@ -144,6 +152,10 @@ const userSettingSchema = Joi.object({
 
 const userIntroductionSchema = Joi.object({
   introduction: Joi.string().max(50).required(),
+});
+
+const notificationIdSchema = Joi.object({
+  notification_id: Joi.number().min(0).required(),
 });
 
 module.exports = {
@@ -163,13 +175,14 @@ module.exports = {
   validateEventProposalSchema: validator(eventPoroposalSchema),
   validatePostSchema: validator(postSchema),
   validatePostIdSchema: validator(postIdSchema),
-  validatePageSchema: validator(pageSchema),
   validateLastRecordIdSchema: validator(lastRecordIdSchema),
   validateCommentSchema: validator(commentSchema),
   validateCommentIdSchema: validator(commentIdSchema),
   validateGroupJoinInviteCodeSchema: validator(groupJoinInviteCodeSchema),
+  validateGroupInviteCodeSchema: validator(groupInviteCodeSchema),
   validateGroupJoinRequestSchema: validator(groupJoinRequestSchema),
   validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
   validateUserSettingSchema: validator(userSettingSchema),
   validateUserIntroductionSchema: validator(userIntroductionSchema),
+  validateNotificationIdSchema: validator(notificationIdSchema),
 };

@@ -3,7 +3,7 @@ const auth = require('./auth');
 const group = require('./group');
 const user = require('./user');
 const { verifyToken } = require('../middleware/token');
-const sseController = require('../controllers/sse');
+const { getNotifications, sseController } = require('../controllers/sse');
 
 const router = express.Router();
 
@@ -14,6 +14,8 @@ router.use('/auth', auth);
 router.use('/*', verifyToken);
 
 router.get('/sse', sseController);
+router.get('/sse/notification/:notification_id', getNotifications);
+
 router.use('/group', group);
 router.use('/user', user);
 

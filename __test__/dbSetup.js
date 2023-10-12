@@ -5,7 +5,6 @@ const GroupSchedule = require('../src/models/groupSchedule');
 const User = require('../src/models/user');
 const PersonalSchedule = require('../src/models/personalSchedule');
 const Post = require('../src/models/post');
-const PostDetail = require('../src/models/postDetail');
 const Comment = require('../src/models/comment');
 const Like = require('../src/models/like');
 
@@ -221,19 +220,19 @@ async function setUpGroupScheduleDB() {
       id: 12, groupId: 1, title: 'test-title12', content: 'test-content12', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 13, groupId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["WE"], until: '2025-01-01',
+      id: 13, groupId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [3], until: '2025-01-01',
     },
     {
       id: 14, groupId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["MO", "TU"], until: '2025-01-01',
+      id: 15, groupId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [1, 2], until: '2025-01-01',
     },
     {
       id: 16, groupId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: null, until: '2023-03-20',
     },
     {
-      id: 17, groupId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["SU"], until: '2025-01-01',
+      id: 17, groupId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [0], until: '2025-01-01',
     },
     {
       id: 18, groupId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
@@ -295,19 +294,19 @@ async function setUpPersonalScheduleDB() {
       id: 12, userId: 1, title: 'test-title12', content: 'test-content12', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 13, userId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["WE"], until: '2025-01-01',
+      id: 13, userId: 1, title: 'test-title13', content: 'test-content13', startDateTime: '2020-01-15T12:00:00.000Z', endDateTime: '2020-01-15T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [3], until: '2025-01-01',
     },
     {
       id: 14, userId: 1, title: 'test-title14', content: 'test-content14', startDateTime: '2020-04-15T12:00:00.000Z', endDateTime: '2020-04-15T13:00:00.000Z', recurrence: 1, freq: 'YEARLY', interval: 1, byweekday: null, until: '2025-01-01',
     },
     {
-      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["MO", "TU"], until: '2025-01-01',
+      id: 15, userId: 1, title: 'test-title15', content: 'test-content15', startDateTime: '2020-01-13T12:00:00.000Z', endDateTime: '2020-01-13T13:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [1, 2], until: '2025-01-01',
     },
     {
       id: 16, userId: 1, title: 'test-title16', content: 'test-content16', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'DAILY', interval: 1, byweekday: null, until: '2023-03-20',
     },
     {
-      id: 17, userId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: ["SU"], until: '2025-01-01',
+      id: 17, userId: 1, title: 'test-title17', content: 'test-content17', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'WEEKLY', interval: 1, byweekday: [0], until: '2025-01-01',
     },
     {
       id: 18, userId: 1, title: 'test-title18', content: 'test-content18', startDateTime: '2020-03-15T12:00:00.000Z', endDateTime: '2020-04-01T00:00:00.000Z', recurrence: 1, freq: 'MONTHLY', interval: 1, byweekday: null, until: '2025-01-01',
@@ -391,67 +390,34 @@ async function setUpGroupScheduleDB2() {
 async function setUpGroupPostDB() {
   await Post.bulkCreate([
     {
-      postId: 1, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title1',
+      postId: 1, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content1', image: 'postImage',
     },
     {
-      postId: 2, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title2',
+      postId: 2, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content2', image: 'postImage',
     },
     {
-      postId: 3, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title3',
+      postId: 3, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content3', image: 'postImage',
     },
     {
-      postId: 4, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title4',
+      postId: 4, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content4', image: 'postImage',
     },
     {
-      postId: 5, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title5',
+      postId: 5, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content5', image: 'postImage',
     },
     {
-      postId: 6, userId: 2, groupId: 2, author: 'test-user2', title: 'test-title6',
+      postId: 6, userId: 2, groupId: 2, author: 'test-user2', content: 'test-content6', image: 'postImage',
     },
     {
-      postId: 7, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title7',
+      postId: 7, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content7', image: 'postImage',
     },
     {
-      postId: 8, userId: 2, groupId: 1, author: 'test-user2', title: 'test-title8',
+      postId: 8, userId: 2, groupId: 1, author: 'test-user2', content: 'test-content8', image: 'postImage',
     },
     {
-      postId: 9, userId: 1, groupId: 2, author: 'test-user1', title: 'test-title9',
+      postId: 9, userId: 1, groupId: 2, author: 'test-user1', content: 'test-content9', image: 'postImage',
     },
     {
-      postId: 10, userId: 1, groupId: 1, author: 'test-user1', title: 'test-title10',
-    },
-  ]);
-
-  await PostDetail.bulkCreate([
-    {
-      postDetailId: 1, postId: 1, content: 'test-content1', image: 'postImage',
-    },
-    {
-      postDetailId: 2, postId: 2, content: 'test-content2', image: 'postImage',
-    },
-    {
-      postDetailId: 3, postId: 3, content: 'test-content3', image: 'postImage',
-    },
-    {
-      postDetailId: 4, postId: 4, content: 'test-content4', image: 'postImage',
-    },
-    {
-      postDetailId: 5, postId: 5, content: 'test-content5', image: 'postImage',
-    },
-    {
-      postDetailId: 6, postId: 6, content: 'test-content6', image: 'postImage',
-    },
-    {
-      postDetailId: 7, postId: 7, content: 'test-content7', image: 'postImage',
-    },
-    {
-      postDetailId: 8, postId: 8, content: 'test-content8', image: 'postImage',
-    },
-    {
-      postDetailId: 9, postId: 9, content: 'test-content9', image: 'postImage',
-    },
-    {
-      postDetailId: 10, postId: 10, content: 'test-content10', image: 'postImage',
+      postId: 10, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content10', image: 'postImage',
     },
   ]);
 
@@ -504,7 +470,6 @@ async function tearDownPersonalScheduleDB() {
 async function tearDownGroupPostDB() {
   await db.sequelize.query('DELETE FROM `comments`');
   await db.sequelize.query('DELETE FROM `posts`');
-  await db.sequelize.query('DELETE FROM `postDetails`');
 }
 
 async function tearDownLikeDB() {

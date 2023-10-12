@@ -9,13 +9,18 @@ class Post extends Sequelize.Model {
         primaryKey: true,
         autoIncrement: true,
       },
-      title: {
-        type: Sequelize.STRING(45),
-        allowNull: false,
-      },
       author: {
         type: Sequelize.STRING(45),
         allowNull: false,
+      },
+      content: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
+      image: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+        defaultValue: null,
       },
     }, {
       sequelize,
@@ -36,14 +41,22 @@ class Post extends Sequelize.Model {
       foreignKey: 'postId',
       onDelete: 'cascade',
     });
-    db.Post.hasOne(db.PostDetail, {
-      as: 'postDetail',
-      foreignKey: 'postId',
-      onDelete: 'cascade',
-    });
     db.Post.belongsTo(db.User, {
       foreignKey: 'userId',
     });
+  }
+
+  static async getUserPostCount(userId) {
+    try {
+      const count = await Post.count({
+        where: {
+          userId,
+        },
+      });
+      return count;
+    } catch (err) {
+      throw new Error();
+    }
   }
 }
 

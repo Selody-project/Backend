@@ -38,13 +38,8 @@ class User extends Sequelize.Model {
       },
       introduction: {
         type: Sequelize.STRING(50),
-        allowNull: true,
-        defaultValue: null,
-      },
-      lastNotificationId: {
-        type: Sequelize.BIGINT,
-        allowNull: true,
-        defaultValue: null,
+        allowNull: false,
+        defaultValue: '',
       },
     }, {
       sequelize,
@@ -72,6 +67,10 @@ class User extends Sequelize.Model {
     });
     db.User.hasMany(db.Comment, {
       foreignKey: 'userId',
+    });
+    db.User.hasMany(db.Notification, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
     });
     db.User.hasMany(db.UserGroup, {
       foreignKey: 'userId',

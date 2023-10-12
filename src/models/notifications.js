@@ -7,14 +7,6 @@ class Notification extends Sequelize.Model {
         type: Sequelize.STRING(50),
         allowNull: false,
       },
-      notificationType: {
-        type: Sequelize.ENUM('user', 'group'),
-        allowNull: false,
-      },
-      receiverId: {
-        type: Sequelize.BIGINT,
-        allowNull: false,
-      },
     }, {
       sequelize,
       timestamps: true,
@@ -26,6 +18,9 @@ class Notification extends Sequelize.Model {
   }
 
   static associate(db) {
+    db.Notification.belongsTo(db.User, {
+      foreignKey: 'userId',
+    });
   }
 }
 

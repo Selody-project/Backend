@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 const { Op } = Sequelize;
 const bcrypt = require('bcrypt');
 const { deleteBucketImage } = require('../middleware/s3');
+const { getAccessLevel } = require('../utils/accessLevel');
 
 // Model
 const User = require('../models/user');
@@ -45,7 +46,7 @@ async function patchUserProfile(req, res, next) {
       throw (new DataFormatError());
     }
 
-    const { nickname, email } = req.body;
+    const { nickname, email, introduction } = req.body;
     const { user } = req;
 
     const nicknameDuplicate = await User.findAll({
@@ -65,10 +66,12 @@ async function patchUserProfile(req, res, next) {
     const previousProfileImage = [user.profileImage];
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      await user.update({ nickname, email, profileImage: fileUrl });
+      await user.update({
+        nickname, email, introduction, profileImage: fileUrl,
+      });
       await deleteBucketImage(previousProfileImage);
     } else {
-      await user.update({ nickname, email });
+      await user.update({ nickname, email, introduction });
     }
     req.user = user;
     return next();
@@ -141,12 +144,18 @@ async function getUserSetup(req, res, next) {
       ],
       where: { userId: user.userId },
     });
-    const parsedOptions = options[0].Groups.map((option) => ({
-      groupId: option.dataValues.groupId,
-      name: option.dataValues.name,
-      shareScheduleOption: option.UserGroup.dataValues.shareScheduleOption,
-      notificationOption: option.UserGroup.dataValues.notificationOption,
-    }));
+    const parsedOptions = await Promise.all(
+      options[0].Groups.map(async (option) => {
+        const accessLevel = await getAccessLevel(user, option.dataValues);
+        return {
+          groupId: option.dataValues.groupId,
+          name: option.dataValues.name,
+          shareScheduleOption: option.UserGroup.dataValues.shareScheduleOption,
+          notificationOption: option.UserGroup.dataValues.notificationOption,
+          accessLevel,
+        };
+      }),
+    );
     return res.status(200).json(parsedOptions);
   } catch (err) {
     return next(new ApiError());

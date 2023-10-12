@@ -24,7 +24,7 @@ const {
 const {
   validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
-  validateGroupdSearchKeyword,
+  validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
 } = require('../utils/validators');
 const { getAccessLevel } = require('../utils/accessLevel');
 
@@ -57,7 +57,7 @@ async function postGroup(req, res, next) {
 
     await user.addGroup(group, { through: { accessLevel: 'owner' } });
 
-    await sseGroupJoin(group.groupId, user);
+    await sseGroupJoin(group, user);
 
     const response = {
       ...{ message: '성공적으로 생성되었습니다.' },
@@ -144,12 +144,12 @@ async function getGroupDetail(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { error: paramError } = validateLastRecordIdSchema(req.params);
-    if (paramError) {
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (queryError) {
       return next(new DataFormatError());
     }
 
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }
@@ -443,7 +443,7 @@ async function postGroupJoinApprove(req, res, next) {
     await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId } });
     await group.update({ member: (group.member + 1) });
 
-    await sseGroupJoin(group.groupId, applicant);
+    await sseGroupJoin(group, applicant);
 
     return res.status(200).json({ message: '성공적으로 수락하였습니다.' });
   } catch (err) {
@@ -565,6 +565,36 @@ async function postInviteLink(req, res, next) {
   }
 }
 
+async function getGroupPreviewWithInviteCode(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupInviteCodeSchema(req.params);
+    if (paramError) {
+      return next(new DataFormatError());
+    }
+
+    const { inviteCode } = req.params;
+    const group = await Group.findOne({ where: { inviteCode } });
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+
+    if (group.inviteExp < new Date()) {
+      return next(new ExpiredCodeError());
+    }
+
+    return res.status(200).json({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    });
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 async function postJoinGroupWithInviteCode(req, res, next) {
   try {
     const { error: paramError } = validateGroupJoinInviteCodeSchema(req.params);
@@ -590,7 +620,7 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
 
-    await sseGroupJoin(groupId, user);
+    await sseGroupJoin(group, user);
 
     return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
@@ -651,20 +681,40 @@ async function searchGroup(req, res, next) {
     }
 
     const { keyword } = req.query;
+    let { last_record_id: lastRecordId } = req.query;
 
-    const group = await Group.findAll({
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
+
+    const pageSize = 9;
+
+    let groups = await Group.findAll({
       where: {
         name: {
           [Op.like]: `%${keyword}%`,
         },
+        groupId: { [Sequelize.Op.lt]: lastRecordId },
       },
+      limit: pageSize,
+      order: [['groupId', 'DESC']],
     });
-
-    if (!group || group.length == 0) {
-      return next(new GroupNotFoundError());
+    let isEnd;
+    if (groups.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
     }
 
-    return res.status(200).json(group);
+    groups = groups.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    }));
+
+    return res.status(200).json({ isEnd, groups });
   } catch (err) {
     return next(new ApiError());
   }
@@ -685,6 +735,7 @@ module.exports = {
   postGroupJoinReject,
   getInviteLink,
   postInviteLink,
+  getGroupPreviewWithInviteCode,
   postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,

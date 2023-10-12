@@ -15,7 +15,6 @@ const {
 // Model
 const Group = require('../models/group');
 const Post = require('../models/post');
-const PostDetail = require('../models/postDetail');
 const Comment = require('../models/comment');
 const Like = require('../models/like');
 
@@ -29,7 +28,7 @@ const {
 // Validator
 const {
   validateGroupIdSchema,
-  validatePostSchema, validatePostIdSchema, validatePageSchema,
+  validatePostSchema, validatePostIdSchema,
   validateCommentSchema, validateCommentIdSchema, validateLastRecordIdSchema,
 } = require('../utils/validators');
 
@@ -59,15 +58,14 @@ async function postGroupPost(req, res, next) {
       throw (new EditPermissionError());
     }
 
-    const { title, content } = req.body;
-    const post = await Post.create({ author: req.nickname, title });
+    const { content } = req.body;
 
-    let postDetail;
+    let post;
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      postDetail = await post.createPostDetail({ content, image: fileUrl });
+      post = await Post.create({ author: req.nickname, content, image: fileUrl });
     } else {
-      postDetail = await post.createPostDetail({ content });
+      post = await Post.create({ author: req.nickname, content });
     }
 
     await user.addPosts(post);
@@ -76,10 +74,9 @@ async function postGroupPost(req, res, next) {
     const response = {
       ...{ message: '성공적으로 등록되었습니다.' },
       ...post.dataValues,
-      ...postDetail.dataValues,
     };
 
-    await sendGroupSSE(`새로운 그룹 피드가 올라왔습니다.(postId: ${post.postId})`, user, group.groupId);
+    await sendGroupSSE(`새로운 그룹 피드가 올라왔습니다.(postId: ${post.postId})`, user, group);
 
     return res.status(201).json(response);
   } catch (err) {
@@ -113,12 +110,10 @@ async function getSinglePost(req, res, next) {
       return next(new PostNotFoundError());
     }
 
-    const { title, author } = post;
-    const { content, image } = (await post.getPostDetail()).dataValues;
-
     const accessLevel = await getAccessLevel(user, group);
     const isMineValue = isMine(user, post);
     const { likesCount, isLikedValue } = (await isLike(user, post));
+    const commentCount = await post.countComments();
     return res.status(200).json({
       accessLevel,
       post: {
@@ -126,10 +121,10 @@ async function getSinglePost(req, res, next) {
         isMine: isMineValue,
         isLiked: isLikedValue,
         likesCount,
-        author,
-        title,
-        content,
-        image,
+        commentCount,
+        author: post.author,
+        content: post.content,
+        image: post.image,
       },
     });
   } catch (err) {
@@ -139,13 +134,14 @@ async function getSinglePost(req, res, next) {
 
 async function getGroupPosts(req, res, next) {
   try {
-    const { error: paramError } = validatePageSchema(req.params);
-    if (paramError) {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (paramError || queryError) {
       return next(new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }
@@ -162,12 +158,6 @@ async function getGroupPosts(req, res, next) {
         groupId,
         postId: { [Sequelize.Op.lt]: lastRecordId }, // ID가 지정한 ID보다 작은(더 오래된) 레코드 검색
       },
-      include: [
-        {
-          model: PostDetail,
-          as: 'postDetail',
-        },
-      ],
       limit: pageSize, // 원하는 개수만큼 데이터 가져오기
       order: [['createdAt', 'DESC']],
     });
@@ -182,16 +172,17 @@ async function getGroupPosts(req, res, next) {
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
         const { likesCount, isLikedValue } = (await isLike(user, post));
+        const commentCount = await post.countComments();
         return {
           postId: post.postId,
           isMine: isMineValue,
           isLiked: isLikedValue,
           likesCount,
-          title: post.title,
+          commentCount,
           author: post.author,
           createdAt: post.createdAt,
-          content: post.postDetail.content,
-          image: post.postDetail.image,
+          content: post.content,
+          image: post.image,
         };
       }),
     );
@@ -218,10 +209,9 @@ async function putGroupPost(req, res, next) {
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
-    const [group, post, postDetail] = await Promise.all([
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
-      PostDetail.findOne({ where: { postId } }),
     ]);
 
     if (!group) {
@@ -236,23 +226,21 @@ async function putGroupPost(req, res, next) {
       throw (new EditPermissionError());
     }
 
-    const { title, content } = req.body;
-    const modifiedPost = await post.update({ title });
+    const { content } = req.body;
 
-    const previousPostImages = postDetail.image?.split(', ');
+    const previousPostImages = post.image?.split(', ');
 
-    let modifiedDetail;
+    let modifiedPost;
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      modifiedDetail = await postDetail.update({ content, image: fileUrl });
+      modifiedPost = await post.update({ content, image: fileUrl });
     } else {
-      modifiedDetail = await postDetail.update({ content, image: null });
+      modifiedPost = await post.update({ content, image: null });
     }
     await deleteBucketImage(previousPostImages);
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedPost.dataValues,
-      ...modifiedDetail.dataValues,
     };
     return res.status(200).json(response);
   } catch (err) {
@@ -273,10 +261,9 @@ async function deleteGroupPost(req, res, next) {
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
-    const [group, post, postDetail] = await Promise.all([
+    const [group, post] = await Promise.all([
       Group.findByPk(groupId),
       Post.findByPk(postId),
-      PostDetail.findOne({ where: { postId } }),
     ]);
 
     if (!group) {
@@ -291,7 +278,7 @@ async function deleteGroupPost(req, res, next) {
     if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, post))) {
       return next(new EditPermissionError());
     }
-    const previousPostImage = postDetail.image?.split(', ');
+    const previousPostImage = post.image?.split(', ');
     await post.destroy();
 
     await deleteBucketImage(previousPostImage);
@@ -466,8 +453,8 @@ async function getSingleComment(req, res, next) {
     const { user } = req;
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
-      Comment.findByPk(commentId),
+      Post.findOne({ where: { postId, groupId } }),
+      Comment.findOne({ where: { commentId, postId } }),
     ]);
 
     if (!group) {
@@ -619,15 +606,15 @@ async function deleteComment(req, res, next) {
 
 async function getUserFeed(req, res, next) {
   try {
-    const { error: paramError } = validateLastRecordIdSchema(req.params);
-    if (paramError) {
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (queryError) {
       return next(new DataFormatError());
     }
 
     const { user } = req;
     const groups = (await user.getGroups()).map((group) => group.groupId);
 
-    let { last_record_id: lastRecordId } = req.params;
+    let { last_record_id: lastRecordId } = req.query;
     if (lastRecordId == 0) {
       lastRecordId = Number.MAX_SAFE_INTEGER;
     }
@@ -648,12 +635,6 @@ async function getUserFeed(req, res, next) {
           },
         ],
       },
-      include: [
-        {
-          model: PostDetail,
-          as: 'postDetail',
-        },
-      ],
       order: [['createdAt', 'DESC']],
       limit: pageSize,
     });
@@ -667,16 +648,19 @@ async function getUserFeed(req, res, next) {
       posts.map(async (post) => {
         const isMineValue = isMine(user, post);
         const { likesCount, isLikedValue } = (await isLike(user, post));
+        const commentCount = await post.countComments();
         return {
           postId: post.postId,
           groupId: post.groupId,
           isMine: isMineValue,
           isLiked: isLikedValue,
           likesCount,
+          commentCount,
           title: post.title,
           author: post.author,
           createdAt: post.createdAt,
-          content: post.postDetail.content,
+          content: post.content,
+          image: post.image,
         };
       }),
     );
