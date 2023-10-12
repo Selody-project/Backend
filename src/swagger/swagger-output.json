@@ -1970,7 +1970,6 @@
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
                           "commentCount": "댓글 개수",
-                          "title": "포스트 제목",
                           "content": "포스트 내용",
                           "createdAt": "생성 일자",
                           "image": "포스트 이미지 주소 배열"
@@ -1982,7 +1981,6 @@
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
                           "commentCount": "댓글 개수",
-                          "title": "포스트 제목",
                           "content": "포스트 내용",
                           "createdAt": "생성 일자",
                           "image": "포스트 이미지 주소 배열"
@@ -2038,7 +2036,7 @@
                   },
                   "data": {
                     "type": "string",
-                    "example": "{\"title\": \"test-title\", \"content\": \"test-content\"}"
+                    "example": "{\"content\": \"test-content\"}"
                   }
                 }
               }
@@ -2056,7 +2054,6 @@
                       "message": "성공적으로 등록되었습니다.",
                       "postId": "포스트 식별자",
                       "author": "작성자",
-                      "title": "포스트 제목",
                       "content": "포스트 내용",
                       "updatedAt": "마지막 업데이트 일자",
                       "createdAt": "생성 일자",
@@ -2117,7 +2114,6 @@
                         "likesCount": "좋아요 개수",
                         "commentCount": "댓글 개수",
                         "author": "작성자",
-                        "title": "포스트 제목",
                         "content": "포스트 내용",
                         "image": "포스트 이미지 주소 배열"
                       }
@@ -2177,7 +2173,7 @@
                   },
                   "data": {
                     "type": "string",
-                    "example": "{\"title\": \"modified-title\", \"content\": \"modified-content\"}"
+                    "example": "{\"content\": \"modified-content\"}"
                   }
                 }
               }
@@ -2197,7 +2193,6 @@
                       "groupId": "그룹 식별자",
                       "userId": "유저 식별자",
                       "author": "작성자",
-                      "title": "포스트 제목",
                       "content": "포스트 내용",
                       "image": "포스트 이미지 주소 배열",
                       "createdAt": "생성 일자",
@@ -2682,7 +2677,6 @@
                           "postId": "포스트 식별자",
                           "groupId": "그룹 식별자",
                           "author": "작성자",
-                          "title": "포스트 제목",
                           "content": "포스트 내용",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",
@@ -2694,7 +2688,6 @@
                           "postId": "포스트 식별자",
                           "groupId": "그룹 식별자",
                           "author": "작성자",
-                          "title": "포스트 제목",
                           "content": "포스트 내용",
                           "isLiked": "좋아요 여부",
                           "likesCount": "좋아요 개수",

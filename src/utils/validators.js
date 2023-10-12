@@ -78,13 +78,13 @@ const scheduleSchema = Joi.object({
   }),
   byweekday: Joi.when('freq', {
     is: 'WEEKLY',
-    then: Joi.array().items(Joi.number()).required(),
+    then: Joi.array().items(Joi.number().min(0).max(6)).required(),
     otherwise: Joi.valid(null).required(),
   }),
   until: Joi.when('recurrence', {
     is: 0,
     then: Joi.valid(null).required(),
-    otherwise: Joi.date().required(),
+    otherwise: Joi.date().allow(null).required(),
   }),
 });
 
@@ -104,7 +104,6 @@ const eventPoroposalSchema = Joi.object({
 });
 
 const postSchema = Joi.object({
-  title: Joi.string().max(45).required(),
   content: Joi.string().max(1000).required(),
 });
 
