@@ -354,7 +354,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["WE"],
+            byweekday: [3],
             isGroup: 0,
             startRecur: '2020-01-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -369,7 +369,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["WE"],
+            byweekday: [3],
             isGroup: 0,
             startRecur: '2020-01-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -384,7 +384,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["WE"],
+            byweekday: [3],
             isGroup: 0,
             startRecur: '2020-01-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -399,7 +399,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["WE"],
+            byweekday: [3],
             isGroup: 0,
             startRecur: '2020-01-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -429,7 +429,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -444,7 +444,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -459,7 +459,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -474,7 +474,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -489,7 +489,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -504,7 +504,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -519,7 +519,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -534,7 +534,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["MO", "TU"],
+            byweekday: [1, 2],
             isGroup: 0,
             startRecur: '2020-01-13T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -609,7 +609,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -624,7 +624,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -639,7 +639,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -654,7 +654,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -669,7 +669,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -684,7 +684,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -699,7 +699,7 @@ describe('Test /api/user endpoints', () => {
             recurrence: 1,
             freq: 'WEEKLY',
             interval: 1,
-            byweekday: ["SU"],
+            byweekday: [0],
             isGroup: 0,
             startRecur: '2020-03-15T12:00:00.000Z',
             endRecur: '2025-01-01T00:00:00.000Z'
@@ -870,7 +870,7 @@ describe('Test /api/user endpoints', () => {
           endRecur: '2026-01-05T00:00:00.000Z',
           isGroup: 0
         },
-        todaySchedule: [
+        todaySchedules: [
           {
             id: 1,
             userId: 1,
@@ -997,7 +997,7 @@ describe('Test /api/user endpoints', () => {
           until: null,
           isGroup: 0
         },
-        todaySchedule: [
+        todaySchedules: [
           {
             id: 25,
             userId: 1,
@@ -1064,7 +1064,7 @@ describe('Test /api/user endpoints', () => {
           endRecur: '2026-01-05T00:00:00.000Z',
           isGroup: 0
         },
-        todaySchedule: [
+        todaySchedules: [
           {
             id: 26,
             userId: 1,
