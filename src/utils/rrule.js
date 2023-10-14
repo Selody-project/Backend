@@ -60,14 +60,12 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
     delete response.scheduleSummary.title;
     delete response.scheduleSummary.content;
     if (requestStart < new Date(startDateTime.getTime() + scheduleLength)) {
-      // 일주일 이내 일정
-      if (startDateTime < sixDaysLater) {
-        response.schedulesForTheWeek.push({ ...schedule });
-      }
-
-      // 오늘 일정
       if (startDateTime < requestEnd) {
+        // 오늘 일정
         response.todaySchedules.push({ ...schedule });
+      } else if (startDateTime < sixDaysLater) {
+        // 일주일 이내 일정
+        response.schedulesForTheWeek.push({ ...schedule });
       }
     }
   } else { // 반복 일정인 경우
@@ -108,14 +106,11 @@ async function getScheduleResponse(requestStartDateTime, requestEndDateTime, sch
         if (scheduleEndTime >= requestStart) {
           schedule.startDateTime = scheduleStartTime;
           schedule.endDateTime = scheduleEndTime;
-
-          // 오늘 일정
           if (scheduleStartTime < requestEnd) {
+            // 오늘 일정
             response.todaySchedules.push({ ...schedule });
-          }
-
-          // 일주일 이내 일정
-          if (scheduleStartTime < sixDaysLater) {
+          } else if (scheduleStartTime < sixDaysLater) {
+            // 일주일 이내 일정
             response.schedulesForTheWeek.push({ ...schedule });
           }
         }
