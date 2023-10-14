@@ -14,7 +14,7 @@ const {
   DataFormatError, ApiError,
   UserNotFoundError, GroupNotFoundError,
   UnauthorizedError, ExpiredCodeError,
-  InvalidGroupJoinError, UserIsLeaderError, NoBanPermission,
+  InvalidGroupJoinError, UserIsLeaderError, NoBanPermission, EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -22,6 +22,7 @@ const {
   validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
+  validateGroupMemberSchema, validateAccessLevelSchema,
 } = require('../utils/validators');
 const { getAccessLevel } = require('../utils/accessLevel');
 
@@ -703,6 +704,60 @@ async function searchGroup(req, res, next) {
   }
 }
 
+async function patchUserAccessLevel(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupMemberSchema(req.params);
+    const { error: bodyError } = validateAccessLevelSchema(req.body);
+    if (paramError || bodyError) {
+      return next(new DataFormatError());
+    }
+
+    const { group_id: groupId, user_id: userId } = req.params;
+    const { user } = req;
+    const [group, member] = await Promise.all([
+      Group.findByPk(groupId),
+      User.findOne({
+        where: {
+          userId,
+        },
+        include: [
+          {
+            model: UserGroup,
+            attributes: ['userId', 'groupId', 'accessLevel'],
+            where: {
+              userId,
+              groupId,
+            },
+          },
+        ],
+      }),
+    ]);
+
+    if (!group) {
+      return next(new GroupNotFoundError());
+    }
+    if (!member) {
+      return next(new UserNotFoundError());
+    }
+
+    const userAccessLevel = await getAccessLevel(user, group);
+    if (userAccessLevel !== 'owner') {
+      return next(new EditPermissionError());
+    }
+
+    const { access_level: accessLevel } = req.body;
+    const userGroup = member.UserGroups[0];
+    if (userGroup) {
+      userGroup.accessLevel = accessLevel;
+      await userGroup.save();
+    }
+
+    return res.status(204).end();
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
 module.exports = {
   postGroup,
   getGroupList,
@@ -722,4 +777,5 @@ module.exports = {
   postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,
+  patchUserAccessLevel,
 };

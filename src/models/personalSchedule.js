@@ -27,11 +27,11 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: true,
       },
       startDateTime: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATE(3),
         allowNull: false,
       },
       endDateTime: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATE(3),
         allowNull: false,
       },
       recurrence: {
@@ -51,7 +51,7 @@ class PersonalSchedule extends Sequelize.Model {
         allowNull: true,
       },
       until: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATE(3),
         allowNull: true,
       },
     }, {

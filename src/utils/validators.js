@@ -154,6 +154,15 @@ const userIntroductionSchema = Joi.object({
   introduction: Joi.string().max(50).required(),
 });
 
+const groupMemberSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  user_id: Joi.number().min(0).required(),
+});
+
+const accessLevelSchema = Joi.object({
+  access_level: Joi.string().valid('viewer', 'regular', 'admin', 'owner').required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -180,4 +189,6 @@ module.exports = {
   validateGroupdSearchKeyword: validator(groupSearchKeywordSchema),
   validateUserSettingSchema: validator(userSettingSchema),
   validateUserIntroductionSchema: validator(userIntroductionSchema),
+  validateGroupMemberSchema: validator(groupMemberSchema),
+  validateAccessLevelSchema: validator(accessLevelSchema),
 };

@@ -961,6 +961,63 @@
         }
       }
     },
+    "/api/group/{group_id}/members/{user_id}/access-level": {
+      "patch": {
+        "description": "리더 권한을 가진 유저가 다른 멤버의 권한을 변경합니다.",
+        "summary": "그룹 멤버 권한 변경",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_level": {
+                    "type": "ENUM('viewer', 'regular', 'admin', 'owner')",
+                    "example": "regular"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/group/invite-link/{invite_code}": {
       "get": {
         "description": "초대 코드를 통해 해당 그룹의 정보를 불러옵니다.",
@@ -1247,7 +1304,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["TH"],
+                    "byweekday": [4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
@@ -1263,10 +1320,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","TH"],
+                    "byweekday": [1, 3, 4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                  "description": "요일 반복 일정 등록 예시입니다. 일월화수목금(0123456) 요일 반복 시에, freq는 WEEKLY 고정입니다. 정수형 배열로 보내주세요."
                 },
                 "recurrence4": {
                   "value": {
@@ -1693,7 +1750,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["TH"],
+                    "byweekday": [4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
@@ -1709,10 +1766,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","TH"],
+                    "byweekday": [1, 3, 4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                  "description": "요일 반복 일정 등록 예시입니다. 일월화수목금(0123456) 요일 반복 시에, freq는 WEEKLY 고정입니다. 정수형 배열로 보내주세요."
                 },
                 "recurrence4": {
                   "value": {
@@ -3244,7 +3301,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["TH"],
+                    "byweekday": [4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
@@ -3260,10 +3317,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","TH"],
+                    "byweekday": [1,3,4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                  "description": "요일 반복 일정 등록 예시입니다. 일월화수목금(0123456) 요일 반복 시에, freq는 WEEKLY 고정입니다. 정수형 배열로 보내주세요."
                 },
                 "recurrence4": {
                   "value": {
@@ -3610,7 +3667,7 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["TH"],
+                    "byweekday": [4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
                   "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
@@ -3626,10 +3683,10 @@
                     "recurrence": 1,
                     "freq": "WEEKLY",
                     "interval": 1,
-                    "byweekday": ["MO","WE","TH"],
+                    "byweekday": [1, 3, 4],
                     "until": "2099-02-01T00:00:00.000Z"
                   },
-                  "description": "요일 반복 일정 등록 예시입니다. [\"MO\",\"TU\",\"WE\",\"TH\",\"FR\",\"SA\",\"SU\"] 요일 반복 시에, freq는 WEEKLY 고정입니다. JSON 배열로 보내주세요."
+                  "description": "요일 반복 일정 등록 예시입니다. 일월화수목금(0123456) 요일 반복 시에, freq는 WEEKLY 고정입니다. 정수형 배열로 보내주세요."
                 },
                 "recurrence4": {
                   "value": {

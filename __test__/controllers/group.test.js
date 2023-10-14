@@ -9,6 +9,7 @@ const {
   setUpLikeDB, tearDownLikeDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
+const UserGroup = require('../../src/models/userGroup');
 
 // ./utils/cron.js 모듈을 모킹합니다.
 jest.mock('../../src/utils/cron', () => {
@@ -254,21 +255,6 @@ describe('Test /api/group endpoints', () => {
             groupId: 1,
             title: 'test-title',
             content: 'test-content',
-            startDateTime: '2023-05-06T00:00:00.000Z',
-            endDateTime: '2023-05-07T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
             startDateTime: '2023-05-07T00:00:00.000Z',
             endDateTime: '2023-05-08T00:00:00.000Z',
             recurrence: 1,
@@ -416,21 +402,6 @@ describe('Test /api/group endpoints', () => {
             groupId: 1,
             title: 'modified-title',
             content: 'modified-content',
-            startDateTime: '2023-05-06T00:00:00.000Z',
-            endDateTime: '2023-05-07T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
             startDateTime: '2023-05-07T00:00:00.000Z',
             endDateTime: '2023-05-08T00:00:00.000Z',
             recurrence: 1,
@@ -559,7 +530,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title1',
             content: 'test-content1',
             startDateTime: '2023-02-03T00:00:00.000Z',
-            endDateTime: '2023-05-15T23:59:59.000Z',
+            endDateTime: '2023-05-15T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -573,7 +544,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title2',
             content: 'test-content2',
             startDateTime: '2023-04-15T00:00:00.000Z',
-            endDateTime: '2023-04-30T23:59:59.000Z',
+            endDateTime: '2023-04-30T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -587,7 +558,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title1',
             content: 'test-content1',
             startDateTime: '2023-02-03T00:00:00.000Z',
-            endDateTime: '2023-05-15T23:59:59.000Z',
+            endDateTime: '2023-05-15T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -601,7 +572,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title2',
             content: 'test-content2',
             startDateTime: '2023-04-15T00:00:00.000Z',
-            endDateTime: '2023-04-30T23:59:59.000Z',
+            endDateTime: '2023-04-30T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -615,7 +586,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title4',
             content: 'test-content4',
             startDateTime: '2023-04-01T00:00:00.000Z',
-            endDateTime: '2023-04-30T23:59:59.000Z',
+            endDateTime: '2023-04-30T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -629,7 +600,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title5',
             content: 'test-content5',
             startDateTime: '2023-03-15T00:00:00.000Z',
-            endDateTime: '2023-04-30T23:59:59.000Z',
+            endDateTime: '2023-04-30T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -643,7 +614,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title6',
             content: 'test-content6',
             startDateTime: '2023-04-15T00:00:00.000Z',
-            endDateTime: '2023-05-15T23:59:59.000Z',
+            endDateTime: '2023-05-15T23:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -657,21 +628,7 @@ describe('Test /api/group endpoints', () => {
             title: 'test-title9',
             content: 'test-content9',
             startDateTime: '2023-03-15T00:00:00.000Z',
-            endDateTime: '2023-04-01T08:59:59.000Z',
-            recurrence: 0,
-            freq: null,
-            interval: null,
-            byweekday: null,
-            until: null,
-            isGroup: 1
-          },
-          {
-            id: 10,
-            groupId: 1,
-            title: 'test-title10',
-            content: 'test-content10',
-            startDateTime: '2023-04-30T23:59:59.000Z',
-            endDateTime: '2023-05-15T23:59:59.000Z',
+            endDateTime: '2023-04-01T08:59:59.999Z',
             recurrence: 0,
             freq: null,
             interval: null,
@@ -1164,14 +1121,14 @@ describe('Test /api/group endpoints', () => {
             groupId: 1,
             title: 'test-title21',
             content: 'test-content21',
-            startDateTime: '2023-04-30T23:59:59.000Z',
-            endDateTime: '2023-05-01T23:59:59.000Z',
+            startDateTime: '2023-04-30T23:59:59.999Z',
+            endDateTime: '2023-05-01T23:59:59.999Z',
             recurrence: 1,
             freq: 'MONTHLY',
             interval: 1,
             byweekday: null,
             isGroup: 1,
-            startRecur: '2020-04-30T23:59:59.000Z',
+            startRecur: '2020-04-30T23:59:59.999Z',
             endRecur: '2025-01-01T00:00:00.000Z'
           }
         ]
@@ -1347,7 +1304,7 @@ describe('Test /api/group endpoints', () => {
         schedule: {
           byweekday: null,
           content: 'test-content1',
-          endDateTime: '2023-05-15T23:59:59.000Z',
+          endDateTime: '2023-05-15T23:59:59.999Z',
           freq: null,
           groupId: 1,
           id: 1,
@@ -2306,6 +2263,60 @@ describe('Test /api/group endpoints', () => {
 
       expect(res.status).toEqual(409);
       expect(res.body).toEqual({ error: '이미 전달된 요청입니다. ' });
+    });
+  });
+
+  describe('Test PATCH /api/group/:group_id/members/:user_id/access-level', () => {
+    it('Successfully updated the access-level ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+
+      const accessLevel = (await UserGroup.findOne({ where: { userId, groupId } })).accessLevel;
+      expect(res.status).toEqual(204);
+      expect(accessLevel).toEqual('viewer');
+    });
+
+    it('Successfully failed to update the access-level (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (User Not Found) ', async () => {
+      const groupId = 3;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '유저를 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (Edit permission Error) ', async () => {
+      const groupId = 2;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 });

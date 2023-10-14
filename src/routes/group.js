@@ -11,6 +11,7 @@ const {
   getGroupPreviewWithInviteCode, postJoinGroupWithInviteCode,
   deleteGroupMember,
   searchGroup,
+  patchUserAccessLevel,
 } = require('../controllers/group');
 
 // Schedule
@@ -50,6 +51,7 @@ router.get('/invite-link/:inviteCode', getGroupPreviewWithInviteCode);
 router.get('/:group_id/join/invite-link', getInviteLink);
 router.post('/:group_id/join/invite-link', postInviteLink);
 router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
+router.patch('/:group_id/members/:user_id/access-level', patchUserAccessLevel);
 
 // Schedule
 router.post('/:group_id/calendar', postGroupSchedule);
