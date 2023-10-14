@@ -961,6 +961,63 @@
         }
       }
     },
+    "/api/group/{group_id}/members/{user_id}/access-level": {
+      "patch": {
+        "description": "리더 권한을 가진 유저가 다른 멤버의 권한을 변경합니다.",
+        "summary": "그룹 멤버 권한 변경",
+        "tags": ["Group"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "access_level": {
+                    "type": "ENUM('viewer', 'regular', 'admin', 'owner')",
+                    "example": "regular"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
     "/api/group/invite-link/{invite_code}": {
       "get": {
         "description": "초대 코드를 통해 해당 그룹의 정보를 불러옵니다.",
