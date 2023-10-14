@@ -9,6 +9,7 @@ const {
   setUpLikeDB, tearDownLikeDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
+const UserGroup = require('../../src/models/userGroup');
 
 // ./utils/cron.js 모듈을 모킹합니다.
 jest.mock('../../src/utils/cron', () => {
@@ -2262,6 +2263,60 @@ describe('Test /api/group endpoints', () => {
 
       expect(res.status).toEqual(409);
       expect(res.body).toEqual({ error: '이미 전달된 요청입니다. ' });
+    });
+  });
+
+  describe('Test PATCH /api/group/:group_id/members/:user_id/access-level', () => {
+    it('Successfully updated the access-level ', async () => {
+      const groupId = 1;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+
+      const accessLevel = (await UserGroup.findOne({ where: { userId, groupId } })).accessLevel;
+      expect(res.status).toEqual(204);
+      expect(accessLevel).toEqual('viewer');
+    });
+
+    it('Successfully failed to update the access-level (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (User Not Found) ', async () => {
+      const groupId = 3;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '유저를 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (Edit permission Error) ', async () => {
+      const groupId = 2;
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
+    });
+
+    it('Successfully failed to update the access-level (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const userId = 2;
+      const res = await request(app).patch(`/api/group/${groupId}/members/${userId}/access-level`).set('Cookie', cookie).send({
+        access_level: 'viewer'
+      });
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
 });
