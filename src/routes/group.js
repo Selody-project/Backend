@@ -17,8 +17,10 @@ const {
 // Schedule
 const {
   getGroupSchedule, getSingleGroupSchedule, getGroupScheduleSummary,
-  postGroupSchedule, putGroupSchedule, deleteGroupSchedule,
-  getEventProposal,
+  deleteGroupSchedule,
+  postScheduleProposal, getScheduleProposal, getScheduleProposalsList, deleteScheduleProposal,
+  postScheduleProposalVote, postScheduleProposalConfirm,
+  getScheduleProposals,
 } = require('../controllers/groupSchedule');
 
 // Feed
@@ -54,13 +56,19 @@ router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 router.patch('/:group_id/members/:user_id/access-level', patchUserAccessLevel);
 
 // Schedule
-router.post('/:group_id/calendar', postGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
 router.get('/:group_id/calendar/summary', getGroupScheduleSummary);
 router.get('/:group_id/calendar/:schedule_id', getSingleGroupSchedule);
-router.put('/:group_id/calendar/:schedule_id', putGroupSchedule);
 router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);
-router.get('/:group_id/proposal', getEventProposal);
+
+// Schedule Vote단일 일정 후보를 사용자가 직접 등록해서 CRUD
+router.post('/:group_id/proposal', postScheduleProposal);
+router.get('/:group_id/proposals', getScheduleProposals);
+router.get('/:group_id/proposal/list', getScheduleProposalsList);
+router.get('/:group_id/proposal/:proposal_id', getScheduleProposal);
+router.delete('/:group_id/proposal/:proposal_id', deleteScheduleProposal);
+router.post('/:group_id/proposal/:proposal_id/vote', postScheduleProposalVote);
+router.post('/:group_id/proposal/:proposal_id/confirm', postScheduleProposalConfirm);
 
 // Feed
 router.post('/:group_id/post', uploadPostMiddleware, postGroupPost);

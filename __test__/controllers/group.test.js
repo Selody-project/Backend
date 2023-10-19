@@ -202,304 +202,6 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test POST /api/group/:group_id/calendar', () => {
-    it('Group schedule creation successful ', async () => {
-      const groupId = 1;
-      const res = await request(app).post(`/api/group/${groupId}/calendar`).set('Cookie', cookie).send({
-        requestStartDateTime: '2023-05-05T12:00:00.000Z',
-        requestEndDateTime: '2023-05-06T12:00:00.000Z',
-        title: 'test-title',
-        content: 'test-content',
-        startDateTime: '2023-05-06T00:00:00.000Z',
-        endDateTime: '2023-05-07T00:00:00.000Z',
-        recurrence: 1,
-        freq: 'DAILY',
-        interval: 1,
-        byweekday: null,
-        until: '2026-01-05T00:00:00.000Z'
-      });
-      const expectedResult = {
-        scheduleSummary: {
-          id: 24,
-          groupId: 1,
-          startDateTime: '2023-05-06T00:00:00.000Z',
-          endDateTime: '2023-05-07T00:00:00.000Z',
-          recurrence: 1,
-          freq: 'DAILY',
-          interval: 1,
-          byweekday: null,
-          startRecur: '2023-05-06T00:00:00.000Z',
-          endRecur: '2026-01-05T00:00:00.000Z',
-          isGroup: 1
-        },
-        todaySchedules: [
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-06T00:00:00.000Z',
-            endDateTime: '2023-05-07T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          }
-        ],
-        schedulesForTheWeek: [
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-07T00:00:00.000Z',
-            endDateTime: '2023-05-08T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-08T00:00:00.000Z',
-            endDateTime: '2023-05-09T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-09T00:00:00.000Z',
-            endDateTime: '2023-05-10T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-10T00:00:00.000Z',
-            endDateTime: '2023-05-11T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-11T00:00:00.000Z',
-            endDateTime: '2023-05-12T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-12T00:00:00.000Z',
-            endDateTime: '2023-05-13T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          }
-        ]
-      };
-      expect(res.status).toEqual(201);
-      expect(res.body).toEqual(expectedResult);
-    });
-  });
-
-  describe('Test PUT /api/group/:group_id/calendar/:schedule_id', () => {
-    it('Group Schedule Modification Successful ', async () => {
-      const groupId = 1;
-      const scheduleId = 1;
-      const res = await request(app).put(`/api/group/${groupId}/calendar/${scheduleId}`).set('Cookie', cookie).send({
-        requestStartDateTime: '2023-05-05T12:00:00.000Z',
-        requestEndDateTime: '2023-05-06T12:00:00.000Z',
-        title: 'modified-title',
-        content: 'modified-content',
-        startDateTime: '2023-05-06T00:00:00.000Z',
-        endDateTime: '2023-05-07T00:00:00.000Z',
-        recurrence: 1,
-        freq: 'DAILY',
-        interval: 1,
-        byweekday: null,
-        until: '2026-01-05T00:00:00.000Z',
-      });
-
-      const expectedResult = {
-        scheduleSummary: {
-          id: 1,
-          groupId: 1,
-          startDateTime: '2023-05-06T00:00:00.000Z',
-          endDateTime: '2023-05-07T00:00:00.000Z',
-          recurrence: 1,
-          freq: 'DAILY',
-          interval: 1,
-          byweekday: null,
-          startRecur: '2023-05-06T00:00:00.000Z',
-          endRecur: '2026-01-05T00:00:00.000Z',
-          isGroup: 1
-        },
-        todaySchedules: [
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-06T00:00:00.000Z',
-            endDateTime: '2023-05-07T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          }
-        ],
-        schedulesForTheWeek: [
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-07T00:00:00.000Z',
-            endDateTime: '2023-05-08T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-08T00:00:00.000Z',
-            endDateTime: '2023-05-09T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-09T00:00:00.000Z',
-            endDateTime: '2023-05-10T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-10T00:00:00.000Z',
-            endDateTime: '2023-05-11T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-11T00:00:00.000Z',
-            endDateTime: '2023-05-12T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 1,
-            groupId: 1,
-            title: 'modified-title',
-            content: 'modified-content',
-            startDateTime: '2023-05-12T00:00:00.000Z',
-            endDateTime: '2023-05-13T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          }
-        ]
-      };
-
-      const modifiedSchedule = await GroupSchedule.findOne({
-        where: { title: 'modified-title', content: 'modified-content' },
-      });
-
-      expect(modifiedSchedule.id).toEqual(1);
-      expect(res.status).toEqual(201);
-      expect(res.body).toEqual(expectedResult);
-    });
-  });
-
   describe('Test DELETE /api/group/:group_id/calendar', () => {
     it('Group schedule deleted successfully ', async () => {
       const groupId = 1;
@@ -2320,3 +2022,150 @@ describe('Test /api/group endpoints', () => {
     });
   });
 });
+
+/*
+describe('Test POST /api/group/:group_id/calendar', () => {
+    it('Group schedule creation successful ', async () => {
+      const groupId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/calendar`).set('Cookie', cookie).send({
+        requestStartDateTime: '2023-05-05T12:00:00.000Z',
+        requestEndDateTime: '2023-05-06T12:00:00.000Z',
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'DAILY',
+        interval: 1,
+        byweekday: null,
+        until: '2026-01-05T00:00:00.000Z'
+      });
+      const expectedResult = {
+        scheduleSummary: {
+          id: 24,
+          groupId: 1,
+          startDateTime: '2023-05-06T00:00:00.000Z',
+          endDateTime: '2023-05-07T00:00:00.000Z',
+          recurrence: 1,
+          freq: 'DAILY',
+          interval: 1,
+          byweekday: null,
+          startRecur: '2023-05-06T00:00:00.000Z',
+          endRecur: '2026-01-05T00:00:00.000Z',
+          isGroup: 1
+        },
+        todaySchedules: [
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-06T00:00:00.000Z',
+            endDateTime: '2023-05-07T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          }
+        ],
+        schedulesForTheWeek: [
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-07T00:00:00.000Z',
+            endDateTime: '2023-05-08T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          },
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-08T00:00:00.000Z',
+            endDateTime: '2023-05-09T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          },
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-09T00:00:00.000Z',
+            endDateTime: '2023-05-10T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          },
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-10T00:00:00.000Z',
+            endDateTime: '2023-05-11T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          },
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-11T00:00:00.000Z',
+            endDateTime: '2023-05-12T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          },
+          {
+            id: 24,
+            groupId: 1,
+            title: 'test-title',
+            content: 'test-content',
+            startDateTime: '2023-05-12T00:00:00.000Z',
+            endDateTime: '2023-05-13T00:00:00.000Z',
+            recurrence: 1,
+            freq: 'DAILY',
+            interval: 1,
+            byweekday: null,
+            startRecur: '2023-05-06T00:00:00.000Z',
+            endRecur: '2026-01-05T00:00:00.000Z',
+            isGroup: 1
+          }
+        ]
+      };
+      expect(res.status).toEqual(201);
+      expect(res.body).toEqual(expectedResult);
+    });
+  });
+*/

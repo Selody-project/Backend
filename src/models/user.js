@@ -72,6 +72,10 @@ class User extends Sequelize.Model {
       foreignKey: 'userId',
       onDelete: 'cascade',
     });
+    db.User.hasMany(db.VoteResult, {
+      foreignKey: 'userId',
+      onDelete: 'cascade',
+    });
   }
 }
 
