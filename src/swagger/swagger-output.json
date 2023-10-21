@@ -495,7 +495,8 @@
                           "inviteCode": "그룹 초대 코드",
                           "inviteExp": "초대 코드 만료일",
                           "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
-                          "image": "그룹 대표 이미지 주소"
+                          "image": "그룹 대표 이미지 주소",
+                          "feedCount": "작성된 피드 개수"
                         },
                         "leaderInfo": {
                           "userId": "유저 식별자",
@@ -632,56 +633,6 @@
           },
           "404": {
             "description": "존재하지 않는 유저/그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}/info": {
-      "get": {
-        "description": "단일 그룹의 groupId, 그룹명, 소개, 멤버 수, 피드 갯수를 보여줍니다",
-        "summary": "단일 그룹 정보 조회",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공",
-            "content": {
-              "application/json": {
-                "examples": {
-                  "successExample": {
-                    "value": {
-                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
-                      "information": {
-                        "groupId": "그룹 식별자",
-                        "name": "그룹 이름",
-                        "description": "그룹 소개",
-                        "member": "멤버 수",
-                        "feed": "그룹 피드 개수"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"

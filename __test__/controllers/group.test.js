@@ -50,8 +50,8 @@ describe('Test /api/group endpoints', () => {
     await tearDownLikeDB();
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
-    //await tearDownVoteResultDB();
-    //await tearDownVoteDB();
+    await tearDownVoteResultDB();
+    await tearDownVoteDB();
     await tearDownGroupPostDB();
     await tearDownGroupDB();
   });
@@ -137,6 +137,7 @@ describe('Test /api/group endpoints', () => {
             member: 2,
             name: 'test-group1',
             image: 'groupImageLink',
+            feedCount: 8,
           },
           leaderInfo: {
             nickname: 'test-user1',

@@ -18,7 +18,7 @@ class VoteResult extends Sequelize.Model {
       timestamps: false,
       underscored: false,
       modelName: 'VoteResult',
-      tableName: 'votesResults',
+      tableName: 'voteResults',
       paranoid: false,
       charset: 'utf8',
       collate: 'utf8_general_ci',
