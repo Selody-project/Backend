@@ -467,7 +467,11 @@ async function postScheduleProposalConfirm(req, res, next) {
       until: pendingSchedule.until,
     });
 
-    await pendingSchedule.destroy();
+    await Vote.destroy({
+      where: {
+        groupId,
+      },
+    });
 
     const response = await getScheduleResponse(requestStartDateTime, requestEndDateTime, groupSchedule.dataValues, true);
 
@@ -529,7 +533,7 @@ async function getScheduleProposals(req, res, next) {
         || event.endDateTime.getTime() <= (start.getTime() + 1000 * 60 * 60 * 9)
     ));
     const sortedResult = filteredTimes.concat(remainingTimes);
-    proposal['proposals'] = sortedResult;
+    proposal.proposals = sortedResult;
 
     return res.status(200).json(proposal);
   } catch (err) {

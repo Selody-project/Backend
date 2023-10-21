@@ -1647,19 +1647,23 @@
             "name": "startDateTime",
             "in": "query",
             "required": true,
-            "type": "integer"
+            "type": "integer",
+            "example": "2099-01-01T12:00:00.000Z"
           },
           {
             "name": "endDateTime",
             "in": "query",
             "required": true,
-            "type": "integer"
+            "type": "integer",
+            "example": "2099-01-08T12:00:00.000Z"
           },
           {
             "name": "duration",
+            "description": "일정 최소 시간(minute)",
             "in": "query",
             "required": true,
-            "type": "integer"
+            "type": "integer",
+            "example": 60
           }
         ],
         "responses": {
@@ -1670,6 +1674,18 @@
                 "examples": {
                   "successExample": {
                     "value": {
+                      "proposals": [
+                        {
+                          "startDateTime": "추천 시작 시간",
+                          "endDateTime": "추천 종료 시간",
+                          "duration": "구간의 길이(분 단위)"
+                        },
+                        {
+                          "startDateTime": "추천 시작 시간",
+                          "endDateTime": "추천 종료 시간",
+                          "duration": "구간의 길이(분 단위)"
+                        }
+                      ]
                     }
                   }
                 }

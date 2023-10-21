@@ -15,7 +15,7 @@ class VoteResult extends Sequelize.Model {
       },
     }, {
       sequelize,
-      timestamps: true,
+      timestamps: false,
       underscored: false,
       modelName: 'VoteResult',
       tableName: 'votesResults',

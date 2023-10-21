@@ -7,6 +7,8 @@ const PersonalSchedule = require('../src/models/personalSchedule');
 const Post = require('../src/models/post');
 const Comment = require('../src/models/comment');
 const Like = require('../src/models/like');
+const Vote = require('../src/models/vote');
+const VoteResult = require('../src/models/voteResult');
 
 const mockUser = {
   email: 'test-user1@email.com',
@@ -451,6 +453,37 @@ async function setUpLikeDB() {
   ]);
 }
 
+async function setUpVoteDB() {
+  await Vote.bulkCreate([
+    {
+      voteId: 1, title: 'test-title1', content: 'test-content1', startDateTime: '2023-02-03T00:00:00.000Z', endDateTime: '2023-05-15T23:59:59.999Z', recurrence: 0, groupId: 1, votingEndDate: '2023-12-01T00:00:00.000Z',
+    },
+    {
+      voteId: 2, title: 'test-title2', content: 'test-content2', startDateTime: '2023-04-15T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0, groupId: 1, votingEndDate: '2023-12-01T00:00:00.000Z',
+    },
+    {
+      voteId: 3, title: 'test-title3', content: 'test-content3', startDateTime: '2023-04-10T00:00:00.000Z', endDateTime: '2023-04-15T23:59:59.999Z', recurrence: 0, groupId: 1, votingEndDate: '2023-12-01T00:00:00.000Z',
+    },
+    {
+      voteId: 4, title: 'test-title4', content: 'test-content4', startDateTime: '2023-04-01T00:00:00.000Z', endDateTime: '2023-04-30T23:59:59.999Z', recurrence: 0, groupId: 1, votingEndDate: '2023-12-01T00:00:00.000Z',
+    },
+  ]);
+}
+
+async function setUpVoteResultDB() {
+  await VoteResult.bulkCreate([
+    {
+      resultId: 1, choice: true, userId: 1, voteId: 1,
+    },
+    {
+      resultId: 2, choice: true, userId: 1, voteId: 2,
+    },
+    {
+      resultId: 3, choice: true, userId: 1, voteId:3,
+    },
+  ]);
+}
+
 async function tearDownUserDB() {
   await db.sequelize.query('DELETE FROM users');
 }
@@ -476,6 +509,14 @@ async function tearDownLikeDB() {
   await db.sequelize.query('DELETE FROM `like`');
 }
 
+async function tearDownVoteDB() {
+  await db.sequelize.query('DELETE FROM votes');
+}
+
+async function tearDownVoteResultDB() {
+  await db.sequelize.query('DELETE FROM voteResults');
+}
+
 module.exports = {
   db,
   mockUser,
@@ -487,12 +528,16 @@ module.exports = {
   setUpGroupScheduleDB2,
   setUpGroupPostDB,
   setUpLikeDB,
+  setUpVoteDB,
+  setUpVoteResultDB,
   tearDownUserDB,
   tearDownGroupDB,
   tearDownGroupScheduleDB,
   tearDownPersonalScheduleDB,
   tearDownGroupPostDB,
   tearDownLikeDB,
+  tearDownVoteDB,
+  tearDownVoteResultDB,
   syncDB,
   dropDB,
 };

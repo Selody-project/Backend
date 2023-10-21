@@ -98,9 +98,9 @@ const groupScheduleIdSchema = Joi.object({
 });
 
 const eventPoroposalSchema = Joi.object({
-  date1: Joi.date().min(getCurrentTime()).required(),
-  date2: Joi.date().min(getCurrentTime()),
-  date3: Joi.date().min(getCurrentTime()),
+  startDateTime: Joi.date().min(getCurrentTime()).required(),
+  endDateTime: Joi.date().min(getCurrentTime() + 60000).required(),
+  duration: Joi.number().min(0).required(),
 });
 
 const postSchema = Joi.object({
@@ -193,7 +193,7 @@ const scheduleProposalIdSchema = Joi.object({
 });
 
 const voteSchema = Joi.object({
-  attendance: Joi.boolean().valid(true, false).required(),
+  attendance: Joi.boolean().allow(1, 0, true, false).required(),
 });
 
 const groupSchedultConfirmSchema = Joi.object({

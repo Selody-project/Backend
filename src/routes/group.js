@@ -67,6 +67,7 @@ router.get('/:group_id/proposals', getScheduleProposals);
 router.get('/:group_id/proposal/list', getScheduleProposalsList);
 router.get('/:group_id/proposal/:proposal_id', getScheduleProposal);
 router.delete('/:group_id/proposal/:proposal_id', deleteScheduleProposal);
+
 router.post('/:group_id/proposal/:proposal_id/vote', postScheduleProposalVote);
 router.post('/:group_id/proposal/:proposal_id/confirm', postScheduleProposalConfirm);
 

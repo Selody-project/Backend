@@ -1,15 +1,15 @@
 const request = require('supertest');
 const app = require('../../src/app');
-const GroupSchedule = require('../../src/models/groupSchedule');
 const {
   db, syncDB, dropDB,
-  tearDownGroupDB, tearDownGroupScheduleDB,
-  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, tearDownPersonalScheduleDB,
+  tearDownGroupDB, tearDownGroupScheduleDB, tearDownPersonalScheduleDB,
+  setUpGroupDB, setUpGroupScheduleDB, setUpUserDB, setUpVoteDB, setUpVoteResultDB,
   setUpPersonalScheduleDB2, setUpGroupPostDB, tearDownGroupPostDB,
-  setUpLikeDB, tearDownLikeDB,
+  setUpLikeDB, tearDownLikeDB, tearDownVoteDB, tearDownVoteResultDB,
 } = require('../dbSetup');
 const Group = require('../../src/models/group');
 const UserGroup = require('../../src/models/userGroup');
+const VoteResult = require('../../src/models/voteResult');
 
 // ./utils/cron.js 모듈을 모킹합니다.
 jest.mock('../../src/utils/cron', () => {
@@ -42,12 +42,16 @@ describe('Test /api/group endpoints', () => {
     await setUpGroupScheduleDB();
     await setUpGroupPostDB();
     await setUpLikeDB();
+    await setUpVoteDB();
+    await setUpVoteResultDB();
   });
 
   afterEach(async () => {
     await tearDownLikeDB();
     await tearDownPersonalScheduleDB();
     await tearDownGroupScheduleDB();
+    //await tearDownVoteResultDB();
+    //await tearDownVoteDB();
     await tearDownGroupPostDB();
     await tearDownGroupDB();
   });
@@ -950,49 +954,6 @@ describe('Test /api/group endpoints', () => {
       const res = (await request(app).post(`/api/group/${groupId}/join/${inviteCode}`).set('Cookie', cookie));
       expect(res.status).toEqual(403);
       expect(res.body).toEqual({ error: '이미 가입된 그룹입니다.' });
-    });
-  });
-
-  describe('Test GET /api/group/:group_id/proposal', () => {
-    it('Successfully get a list of Event', async () => {
-      const id = 1;
-      const date1 = '2023-04-15T00:00:00.000Z';
-      const date2 = '2030-04-16T00:00:00.000Z';
-      const date3 = '2000-04-01T00:00:00.000Z';
-      const res = await request(app).get(`/api/group/${id}/proposal`).set('Cookie', cookie).query({
-        date1,
-        date2,
-        date3,
-      });
-      const expectedProposal = {
-        '2023-04-15T00:00:00.000Z': [],
-        '2030-04-16T00:00:00.000Z': [
-          {
-            startDateTime: '2030-04-16T00:00:00.000Z',
-            endDateTime: '2030-04-16T23:59:59.000Z',
-            duration: 1440,
-          },
-        ],
-        '2000-04-01T00:00:00.000Z': [
-          {
-            startDateTime: '2000-04-01T09:30:00.000Z',
-            endDateTime: '2000-04-01T13:00:00.000Z',
-            duration: 210,
-          },
-          {
-            startDateTime: '2000-04-01T18:00:00.000Z',
-            endDateTime: '2000-04-01T23:59:59.000Z',
-            duration: 360,
-          },
-          {
-            startDateTime: '2000-04-01T00:00:00.000Z',
-            endDateTime: '2000-04-01T08:00:00.000Z',
-            duration: 480,
-          },
-        ],
-      };
-      expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedProposal);
     });
   });
 
@@ -2021,15 +1982,11 @@ describe('Test /api/group endpoints', () => {
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
     });
   });
-});
 
-/*
-describe('Test POST /api/group/:group_id/calendar', () => {
-    it('Group schedule creation successful ', async () => {
+  describe('Test POST /api/group/:group_id/proposal', () => {
+    it('Successfully created a Schedule proposal', async () => {
       const groupId = 1;
-      const res = await request(app).post(`/api/group/${groupId}/calendar`).set('Cookie', cookie).send({
-        requestStartDateTime: '2023-05-05T12:00:00.000Z',
-        requestEndDateTime: '2023-05-06T12:00:00.000Z',
+      const res = await request(app).post(`/api/group/${groupId}/proposal`).set('Cookie', cookie).send({
         title: 'test-title',
         content: 'test-content',
         startDateTime: '2023-05-06T00:00:00.000Z',
@@ -2040,132 +1997,417 @@ describe('Test POST /api/group/:group_id/calendar', () => {
         byweekday: null,
         until: '2026-01-05T00:00:00.000Z'
       });
+      const expectedProposal = {
+        voteId: 5,
+        groupId: 1,
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'DAILY',
+        interval: 1,
+        byweekday: null,
+        until: '2026-01-05T00:00:00.000Z',
+      };
+
+      const result = {
+        voteId: res.body.voteId,
+        groupId: res.body.groupId,
+        title: res.body.title,
+        content: res.body.content,
+        startDateTime: res.body.startDateTime,
+        endDateTime: res.body.endDateTime,
+        recurrence: res.body.recurrence,
+        freq: res.body.freq,
+        interval: res.body.interval,
+        byweekday: res.body.byweekday,
+        until: res.body.until,
+      };
+
+      expect(res.status).toEqual(200);
+      expect(result).toEqual(expectedProposal);
+    });
+
+    it('Successfully failed to create a Schedule proposal (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const res = await request(app).post(`/api/group/${groupId}/proposal`).set('Cookie', cookie).send({
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'DAILY',
+        interval: 1,
+        byweekday: null,
+        until: '2026-01-05T00:00:00.000Z'
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to create a Schedule proposal (Edit permission Error) ', async () => {
+      const groupId = 2;
+      const res = await request(app).post(`/api/group/${groupId}/proposal`).set('Cookie', cookie).send({
+        title: 'test-title',
+        content: 'test-content',
+        startDateTime: '2023-05-06T00:00:00.000Z',
+        endDateTime: '2023-05-07T00:00:00.000Z',
+        recurrence: 1,
+        freq: 'DAILY',
+        interval: 1,
+        byweekday: null,
+        until: '2026-01-05T00:00:00.000Z'
+      });
+      expect(res.status).toEqual(403);
+      expect(res.body).toEqual({ error: '수정할 권한이 없습니다.' });
+    });
+
+    it('Successfully failed to create a Schedule proposal (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal`).set('Cookie', cookie).send({
+        isWrongKeyValue: '2023-05-05T12:00:00.000Z',
+      });
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '\"title\" is required'});
+    });
+  });
+
+  describe('Test GET /api/group/:group_id/proposals', () => {
+    it('Successfully get a list of Event', async () => {
+      const groupId = 1;
+      const startDateTime = '2000-04-01T00:00:00.000Z';
+      const endDateTime = '2000-04-02T00:00:00.000Z';
+      const duration = 211;
+      const res = await request(app).get(`/api/group/${groupId}/proposals`).set('Cookie', cookie).query({
+        startDateTime,
+        endDateTime,
+        duration,
+      });
+      const expectedProposal = {
+        proposals: [
+          {
+            startDateTime: '2000-04-01T18:00:00.000Z',
+            endDateTime: '2000-04-02T00:00:00.000Z',
+            duration: 360,
+          },
+          {
+            startDateTime: '2000-04-01T00:00:00.000Z',
+            endDateTime: '2000-04-01T08:00:00.000Z',
+            duration: 480,
+          },
+        ],
+      };
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedProposal);
+    });
+  });
+
+  describe('Test GET /api/group/:group_id/proposal/list', () => {
+    it('Successfully retrieve the proposal list', async () => {
+      const groupId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/proposal/list`).set('Cookie', cookie);
+      const expectedProposal =  [
+        {
+          voteId:1,
+          title: 'test-title1',
+          content: 'test-content1',
+          startDateTime: '2023-02-03T00:00:00.000Z',
+          endDateTime: '2023-05-15T23:59:59.999Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
+          byweekday: null,
+          until: null,
+          votingEndDate: '2023-12-01T00:00:00.000Z',
+          groupId: 1,
+          votesCount:1,
+          voteResults: [
+            {
+              userId: 1,
+              choice: 1,
+              User: {
+                nickname: 'test-user1',
+                profileImage: 'profileImageLink'
+              }
+            }
+          ]
+        },
+        {
+          voteId: 2,
+          title: 'test-title2',
+          content: 'test-content2',
+          startDateTime: '2023-04-15T00:00:00.000Z',
+          endDateTime: '2023-04-30T23:59:59.999Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
+          byweekday: null,
+          until: null,
+          votingEndDate: '2023-12-01T00:00:00.000Z', 
+          groupId: 1,
+          votesCount: 1,
+          voteResults: [
+            {
+              userId: 1,
+              choice: 1,
+              User: {
+                nickname: 'test-user1',
+                profileImage: 'profileImageLink'
+              }
+            }
+          ]
+        },
+        {
+          voteId: 3, 
+          title: 'test-title3',
+          content: 'test-content3',
+          startDateTime: '2023-04-10T00:00:00.000Z',
+          endDateTime: '2023-04-15T23:59:59.999Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
+          byweekday: null,
+          until: null,
+          votingEndDate: '2023-12-01T00:00:00.000Z',
+          groupId: 1,
+          votesCount: 1,
+          voteResults: [
+            {
+              userId: 1,
+              choice: 1,
+              User: {
+                nickname: 'test-user1',
+                profileImage: 'profileImageLink'
+              }
+            }
+          ]
+        },
+        {
+          voteId: 4,
+          title: 'test-title4',
+          content: 'test-content4',
+          startDateTime: '2023-04-01T00:00:00.000Z',
+          endDateTime: '2023-04-30T23:59:59.999Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
+          byweekday: null,
+          until: null,
+          votingEndDate: '2023-12-01T00:00:00.000Z',
+          groupId: 1,
+          votesCount: 0,
+          voteResults: []
+        }
+      ]
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedProposal);
+    });
+
+    it('Successfully failed to retrieve a proposal list (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const res = await request(app).get(`/api/group/${groupId}/proposal/list`).set('Cookie', cookie);
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to retrieve a proposal list (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const res = await request(app).get(`/api/group/${groupId}/proposal/list`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
+  });
+
+  describe('Test GET /api/group/:group_id/proposal/:proposal_id', () => {
+    it('Successfully retrieved a proposal', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      const expectedProposal = {
+        byweekday: null,
+        content: 'test-content1',
+        endDateTime: '2023-05-15T23:59:59.999Z',
+        freq: null,
+        groupId: 1,
+        interval: null,
+        recurrence: 0,
+        startDateTime: '2023-02-03T00:00:00.000Z',
+        title: 'test-title1',
+        until: null,
+        voteId: 1,
+        votingEndDate: '2023-12-01T00:00:00.000Z',
+      };
+
+      const result = {
+        voteId: res.body.voteId,
+        groupId: res.body.groupId,
+        title: res.body.title,
+        content: res.body.content,
+        startDateTime: res.body.startDateTime,
+        endDateTime: res.body.endDateTime,
+        recurrence: res.body.recurrence,
+        freq: res.body.freq,
+        interval: res.body.interval,
+        byweekday: res.body.byweekday,
+        until: res.body.until,
+        votingEndDate: res.body.votingEndDate,
+      };
+
+      expect(res.status).toEqual(200);
+      expect(result).toEqual(expectedProposal);
+    });
+
+    it('Successfully failed to retrieve a proposal (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const proposalId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to ritrieve a proposal (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const proposalId = 1;
+      const res = await request(app).get(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
+  });
+
+  describe('Test DELETE /api/group/:group_id/proposal/:proposal_id', () => {
+    it('Successfully deleted a proposal', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const res = await request(app).delete(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      expect(res.status).toEqual(204);
+    });
+
+    it('Successfully failed to delete a proposal (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const proposalId = 1;
+      const res = await request(app).delete(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to delete a proposal (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const proposalId = 1;
+      const res = await request(app).delete(`/api/group/${groupId}/proposal/${proposalId}`).set('Cookie', cookie);
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/proposal/:proposal_id/vote', () => {
+    it('Successfully voted on a proposal', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const attendance = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/vote`).set('Cookie', cookie).send({
+        attendance,
+      });
+      const voteResult = await VoteResult.findOne({ where: { userId: 1, voteId: proposalId }});
+
+      expect(res.status).toEqual(200);
+      expect(voteResult.dataValues).toEqual({
+        resultId: 1,
+        choice: attendance,
+        userId: 1,
+        voteId: proposalId
+      })
+    });
+
+    it('Successfully failed to vote on a proposal (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const proposalId = 1;
+      const attendance = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/vote`).set('Cookie', cookie).send({
+        attendance,
+      });;
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to vote on a proposal (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const attendance = 'isWrongString';
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/vote`).set('Cookie', cookie).send({
+        attendance,
+      });
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
+  });
+
+  describe('Test POST /api/group/:group_id/proposal/:proposal_id/confirm', () => {
+    it('Successfully created a schedule', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/confirm`).set('Cookie', cookie).send({
+        requestStartDateTime: '2023-05-05T12:00:00.000Z',
+        requestEndDateTime: '2023-05-06T12:00:00.000Z',
+      });
       const expectedResult = {
         scheduleSummary: {
           id: 24,
           groupId: 1,
-          startDateTime: '2023-05-06T00:00:00.000Z',
-          endDateTime: '2023-05-07T00:00:00.000Z',
-          recurrence: 1,
-          freq: 'DAILY',
-          interval: 1,
+          startDateTime: '2023-02-03T00:00:00.000Z',
+          endDateTime: '2023-05-15T23:59:59.999Z',
+          recurrence: 0,
+          freq: null,
+          interval: null,
           byweekday: null,
-          startRecur: '2023-05-06T00:00:00.000Z',
-          endRecur: '2026-01-05T00:00:00.000Z',
+          until: null,
           isGroup: 1
         },
         todaySchedules: [
           {
             id: 24,
             groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-06T00:00:00.000Z',
-            endDateTime: '2023-05-07T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
+            title: 'test-title1',
+            content: 'test-content1',
+            startDateTime: '2023-02-03T00:00:00.000Z',
+            endDateTime: '2023-05-15T23:59:59.999Z',
+            recurrence: 0,
+            freq: null,
+            interval: null,
             byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
+            until: null,
             isGroup: 1
           }
         ],
-        schedulesForTheWeek: [
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-07T00:00:00.000Z',
-            endDateTime: '2023-05-08T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-08T00:00:00.000Z',
-            endDateTime: '2023-05-09T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-09T00:00:00.000Z',
-            endDateTime: '2023-05-10T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-10T00:00:00.000Z',
-            endDateTime: '2023-05-11T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-11T00:00:00.000Z',
-            endDateTime: '2023-05-12T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          },
-          {
-            id: 24,
-            groupId: 1,
-            title: 'test-title',
-            content: 'test-content',
-            startDateTime: '2023-05-12T00:00:00.000Z',
-            endDateTime: '2023-05-13T00:00:00.000Z',
-            recurrence: 1,
-            freq: 'DAILY',
-            interval: 1,
-            byweekday: null,
-            startRecur: '2023-05-06T00:00:00.000Z',
-            endRecur: '2026-01-05T00:00:00.000Z',
-            isGroup: 1
-          }
-        ]
+        schedulesForTheWeek: []
       };
       expect(res.status).toEqual(201);
       expect(res.body).toEqual(expectedResult);
     });
+
+    it('Successfully failed to create a schedule (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const proposalId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/confirm`).set('Cookie', cookie).send({
+        requestStartDateTime: '2023-05-05T12:00:00.000Z',
+        requestEndDateTime: '2023-05-06T12:00:00.000Z',
+      });
+
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to create a schedule (DataFormat Error) ', async () => {
+      const groupId = 1;
+      const proposalId = 1;
+      const res = await request(app).post(`/api/group/${groupId}/proposal/${proposalId}/confirm`).set('Cookie', cookie).send({
+        requestStartDateTime: '2023-05-05T12:00:00.000Z',
+        requestEndDateTime: '2023-05-06T12:00:00.000Z',
+        isWrongKeyValue: 'isWrongString',
+      });
+
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
   });
-*/
+});
