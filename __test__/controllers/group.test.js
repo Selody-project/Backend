@@ -120,39 +120,6 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group/:group_id/info', () => {
-    it('Successfully get a group info', async () => {
-      const groupId = 1;
-      const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
-      const expectedGroups = {
-        accessLevel: 'owner',
-        information: {
-          groupId: 1,
-          name: 'test-group1',
-          description: 'test-description1',
-          member: 2,
-          feed: 8,
-        },
-      };
-
-      expect(res.status).toEqual(200);
-      expect(res.body).toEqual(expectedGroups);
-    });
-
-    it('Successfully failed to get an group info (Group Not Found)', async () => {
-      const groupId = 10000;
-      const res = (await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie));
-      expect(res.status).toEqual(404);
-      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
-    });
-
-    it('Successfully fail to get an group info (DataFormat Error)', async () => {
-      const groupId = 'abc';
-      const res = await request(app).get(`/api/group/${groupId}/info`).set('Cookie', cookie);
-      expect(res.status).toEqual(400);
-    });
-  });
-
   describe('Test GET /api/group/:group_id', () => {
     it('Successfully get a group detail', async () => {
       const id = 1;

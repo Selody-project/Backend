@@ -70,35 +70,6 @@ async function postGroup(req, res, next) {
   }
 }
 
-async function getGroupInfo(req, res, next) {
-  try {
-    const { error } = validateGroupIdSchema(req.params);
-    if (error) return next(new DataFormatError());
-
-    const { group_id: groupId } = req.params;
-    const { user } = req;
-    const group = await Group.findByPk(groupId);
-
-    if (!group) {
-      return next(new GroupNotFoundError());
-    }
-
-    const feedCount = await Post.count({ where: { groupId } });
-    const accessLevel = await getAccessLevel(user, group);
-    const information = {
-      groupId: group.groupId,
-      name: group.name,
-      description: group.description,
-      member: group.member,
-      feed: feedCount,
-    };
-
-    return res.status(200).json({ accessLevel, information });
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
 async function getGroupDetail(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
@@ -114,6 +85,7 @@ async function getGroupDetail(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
+    group.dataValues.feedCount = await Post.count({ where: { groupId } });
     const accessLevel = await getAccessLevel(user, group);
 
     const memberInfo = [];
@@ -131,8 +103,8 @@ async function getGroupDetail(req, res, next) {
       }
       memberInfo.push({ userId, nickname });
     });
-
-    return res.status(200).json({ accessLevel, information: { group, leaderInfo, memberInfo } });
+    const response = { accessLevel, information: { group, leaderInfo, memberInfo } };
+    return res.status(200).json(response);
   } catch (err) {
     return next(new ApiError());
   }
@@ -761,7 +733,6 @@ async function patchUserAccessLevel(req, res, next) {
 module.exports = {
   postGroup,
   getGroupList,
-  getGroupInfo,
   getGroupDetail,
   deleteGroup,
   putGroup,
