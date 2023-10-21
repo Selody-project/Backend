@@ -93,7 +93,7 @@ async function getSinglePost(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
+      Post.findOne({ where: { groupId, postId } }),
     ]);
 
     if (!group) {
@@ -205,7 +205,7 @@ async function putGroupPost(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
+      Post.findOne({ where: { groupId, postId } }),
     ]);
 
     if (!group) {
@@ -257,7 +257,7 @@ async function deleteGroupPost(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
+      Post.findOne({ where: { groupId, postId } }),
     ]);
 
     if (!group) {
@@ -295,7 +295,7 @@ async function postGroupPostLike(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId, { transaction }),
-      Post.findByPk(postId, { transaction }),
+      Post.findOne({ where: { groupId, postId }, transaction }),
     ]);
 
     if (!group) {
@@ -352,7 +352,7 @@ async function deleteGroupPostLike(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId, { transaction }),
-      Post.findByPk(postId, { transaction }),
+      Post.findOne({ where: { groupId, postId }, transaction }),
     ]);
 
     if (!group) {
@@ -406,7 +406,7 @@ async function postComment(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
+      Post.findOne({ where: { groupId, postId } }),
     ]);
 
     if (!group) {
@@ -483,7 +483,7 @@ async function getPostComment(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
+      Post.findOne({ where: { groupId, postId } }),
     ]);
 
     if (!group) {
@@ -525,8 +525,8 @@ async function putComment(req, res, next) {
     const { user } = req;
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
-      Comment.findByPk(commentId),
+      Post.findOne({ where: { groupId, postId } }),
+      Comment.findOne({ where: { postId, commentId } }),
     ]);
 
     if (!group) {
@@ -569,8 +569,8 @@ async function deleteComment(req, res, next) {
     const { user } = req;
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findByPk(postId),
-      Comment.findByPk(commentId),
+      Post.findOne({ where: { groupId, postId } }),
+      Comment.findOne({ where: { postId, commentId } }),
     ]);
 
     if (!group) {

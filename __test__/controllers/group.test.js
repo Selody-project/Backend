@@ -978,7 +978,7 @@ describe('Test /api/group endpoints', () => {
         content: 'testContent',
         image: null,
         message: '성공적으로 등록되었습니다.',
-        postId: 11,
+        postId: 12,
       };
       delete res.body.updatedAt;
       delete res.body.createdAt;
@@ -1825,7 +1825,7 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to create a Like (Edit Permission Error) ', async () => {
       const groupId = 3;
-      const postId = 10;
+      const postId = 11;
       const res = await request(app).post(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(403);
@@ -1880,7 +1880,7 @@ describe('Test /api/group endpoints', () => {
 
     it('Successfully failed to delete a Like (Edit Permission Error) ', async () => {
       const groupId = 3;
-      const postId = 10;
+      const postId = 11;
       const res = await request(app).delete(`/api/group/${groupId}/post/${postId}/like`).set('Cookie', cookie);
 
       expect(res.status).toEqual(403);

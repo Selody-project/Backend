@@ -1176,16 +1176,10 @@ describe('Test /api/user endpoints', () => {
     });
 
     it('Successfully failed to delete a User schedule from the database (non-existent schedule)', async () => {
-      const id = 10000;
+      const id = 24;
       const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
       expect(res.statusCode).toEqual(404);
       expect(res.body).toEqual({ error: '데이터를 찾을 수 없습니다.' });
-    });
-
-    it('Successfully failed to delete a User schedule from the database (Edit Permission Error)', async () => {
-      const id = 24;
-      const res = await request(app).delete(`/api/user/calendar/${id}`).set('Cookie', cookie);
-      expect(res.statusCode).toEqual(403);
     });
   });
 

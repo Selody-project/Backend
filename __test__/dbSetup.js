@@ -426,6 +426,9 @@ async function setUpGroupPostDB() {
     {
       postId: 10, userId: 1, groupId: 1, author: 'test-user1', content: 'test-content10', image: 'postImage',
     },
+    {
+      postId: 11, userId: 5, groupId: 3, author: 'test-user5', content: 'test-content11', image: 'postImage',
+    },
   ]);
 
   await Comment.bulkCreate([
