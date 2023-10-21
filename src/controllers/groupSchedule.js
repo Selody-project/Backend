@@ -164,7 +164,7 @@ async function deleteGroupSchedule(req, res, next) {
     const { user } = req;
     const [group, schedule] = await Promise.all([
       Group.findByPk(groupId),
-      GroupSchedule.findByPk(scheduleId),
+      GroupSchedule.findOne({ where: { groupId, id: scheduleId } }),
     ]);
 
     if (!group) {
@@ -250,12 +250,7 @@ async function getScheduleProposal(req, res, next) {
     const { group_id: groupId, proposal_id: proposalId } = req.params;
     const [group, pendingSchedule] = await Promise.all([
       Group.findByPk(groupId),
-      Vote.findOne({
-        where: {
-          groupId,
-          voteId: proposalId,
-        },
-      }),
+      Vote.findOne({ where: { groupId, voteId: proposalId } }),
     ]);
 
     if (!group) {

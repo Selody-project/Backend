@@ -1,5 +1,4 @@
 const moment = require('moment');
-const { isMine } = require('../utils/accessLevel');
 const { getScheduleResponse } = require('../utils/rrule');
 
 // Model
@@ -10,7 +9,6 @@ const GroupSchedule = require('../models/groupSchedule');
 const {
   ApiError, DataFormatError,
   ScheduleNotFoundError, NotFoundError,
-  EditPermissionError,
 } = require('../errors');
 
 // Validator
@@ -63,14 +61,10 @@ async function getSingleUserSchedule(req, res, next) {
 
     const { schedule_id: scheduleId } = req.params;
     const { user } = req;
-    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
-    }
-
-    if (!isMine(user, schedule)) {
-      return next(new EditPermissionError());
     }
 
     return res.status(200).json(schedule);
@@ -177,14 +171,10 @@ async function putPersonalSchedule(req, res, next) {
 
     const { schedule_id: scheduleId } = req.params;
     const { user } = req;
-    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
       return next(new ScheduleNotFoundError());
-    }
-
-    if (!isMine(user, schedule)) {
-      return next(new EditPermissionError());
     }
 
     const {
@@ -224,14 +214,10 @@ async function deletePersonalSchedule(req, res, next) {
 
     const { schedule_id: scheduleId } = req.params;
     const { user } = req;
-    const schedule = await PersonalSchedule.findByPk(scheduleId);
+    const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
       return next(new NotFoundError());
-    }
-
-    if (!isMine(user, schedule)) {
-      return next(new EditPermissionError());
     }
 
     await schedule.destroy();

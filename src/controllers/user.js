@@ -14,8 +14,7 @@ const PersonalSchedule = require('../models/personalSchedule');
 // Error
 const {
   ApiError, DataFormatError, BelongToGroupError,
-  DuplicateNicknameError, DuplicateEmailError,
-  EditPermissionError, GroupNotFoundError,
+  DuplicateNicknameError, DuplicateEmailError, GroupNotFoundError,
   InvalidPasswordError,
 } = require('../errors');
 
@@ -211,10 +210,6 @@ async function patchUserSetUp(req, res, next) {
 
     if (!group) {
       return next(new GroupNotFoundError());
-    }
-
-    if (!(await user.hasGroup(group))) {
-      return next(new EditPermissionError());
     }
 
     await UserGroup.update(req.body, { where: { userId: user.userId, groupId } });
