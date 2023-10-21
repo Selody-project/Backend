@@ -3,6 +3,8 @@ const { Sequelize } = require('sequelize');
 const { Op } = Sequelize;
 const { deleteBucketImage } = require('../middleware/s3');
 
+const maxGroupCount = 50;
+
 // Model
 const User = require('../models/user');
 const UserGroup = require('../models/userGroup');
@@ -15,11 +17,12 @@ const {
   UserNotFoundError, GroupNotFoundError,
   UnauthorizedError, ExpiredCodeError,
   InvalidGroupJoinError, UserIsLeaderError, NoBanPermission, EditPermissionError,
+  ExceedGroupCountError,
 } = require('../errors');
 
 // Validator
 const {
-  validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
+  validateGroupSchema, validateGroupIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
   validateGroupMemberSchema, validateAccessLevelSchema,
@@ -40,6 +43,11 @@ async function postGroup(req, res, next) {
 
     const { name, description } = req.body;
     const { user } = req;
+
+    const groupCount = await user.countGroups();
+    if (groupCount >= maxGroupCount) {
+      return next(new ExceedGroupCountError());
+    }
 
     let group;
     if (req.fileUrl !== null) {
@@ -112,30 +120,12 @@ async function getGroupDetail(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { error: queryError } = validateLastRecordIdSchema(req.query);
-    if (queryError) {
-      return next(new DataFormatError());
-    }
-
-    let { last_record_id: lastRecordId } = req.query;
-    if (lastRecordId == 0) {
-      lastRecordId = Number.MAX_SAFE_INTEGER;
-    }
-
-    const pageSize = 9;
-    let groups = await Group.findAll({
+    const { user } = req;
+    let groups = await user.getGroups({
       where: {
-        groupId: { [Sequelize.Op.lt]: lastRecordId },
+        '$UserGroup.isPendingMember$': 0,
       },
-      limit: pageSize,
-      order: [['groupId', 'DESC']],
     });
-    let isEnd;
-    if (groups.length < pageSize) {
-      isEnd = true;
-    } else {
-      isEnd = false;
-    }
     groups = groups.map((group) => ({
       groupId: group.groupId,
       name: group.name,
@@ -143,7 +133,28 @@ async function getGroupList(req, res, next) {
       member: group.member,
       image: group.image,
     }));
-    return res.status(200).json({ isEnd, groups });
+    return res.status(200).json(groups);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getPendingGroupList(req, res, next) {
+  try {
+    const { user } = req;
+    let pendingGroups = await user.getGroups({
+      where: {
+        '$UserGroup.isPendingMember$': 1,
+      },
+    });
+    pendingGroups = pendingGroups.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    }));
+    return res.status(200).json(pendingGroups);
   } catch (err) {
     return next(new ApiError());
   }
@@ -355,6 +366,11 @@ async function postGroupJoinRequest(req, res, next) {
 
     if (!group) {
       return next(new GroupNotFoundError());
+    }
+
+    const groupCount = await user.countGroups();
+    if (groupCount >= maxGroupCount) {
+      return next(new ExceedGroupCountError());
     }
 
     const userBelongGroup = await UserGroup.findOne({
@@ -578,6 +594,11 @@ async function postJoinGroupWithInviteCode(req, res, next) {
       return next(new InvalidGroupJoinError());
     }
 
+    const groupCount = await user.countGroups();
+    if (groupCount >= maxGroupCount) {
+      return next(new ExceedGroupCountError());
+    }
+
     await user.addGroup(group);
     await group.update({ member: (group.member + 1) });
 
@@ -734,6 +755,7 @@ module.exports = {
   postGroup,
   getGroupList,
   getGroupDetail,
+  getPendingGroupList,
   deleteGroup,
   putGroup,
   deleteGroupUser,

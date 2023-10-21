@@ -3,7 +3,7 @@ const express = require('express');
 // Group
 const {
   postGroup,
-  getGroupDetail, getGroupList,
+  getGroupDetail, getGroupList, getPendingGroupList,
   putGroup, deleteGroup,
   getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
@@ -38,6 +38,7 @@ const router = express.Router();
 // Group
 router.post('/', uploadGroupMiddleware, postGroup);
 router.get('/list', getGroupList);
+router.get('/pending', getPendingGroupList);
 router.get('/search', searchGroup);
 router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', uploadGroupMiddleware, putGroup);
