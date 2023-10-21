@@ -60,35 +60,40 @@ describe('Test /api/user endpoints', () => {
   describe('Test GET /api/user/group', () => {
     it('Successfully get a list of group', async () => {
       const res = await request(app).get('/api/user/group').set('Cookie', cookie);
-      const expectedGroups = {
-        groupList: [{
+      const expectedGroups = [
+        {
           groupId: 1,
-          leader: 1,
-          description: 'test-description1',
           name: 'test-group1',
+          description: 'test-description1',
           member: 2,
-          inviteCode: 'inviteCode01',
-          inviteExp: '2099-01-01T00:00:00.000Z',
-          isPublicGroup: 0,
-          image: 'groupImageLink',
-          UserGroup: {
-            groupId: 1, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'owner',
-          },
-        }, {
+          image: 'groupImageLink'
+        },
+        {
           groupId: 2,
-          leader: 2,
-          description: 'test-description2',
           name: 'test-group2',
+          description: 'test-description2',
           member: 6,
-          inviteCode: 'expiredCode02',
-          inviteExp: '2000-01-01T00:00:00.000Z',
-          isPublicGroup: 0,
-          image: 'groupImageLink',
-          UserGroup: {
-            groupId: 2, userId: 1, shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0, accessLevel: 'regular',
-          },
-        }],
-      };
+          image: 'groupImageLink'
+        }
+      ];
+
+      expect(res.status).toEqual(200);
+      expect(res.body).toEqual(expectedGroups);
+    });
+  });
+
+  describe('Test GET /api/user/group/pending', () => {
+    it('Successfully get a list of group', async () => {
+      const res = await request(app).get('/api/user/group/pending').set('Cookie', cookie);
+      const expectedGroups = [
+        {
+          groupId: 3,
+          name: 'test-group3',
+          description: 'test-description3',
+          member: 1,
+          image: 'groupImageLink'
+        }
+      ];
 
       expect(res.status).toEqual(200);
       expect(res.body).toEqual(expectedGroups);

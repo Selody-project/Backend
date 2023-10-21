@@ -93,7 +93,16 @@ async function getUserPersonalSchedule(req, res, next) {
     const end = moment.utc(endDateTime).toDate();
 
     const userSchedule = await PersonalSchedule.getSchedule([user.userId], start, end);
-    const groups = (await user.getGroups()).map((group) => group.groupId);
+    const groups = (await user.getGroups(
+      {
+        through: {
+          where: {
+            isPendingMember: 0,
+          },
+        },
+      },
+    )
+    ).map((group) => group.groupId);
     if (groups.length) {
       const groupSchedule = await GroupSchedule.getSchedule(groups, start, end);
       const response = {};
@@ -123,7 +132,16 @@ async function getUserPersonalScheduleSummary(req, res, next) {
     const end = moment.utc(endDateTime).toDate();
 
     const userSchedule = await PersonalSchedule.getSchedule([user.userId], start, end, true);
-    const groups = (await user.getGroups()).map((group) => group.groupId);
+    const groups = (await user.getGroups(
+      {
+        through: {
+          where: {
+            isPendingMember: 0,
+          },
+        },
+      },
+    )
+    ).map((group) => group.groupId);
     if (groups.length) {
       const groupSchedule = await GroupSchedule.getSchedule(groups, start, end, true);
       let response;

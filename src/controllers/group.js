@@ -3,6 +3,8 @@ const { Sequelize } = require('sequelize');
 const { Op } = Sequelize;
 const { deleteBucketImage } = require('../middleware/s3');
 
+const maxGroupCount = 50;
+
 // Model
 const User = require('../models/user');
 const UserGroup = require('../models/userGroup');
@@ -15,6 +17,7 @@ const {
   UserNotFoundError, GroupNotFoundError,
   UnauthorizedError, ExpiredCodeError,
   InvalidGroupJoinError, UserIsLeaderError, NoBanPermission, EditPermissionError,
+  ExceedGroupCountError,
 } = require('../errors');
 
 // Validator
@@ -40,6 +43,11 @@ async function postGroup(req, res, next) {
 
     const { name, description } = req.body;
     const { user } = req;
+
+    const groupCount = await user.countGroups();
+    if (groupCount >= maxGroupCount) {
+      return next(new ExceedGroupCountError());
+    }
 
     let group;
     if (req.fileUrl !== null) {
@@ -90,13 +98,13 @@ async function getGroupDetail(req, res, next) {
 
     const memberInfo = [];
     let leaderInfo;
-    (await group.getUsers(({
+    (await group.getUsers({
       through: {
         where: {
           isPendingMember: 0,
         },
       },
-    }))).forEach((member) => {
+    })).forEach((member) => {
       const { userId, nickname } = member.dataValues;
       if (userId === group.leader) {
         leaderInfo = { userId, nickname };
@@ -277,13 +285,13 @@ async function getGroupMembers(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const members = await group.getUsers(({
+    const members = await group.getUsers({
       through: {
         where: {
           isPendingMember: 0,
         },
       },
-    }));
+    });
     const promises = members.map(async (member) => {
       const accessLevel = await getAccessLevel(member, group);
       return {
@@ -317,13 +325,13 @@ async function getPendingMembers(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const members = await group.getUsers(({
+    const members = await group.getUsers({
       through: {
         where: {
           isPendingMember: 1,
         },
       },
-    }));
+    });
     const promises = members.map(async (member) => {
       const accessLevel = await getAccessLevel(member, group);
       return {
@@ -355,6 +363,11 @@ async function postGroupJoinRequest(req, res, next) {
 
     if (!group) {
       return next(new GroupNotFoundError());
+    }
+
+    const groupCount = await user.countGroups();
+    if (groupCount >= maxGroupCount) {
+      return next(new ExceedGroupCountError());
     }
 
     const userBelongGroup = await UserGroup.findOne({
@@ -573,14 +586,20 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     if (group.inviteExp < new Date()) {
       return next(new ExpiredCodeError());
     }
-
-    if (await user.hasGroup(group)) {
+    const userGroup = await UserGroup.findOne({ where: { userId: user.userId, groupId: group.groupId } });
+    if (userGroup?.isPendingMember === 0) {
       return next(new InvalidGroupJoinError());
     }
-
-    await user.addGroup(group);
-    await group.update({ member: (group.member + 1) });
-
+    if (userGroup?.isPendingMember === 1) {
+      await userGroup.update({ isPendingMember: 1 });
+    } else {
+      const groupCount = await user.countGroups();
+      if (groupCount >= maxGroupCount) {
+        return next(new ExceedGroupCountError());
+      }
+      await user.addGroup(group);
+      await group.update({ member: (group.member + 1) });
+    }
     return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
     return next(new ApiError());

@@ -84,6 +84,7 @@ async function getGroupSchedule(req, res, next) {
       where: {
         groupId,
         shareScheduleOption: 1,
+        isPendingMember: 0,
       },
       attributes: ['userId'],
     })).map((member) => member.userId);
@@ -125,6 +126,7 @@ async function getGroupScheduleSummary(req, res, next) {
       where: {
         groupId,
         shareScheduleOption: 1,
+        isPendingMember: 0,
       },
       attributes: ['userId'],
     })).map((member) => member.userId);

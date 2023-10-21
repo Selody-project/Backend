@@ -151,6 +151,11 @@ async function setUpGroupDB() {
       accessLevel: 'regular', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 0,
     },
   });
+  await user[0].addGroup(group3, {
+    through: {
+      accessLevel: 'viewer', shareScheduleOption: 1, notificationOption: 1, isPendingMember: 1,
+    },
+  });
   await user[1].addGroup(group1, {
     through: {
       accessLevel: 'admin', shareScheduleOption: 0, notificationOption: 1, isPendingMember: 0,

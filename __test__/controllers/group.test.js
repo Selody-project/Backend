@@ -1231,7 +1231,7 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
-  describe('Test GET /api/group', () => {
+  describe('Test GET /api/group/list', () => {
     it('Successfully retrieved group lists. ', async () => {
       const lastRecordId = 0;
       const res = (await request(app).get('/api/group/list').set('Cookie', cookie).query({
