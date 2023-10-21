@@ -2761,7 +2761,7 @@
     "/api/user/group": {
       "get": {
         "description": "",
-        "summary": "유저 그룹 조회",
+        "summary": "가입된 그룹 조회",
         "tags": ["User"],
         "responses": {
           "200": {
@@ -2770,48 +2770,64 @@
               "application/json": {
                 "examples": {
                   "successExample": {
-                    "value": {
-                      "groupList": [
-                        {
-                          "groupId": "그룹 식별자",
-                          "name": "그룹 이름",
-                          "description": "그룹 소개",
-                          "member": "멤버 수",
-                          "leader": "리더 식별자",
-                          "inviteCode": "그룹 초대 코드",
-                          "inviteExp": "초대 코드 만료일",
-                          "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
-                          "image": "그룹 대표 이미지 주소",
-                          "UserGroup": {
-                            "userId": "유저 식별자",
-                            "groupId": "그룹 식별자",
-                            "shareScheduleOption": "일정 공유 여부",
-                            "notificationOption": "그룹 알림 여부",
-                            "isPendingMember": "가입 대기 여부",
-                            "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴"
-                          }
-                        },
-                        {
-                          "groupId": "그룹 식별자",
-                          "name": "그룹 이름",
-                          "description": "그룹 소개",
-                          "member": "멤버 수",
-                          "leader": "리더 식별자",
-                          "inviteCode": "그룹 초대 코드",
-                          "inviteExp": "초대 코드 만료일",
-                          "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
-                          "image": "그룹 대표 이미지 주소",
-                          "UserGroup": {
-                            "userId": "유저 식별자",
-                            "groupId": "그룹 식별자",
-                            "shareScheduleOption": "일정 공유 여부",
-                            "notificationOption": "그룹 알림 여부",
-                            "isPendingMember": "가입 대기 여부",
-                            "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴"
-                          }
-                        }
-                      ]
-                    }
+                    "value": [
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "image": "그룹 대표 이미지 주소"
+                      },
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "image": "그룹 대표 이미지 주소"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/user/group/pending": {
+      "get": {
+        "description": "",
+        "summary": "가입 요청 중인 그룹 조회",
+        "tags": ["User"],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": [
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "image": "그룹 대표 이미지 주소"
+                      },
+                      {
+                        "groupId": "그룹 식별자",
+                        "name": "그룹 이름",
+                        "description": "그룹 소개",
+                        "member": "멤버 수",
+                        "image": "그룹 대표 이미지 주소"
+                      }
+                    ]
                   }
                 }
               }
