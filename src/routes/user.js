@@ -4,7 +4,7 @@ const { uploadProfileMiddleware } = require('../middleware/s3');
 
 // User
 const {
-  getUserGroup,
+  getUserGroup, getPendingGroupList,
   patchUserProfile, patchUserPassword,
   getUserSetup, patchUserSetUp, patchIntroduction,
 } = require('../controllers/user');
@@ -27,6 +27,7 @@ const router = express.Router();
 
 // User
 router.get('/group', getUserGroup);
+router.get('/group/pending', getPendingGroupList);
 router.delete('/group/:group_id', deleteGroupUser);
 router.patch('/profile', uploadProfileMiddleware, patchUserProfile, createToken);
 router.patch('/profile/password', patchUserPassword);

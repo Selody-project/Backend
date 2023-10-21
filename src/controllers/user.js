@@ -28,8 +28,42 @@ const {
 async function getUserGroup(req, res, next) {
   try {
     const { user } = req;
-    const groupList = await user.getGroups();
-    return res.status(200).json({ groupList });
+    let groups = await user.getGroups({
+      through: {
+        where: {
+          isPendingMember: 0,
+        },
+      },
+    });
+    groups = groups.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    }));
+    return res.status(200).json(groups);
+  } catch (err) {
+    return next(new ApiError());
+  }
+}
+
+async function getPendingGroupList(req, res, next) {
+  try {
+    const { user } = req;
+    let pendingGroups = await user.getGroups({
+      where: {
+        '$UserGroup.isPendingMember$': 1,
+      },
+    });
+    pendingGroups = pendingGroups.map((group) => ({
+      groupId: group.groupId,
+      name: group.name,
+      description: group.description,
+      member: group.member,
+      image: group.image,
+    }));
+    return res.status(200).json(pendingGroups);
   } catch (err) {
     return next(new ApiError());
   }
@@ -213,6 +247,7 @@ async function patchIntroduction(req, res, next) {
 
 module.exports = {
   getUserGroup,
+  getPendingGroupList,
   patchUserProfile,
   patchUserPassword,
   withdrawal,

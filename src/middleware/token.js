@@ -42,7 +42,13 @@ async function createToken(req, res, next) {
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     res.cookie('refreshToken', refreshToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     const postCount = await Post.getUserPostCount(user.userId);
-    const groupCount = await user.countGroups();
+    const groupCount = await user.countGroups({
+      through: {
+        where: {
+          isPendingMember: 0,
+        },
+      },
+    });
     return res.status(200).json({
       userId: user.userId,
       email: user.email,
@@ -95,7 +101,13 @@ async function renewToken(req, res, next) {
     res.cookie('accessToken', accessToken, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: false });
     const user = await User.findOne({ where: { nickname } });
     const postCount = await Post.getUserPostCount(user.userId);
-    const groupCount = await user.countGroups();
+    const groupCount = await user.countGroups({
+      through: {
+        where: {
+          isPendingMember: 0,
+        },
+      },
+    });
     return res.status(200).json({
       userId: user.userId,
       email: user.email,

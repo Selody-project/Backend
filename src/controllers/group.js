@@ -22,7 +22,7 @@ const {
 
 // Validator
 const {
-  validateGroupSchema, validateGroupIdSchema,
+  validateGroupSchema, validateGroupIdSchema, validateLastRecordIdSchema,
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
   validateGroupMemberSchema, validateAccessLevelSchema,
@@ -98,13 +98,13 @@ async function getGroupDetail(req, res, next) {
 
     const memberInfo = [];
     let leaderInfo;
-    (await group.getUsers(({
+    (await group.getUsers({
       through: {
         where: {
           isPendingMember: 0,
         },
       },
-    }))).forEach((member) => {
+    })).forEach((member) => {
       const { userId, nickname } = member.dataValues;
       if (userId === group.leader) {
         leaderInfo = { userId, nickname };
@@ -120,12 +120,30 @@ async function getGroupDetail(req, res, next) {
 
 async function getGroupList(req, res, next) {
   try {
-    const { user } = req;
-    let groups = await user.getGroups({
+    const { error: queryError } = validateLastRecordIdSchema(req.query);
+    if (queryError) {
+      return next(new DataFormatError());
+    }
+
+    let { last_record_id: lastRecordId } = req.query;
+    if (lastRecordId == 0) {
+      lastRecordId = Number.MAX_SAFE_INTEGER;
+    }
+
+    const pageSize = 9;
+    let groups = await Group.findAll({
       where: {
-        '$UserGroup.isPendingMember$': 0,
+        groupId: { [Sequelize.Op.lt]: lastRecordId },
       },
+      limit: pageSize,
+      order: [['groupId', 'DESC']],
     });
+    let isEnd;
+    if (groups.length < pageSize) {
+      isEnd = true;
+    } else {
+      isEnd = false;
+    }
     groups = groups.map((group) => ({
       groupId: group.groupId,
       name: group.name,
@@ -133,28 +151,7 @@ async function getGroupList(req, res, next) {
       member: group.member,
       image: group.image,
     }));
-    return res.status(200).json(groups);
-  } catch (err) {
-    return next(new ApiError());
-  }
-}
-
-async function getPendingGroupList(req, res, next) {
-  try {
-    const { user } = req;
-    let pendingGroups = await user.getGroups({
-      where: {
-        '$UserGroup.isPendingMember$': 1,
-      },
-    });
-    pendingGroups = pendingGroups.map((group) => ({
-      groupId: group.groupId,
-      name: group.name,
-      description: group.description,
-      member: group.member,
-      image: group.image,
-    }));
-    return res.status(200).json(pendingGroups);
+    return res.status(200).json({ isEnd, groups });
   } catch (err) {
     return next(new ApiError());
   }
@@ -288,13 +285,13 @@ async function getGroupMembers(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const members = await group.getUsers(({
+    const members = await group.getUsers({
       through: {
         where: {
           isPendingMember: 0,
         },
       },
-    }));
+    });
     const promises = members.map(async (member) => {
       const accessLevel = await getAccessLevel(member, group);
       return {
@@ -328,13 +325,13 @@ async function getPendingMembers(req, res, next) {
       return next(new GroupNotFoundError());
     }
 
-    const members = await group.getUsers(({
+    const members = await group.getUsers({
       through: {
         where: {
           isPendingMember: 1,
         },
       },
-    }));
+    });
     const promises = members.map(async (member) => {
       const accessLevel = await getAccessLevel(member, group);
       return {
@@ -589,19 +586,20 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     if (group.inviteExp < new Date()) {
       return next(new ExpiredCodeError());
     }
-
-    if (await user.hasGroup(group)) {
+    const userGroup = await UserGroup.findOne({ where: { userId: user.userId, groupId: group.groupId } });
+    if (userGroup?.isPendingMember === 0) {
       return next(new InvalidGroupJoinError());
     }
-
-    const groupCount = await user.countGroups();
-    if (groupCount >= maxGroupCount) {
-      return next(new ExceedGroupCountError());
+    if (userGroup?.isPendingMember === 1) {
+      await userGroup.update({ isPendingMember: 1 });
+    } else {
+      const groupCount = await user.countGroups();
+      if (groupCount >= maxGroupCount) {
+        return next(new ExceedGroupCountError());
+      }
+      await user.addGroup(group);
+      await group.update({ member: (group.member + 1) });
     }
-
-    await user.addGroup(group);
-    await group.update({ member: (group.member + 1) });
-
     return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
     return next(new ApiError());
@@ -755,7 +753,6 @@ module.exports = {
   postGroup,
   getGroupList,
   getGroupDetail,
-  getPendingGroupList,
   deleteGroup,
   putGroup,
   deleteGroupUser,
