@@ -495,7 +495,8 @@
                           "inviteCode": "그룹 초대 코드",
                           "inviteExp": "초대 코드 만료일",
                           "isPublicGroup": "BOOLEAN, 공개 그룹 여부",
-                          "image": "그룹 대표 이미지 주소"
+                          "image": "그룹 대표 이미지 주소",
+                          "feedCount": "작성된 피드 개수"
                         },
                         "leaderInfo": {
                           "userId": "유저 식별자",
@@ -632,56 +633,6 @@
           },
           "404": {
             "description": "존재하지 않는 유저/그룹"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}/info": {
-      "get": {
-        "description": "단일 그룹의 groupId, 그룹명, 소개, 멤버 수, 피드 갯수를 보여줍니다",
-        "summary": "단일 그룹 정보 조회",
-        "tags": ["Group"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공",
-            "content": {
-              "application/json": {
-                "examples": {
-                  "successExample": {
-                    "value": {
-                      "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
-                      "information": {
-                        "groupId": "그룹 식별자",
-                        "name": "그룹 이름",
-                        "description": "그룹 소개",
-                        "member": "멤버 수",
-                        "feed": "그룹 피드 개수"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "404": {
-            "description": "존재하지 않는 그룹"
           },
           "500": {
             "description": "서버 에러"
@@ -1196,230 +1147,6 @@
       }
     },
     "/api/group/{group_id}/calendar": {
-      "post": {
-        "description": "",
-        "summary": "그룹 일정 등록",
-        "tags": ["Group Schedule"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "requestStartDateTime" : {
-                    "example": "2099-01-01T12:00:00.000Z",
-                    "type": "DATETIME"
-                  },
-                  "requestEndDateTime" : {
-                    "example": "2099-01-02T12:00:00.000Z",
-                    "type": "DATETIME"
-                  },
-                  "title": {
-                    "example": "test-title",
-                    "type": "VARCHAR(45)"
-                  },
-                  "content": {
-                    "example": "test-content",
-                    "type": "VARCHAR(300)"
-                  },
-                  "startDateTime": {
-                    "example": "2099-01-01T12:00:00.000Z",
-                    "type": "DATETIME"
-                  },
-                  "endDateTime": {
-                    "example": "2099-01-01T13:00:00.000Z",
-                    "type": "DATETIME"
-                  },
-                  "recurrence": {
-                    "example": 0,
-                    "type": "TINYINT(1)"
-                  },
-                  "freq": {
-                    "example": null,
-                    "type": "ENUM(DAILY, WEEKLY, MONTHLY, YEARLY)"
-                  },
-                  "interval": {
-                    "example": null,
-                    "type": "integer"
-                  },
-                  "byweekday": {
-                    "example": null,
-                    "type": "TEXT"
-                  },
-                  "until": {
-                    "example": null,
-                    "type": "DATETIME"
-                  }
-                }
-              },
-              "examples": {
-                "non-recurrence": {
-                  "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
-                    "title": "test-title",
-                    "content": "test-content",
-                    "startDateTime": "2099-01-01T12:00:00.000Z",
-                    "endDateTime": "2099-01-01T13:00:00.000Z",
-                    "recurrence": 0,
-                    "freq": null,
-                    "interval": null,
-                    "byweekday": null,
-                    "until": null
-                  }
-                },
-                "recurrence1": {
-                  "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
-                    "title": "test-title",
-                    "content": "test-content",
-                    "startDateTime": "2099-01-01T12:00:00.000Z",
-                    "endDateTime": "2099-01-01T13:00:00.000Z",
-                    "recurrence": 1,
-                    "freq": "DAILY",
-                    "interval": 1,
-                    "byweekday": null,
-                    "until": "2099-02-01T00:00:00.000Z"
-                  },
-                  "description": "매일 반복되는 일정 등록 예시"
-                },
-                "recurrence2": {
-                  "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
-                    "title": "test-title",
-                    "content": "test-content",
-                    "startDateTime": "2099-01-01T12:00:00.000Z",
-                    "endDateTime": "2099-01-01T13:00:00.000Z",
-                    "recurrence": 1,
-                    "freq": "WEEKLY",
-                    "interval": 1,
-                    "byweekday": [4],
-                    "until": "2099-02-01T00:00:00.000Z"
-                  },
-                  "description": "주간 반복 일정 등록 예시, byweekday 배열에 해당 날짜의 요일을 필수적으로 포함."
-                },
-                "recurrence3": {
-                  "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
-                    "title": "test-title",
-                    "content": "test-content",
-                    "startDateTime": "2099-01-01T12:00:00.000Z",
-                    "endDateTime": "2099-01-01T13:00:00.000Z",
-                    "recurrence": 1,
-                    "freq": "WEEKLY",
-                    "interval": 1,
-                    "byweekday": [1, 3, 4],
-                    "until": "2099-02-01T00:00:00.000Z"
-                  },
-                  "description": "요일 반복 일정 등록 예시입니다. 일월화수목금(0123456) 요일 반복 시에, freq는 WEEKLY 고정입니다. 정수형 배열로 보내주세요."
-                },
-                "recurrence4": {
-                  "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
-                    "title": "test-title",
-                    "content": "test-content",
-                    "startDateTime": "2099-01-01T12:00:00.000Z",
-                    "endDateTime": "2099-01-01T13:00:00.000Z",
-                    "recurrence": 1,
-                    "freq": "MONTHLY",
-                    "interval": 2,
-                    "byweekday": null,
-                    "until": "2100-01-01T00:00:00.000Z"
-                  },
-                  "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "성공",
-            "content": {
-              "application/json": {
-                "examples": {
-                  "successExample": {
-                    "value": {
-                      "scheduleSummary": {
-                        "id": "일정 식별자",
-                        "groupId": "그룹 식별자",
-                        "startDateTime": "일정 시작 일자",
-                        "endDateTime": "일정 종료 일자",
-                        "recurrence": "반복 여부",
-                        "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                        "interval": "반복 간격",
-                        "byweekday": "반복 요일",
-                        "until": "반복 종료일 (일반 일정인 경우)",
-                        "startRecur": "반복 시작 일자 (반복 일정인 경우)",
-                        "endRecur": "반복 종료 일자 (반복 일정인 경우)",
-                        "isGroup": 1
-                      },
-                      "todaySchedule": [
-                        {
-                          "id": "일정 식별자",
-                          "groupId": "그룹 식별자",
-                          "title": "일정 제목",
-                          "content": "일정 내용",
-                          "startDateTime": "일정 시작 일자",
-                          "endDateTime": "일정 종료 일자",
-                          "recurrence": "반복 여부",
-                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                          "interval": "반복 간격",
-                          "byweekday": "반복 요일",
-                          "until": "반복 종료일 (일반 일정인 경우)",
-                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
-                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
-                          "isGroup": 1
-                        }
-                      ],
-                      "schedulesForTheWeek": [
-                        {
-                          "id": "일정 식별자",
-                          "groupId": "그룹 식별자",
-                          "title": "일정 제목",
-                          "content": "일정 내용",
-                          "startDateTime": "일정 시작 일자",
-                          "endDateTime": "일정 종료 일자",
-                          "recurrence": "반복 여부",
-                          "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
-                          "interval": "반복 간격",
-                          "byweekday": "반복 요일",
-                          "until": "반복 종료일 (일반 일정인 경우)",
-                          "startRecur": "반복 시작 일자 (반복 일정인 경우)",
-                          "endRecur": "반복 종료 일자 (반복 일정인 경우)",
-                          "isGroup": 1
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "로그인 실패"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
       "get": {
         "description": "",
         "summary": "그룹 일정 조회",
@@ -1640,9 +1367,9 @@
           }
         }
       },
-      "put": {
+      "delete": {
         "description": "",
-        "summary": "그룹 일정 수정",
+        "summary": "그룹 일정 삭제",
         "tags": ["Group Schedule"],
         "parameters": [
           {
@@ -1658,6 +1385,38 @@
             "type": "integer"
           }
         ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "403": {
+            "description": "존재하지 않는 일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposal": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 후보 추가",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1665,25 +1424,21 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "requestStartDateTime" : {
+                  "title": {
+                    "example": "test-title",
+                    "type": "VARCHAR(45)"
+                  },
+                  "content": {
+                    "example": "test-content",
+                    "type": "VARCHAR(300)"
+                  },
+                  "startDateTime": {
                     "example": "2099-01-01T12:00:00.000Z",
                     "type": "DATETIME"
                   },
-                  "requestEndDateTime" : {
-                    "example": "2099-01-02T12:00:00.000Z",
-                    "type": "DATETIME"
-                  },
-                  "title": {
-                    "example": "modified-title"
-                  },
-                  "content": {
-                    "example": "modified-content"
-                  },
-                  "startDateTime": {
-                    "example": "2099-02-01T12:00:00.000Z"
-                  },
                   "endDateTime": {
-                    "example": "2099-02-01T13:00:00.000Z"
+                    "example": "2099-01-01T13:00:00.000Z",
+                    "type": "DATETIME"
                   },
                   "recurrence": {
                     "example": 0,
@@ -1710,8 +1465,6 @@
               "examples": {
                 "non-recurrence": {
                   "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1725,8 +1478,6 @@
                 },
                 "recurrence1": {
                   "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1741,8 +1492,6 @@
                 },
                 "recurrence2": {
                   "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1757,8 +1506,6 @@
                 },
                 "recurrence3": {
                   "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1773,8 +1520,6 @@
                 },
                 "recurrence4": {
                   "value": {
-                    "requestStartDateTime" : "2099-01-01T12:00:00.000Z",
-                    "requestEndDateTime" : "2099-01-02T12:00:00.000Z",
                     "title": "test-title",
                     "content": "test-content",
                     "startDateTime": "2099-01-01T12:00:00.000Z",
@@ -1786,6 +1531,365 @@
                     "until": "2100-01-01T00:00:00.000Z"
                   },
                   "description": "2달마다 반복되는 월간 반복 일정 등록 예시"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "voteId": "일정 후보 식별자",
+                      "groupId": "그룹 식별자",
+                      "title": "일정 제목",
+                      "content": "일정 내용",
+                      "startDateTime": "일정 시작 일자",
+                      "endDateTime": "일정 종료 일자",
+                      "recurrence": "반복 여부",
+                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                      "interval": "반복 간격",
+                      "byweekday": "반복 요일",
+                      "until": "반복 종료일",
+                      "votingEndDate": "투표 종료일",
+                      "updatedAt": "마지막 업데이트 일자",
+                      "createdAt": "생성 일자"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposals": {
+      "get": {
+        "description": "",
+        "summary": "그룹 일정 후보 시간 추천 받기",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "startDateTime",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "example": "2099-01-01T12:00:00.000Z"
+          },
+          {
+            "name": "endDateTime",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "example": "2099-01-08T12:00:00.000Z"
+          },
+          {
+            "name": "duration",
+            "description": "일정 최소 시간(minute)",
+            "in": "query",
+            "required": true,
+            "type": "integer",
+            "example": 60
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "proposals": [
+                        {
+                          "startDateTime": "추천 시작 시간",
+                          "endDateTime": "추천 종료 시간",
+                          "duration": "구간의 길이(분 단위)"
+                        },
+                        {
+                          "startDateTime": "추천 시작 시간",
+                          "endDateTime": "추천 종료 시간",
+                          "duration": "구간의 길이(분 단위)"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저"
+          },
+          "403": {
+            "description": "수정할 권한이 없음"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposal/list": {
+      "get": {
+        "description": "그룹 일정 후보 리스트 및 각 일정의 투표 현황을 같이 보여줍니다.",
+        "summary": "그룹 일정 후보 리스트 조회",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposal/{proposal_id}": {
+      "get": {
+        "description": "",
+        "summary": "그룹 일정 후보 단일 조회",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "성공",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "successExample": {
+                    "value": {
+                      "voteId": "일정 후보 식별자",
+                      "groupId": "그룹 식별자",
+                      "title": "일정 제목",
+                      "content": "일정 내용",
+                      "startDateTime": "일정 시작 일자",
+                      "endDateTime": "일정 종료 일자",
+                      "recurrence": "반복 여부",
+                      "freq": "DAILY, WEEKLY, MONTHLY, YEARLY와 같은 반복 주기",
+                      "interval": "반복 간격",
+                      "byweekday": "반복 요일",
+                      "until": "반복 종료일",
+                      "votingEndDate": "투표 종료일",
+                      "updatedAt": "마지막 업데이트 일자",
+                      "createdAt": "생성 일자"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      },
+      "delete": {
+        "description": "",
+        "summary": "그룹 일정 후보 삭제",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposal/{proposal_id}/vote": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 후보 투표",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "attendance": {
+                    "example": true,
+                    "type": "TINYINT(1)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "성공"
+          },
+          "400": {
+            "description": "형식에 맞지 않는 데이터"
+          },
+          "401": {
+            "description": "권한 없음"
+          },
+          "404": {
+            "description": "존재하지 않는 그룹/유저/일정"
+          },
+          "500": {
+            "description": "서버 에러"
+          }
+        }
+      }
+    },
+    "/api/group/{group_id}/proposal/{proposal_id}/confirm": {
+      "post": {
+        "description": "",
+        "summary": "그룹 일정 후보 확정",
+        "tags": ["Group Schedule"],
+        "parameters": [
+          {
+            "name": "group_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "proposal_id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "requestStartDateTime" : {
+                    "example": "2099-01-01T12:00:00.000Z",
+                    "type": "DATETIME"
+                  },
+                  "requestEndDateTime" : {
+                    "example": "2099-01-02T12:00:00.000Z",
+                    "type": "DATETIME"
+                  }
                 }
               }
             }
@@ -1861,128 +1965,8 @@
           "401": {
             "description": "권한 없음"
           },
-          "403": {
-            "description": "존재하지 않는 일정"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      },
-      "delete": {
-        "description": "",
-        "summary": "그룹 일정 삭제",
-        "tags": ["Group Schedule"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "schedule_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "204": {
-            "description": "성공"
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
-          },
-          "403": {
-            "description": "존재하지 않는 일정"
-          },
-          "500": {
-            "description": "서버 에러"
-          }
-        }
-      }
-    },
-    "/api/group/{group_id}/proposal": {
-      "get": {
-        "description": "",
-        "summary": "그룹 새 일정 시간대 추천 받기",
-        "tags": ["Group Schedule"],
-        "parameters": [
-          {
-            "name": "group_id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "date1",
-            "in": "query",
-            "required": true,
-            "type": "DATETIME",
-            "example": "2099-01-01T00:00:00.000Z"
-          },
-          {
-            "name": "date2",
-            "in": "query",
-            "type": "DATETIME",
-            "example": "2099-02-01T00:00:00.000Z"
-          },
-          {
-            "name": "date3",
-            "in": "query",
-            "type": "DATETIME",
-            "example": "2099-03-01T00:00:00.000Z"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "성공",
-            "content": {
-              "application/json": {
-                "examples": {
-                  "successExample": {
-                    "value": {
-                      "2099-01-01T00:00:00.000Z": [
-                        {
-                          "startDateTime": "2099-01-01T00:00:00.000Z",
-                          "endDateTime": "2099-01-01T12:00:00.000Z",
-                          "duration": 720
-                        },
-                        {
-                          "startDateTime": "2099-01-01T13:00:00.000Z",
-                          "endDateTime": "2099-01-01T23:59:59.000Z",
-                          "duration": 660
-                        }
-                      ],
-                      "2099-02-01T00:00:00.000Z": [
-                        {
-                          "startDateTime": "2099-02-01T00:00:00.000Z",
-                          "endDateTime": "2099-02-01T23:59:59.000Z",
-                          "duration": 1440
-                        }
-                      ],
-                      "2099-03-01T00:00:00.000Z": [
-                        {
-                          "startDateTime": "2099-03-01T00:00:00.000Z",
-                          "endDateTime": "2099-03-01T23:59:59.000Z",
-                          "duration": 1440
-                        }
-                      ]
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "형식에 맞지 않는 데이터"
-          },
-          "401": {
-            "description": "권한 없음"
+          "404": {
+            "description": "존재하지 않는 그룹/유저/일정"
           },
           "500": {
             "description": "서버 에러"

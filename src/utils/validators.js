@@ -98,9 +98,9 @@ const groupScheduleIdSchema = Joi.object({
 });
 
 const eventPoroposalSchema = Joi.object({
-  date1: Joi.date().min(getCurrentTime()).required(),
-  date2: Joi.date().min(getCurrentTime()),
-  date3: Joi.date().min(getCurrentTime()),
+  startDateTime: Joi.date().min(getCurrentTime()).required(),
+  endDateTime: Joi.date().min(getCurrentTime() + 60000).required(),
+  duration: Joi.number().min(0).required(),
 });
 
 const postSchema = Joi.object({
@@ -163,6 +163,44 @@ const accessLevelSchema = Joi.object({
   access_level: Joi.string().valid('viewer', 'regular', 'admin', 'owner').required(),
 });
 
+const scheduleProposalSchema = Joi.object({
+  title: Joi.string().max(45).required(),
+  content: Joi.string(),
+  startDateTime: Joi.date().min(getCurrentTime()).required(),
+  endDateTime: Joi.date().required(),
+  recurrence: Joi.valid(0, 1).required(),
+  freq: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.string().valid('WEEKLY', 'DAILY', 'MONTHLY', 'YEARLY').required(),
+  }),
+  interval: Joi.when('recurrence', {
+    is: 0,
+    then: Joi.valid(null).required(),
+    otherwise: Joi.number().required(),
+  }),
+  byweekday: Joi.when('freq', {
+    is: 'WEEKLY',
+    then: Joi.array().items(Joi.number().min(0).max(6)).required(),
+    otherwise: Joi.valid(null).required(),
+  }),
+  until: Joi.date().allow(null).required(),
+});
+
+const scheduleProposalIdSchema = Joi.object({
+  group_id: Joi.number().min(0).required(),
+  proposal_id: Joi.number().min(0).required(),
+});
+
+const voteSchema = Joi.object({
+  attendance: Joi.boolean().allow(1, 0, true, false).required(),
+});
+
+const groupSchedultConfirmSchema = Joi.object({
+  requestStartDateTime: Joi.date().required(),
+  requestEndDateTime: Joi.date().required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -191,4 +229,8 @@ module.exports = {
   validateUserIntroductionSchema: validator(userIntroductionSchema),
   validateGroupMemberSchema: validator(groupMemberSchema),
   validateAccessLevelSchema: validator(accessLevelSchema),
+  validateScheduleProposalSchema: validator(scheduleProposalSchema),
+  validateScheduleProposalIdSchema: validator(scheduleProposalIdSchema),
+  validateVoteSchema: validator(voteSchema),
+  validateGroupScheduleConfirmSchema: validator(groupSchedultConfirmSchema),
 };

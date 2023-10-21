@@ -3,7 +3,7 @@ const express = require('express');
 // Group
 const {
   postGroup,
-  getGroupInfo, getGroupDetail, getGroupList,
+  getGroupDetail, getGroupList,
   putGroup, deleteGroup,
   getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
@@ -17,8 +17,10 @@ const {
 // Schedule
 const {
   getGroupSchedule, getSingleGroupSchedule, getGroupScheduleSummary,
-  postGroupSchedule, putGroupSchedule, deleteGroupSchedule,
-  getEventProposal,
+  deleteGroupSchedule,
+  postScheduleProposal, getScheduleProposal, getScheduleProposalsList, deleteScheduleProposal,
+  postScheduleProposalVote, postScheduleProposalConfirm,
+  getScheduleProposals,
 } = require('../controllers/groupSchedule');
 
 // Feed
@@ -37,7 +39,6 @@ const router = express.Router();
 router.post('/', uploadGroupMiddleware, postGroup);
 router.get('/list', getGroupList);
 router.get('/search', searchGroup);
-router.get('/:group_id/info', getGroupInfo);
 router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', uploadGroupMiddleware, putGroup);
 router.delete('/:group_id', deleteGroup);
@@ -54,13 +55,20 @@ router.post('/:group_id/join/:inviteCode', postJoinGroupWithInviteCode);
 router.patch('/:group_id/members/:user_id/access-level', patchUserAccessLevel);
 
 // Schedule
-router.post('/:group_id/calendar', postGroupSchedule);
 router.get('/:group_id/calendar', getGroupSchedule);
 router.get('/:group_id/calendar/summary', getGroupScheduleSummary);
 router.get('/:group_id/calendar/:schedule_id', getSingleGroupSchedule);
-router.put('/:group_id/calendar/:schedule_id', putGroupSchedule);
 router.delete('/:group_id/calendar/:schedule_id', deleteGroupSchedule);
-router.get('/:group_id/proposal', getEventProposal);
+
+// Schedule Vote단일 일정 후보를 사용자가 직접 등록해서 CRUD
+router.post('/:group_id/proposal', postScheduleProposal);
+router.get('/:group_id/proposals', getScheduleProposals);
+router.get('/:group_id/proposal/list', getScheduleProposalsList);
+router.get('/:group_id/proposal/:proposal_id', getScheduleProposal);
+router.delete('/:group_id/proposal/:proposal_id', deleteScheduleProposal);
+
+router.post('/:group_id/proposal/:proposal_id/vote', postScheduleProposalVote);
+router.post('/:group_id/proposal/:proposal_id/confirm', postScheduleProposalConfirm);
 
 // Feed
 router.post('/:group_id/post', uploadPostMiddleware, postGroupPost);
