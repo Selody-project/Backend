@@ -4,6 +4,7 @@ const { Op } = Sequelize;
 const bcrypt = require('bcrypt');
 const { deleteBucketImage } = require('../middleware/s3');
 const { getAccessLevel } = require('../utils/accessLevel');
+const { sequelize } = require('../models/index');
 
 // Model
 const User = require('../models/user');
@@ -69,7 +70,9 @@ async function getPendingGroupList(req, res, next) {
 }
 
 async function patchUserProfile(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     if (!req.body?.data) {
       throw (new DataFormatError());
     }
@@ -102,14 +105,18 @@ async function patchUserProfile(req, res, next) {
       const fileUrl = req.fileUrl.join(', ');
       await user.update({
         nickname, email, introduction, profileImage: fileUrl,
-      });
+      }, { transaction });
       await deleteBucketImage(previousProfileImage);
     } else {
-      await user.update({ nickname, email, introduction });
+      await user.update({ nickname, email, introduction }, { transaction });
     }
     req.user = user;
+
+    await transaction.commit();
     return next();
   } catch (err) {
+    await transaction.rollback();
+
     await deleteBucketImage(req.fileUrl);
     if (!err || err.status === undefined) {
       return next(new ApiError());
@@ -122,7 +129,7 @@ async function patchUserPassword(req, res, next) {
   try {
     const { error: bodyError } = validatePasswordSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { currentPassword, newPassword } = req.body;
@@ -130,7 +137,7 @@ async function patchUserPassword(req, res, next) {
 
     const result = await bcrypt.compare(currentPassword, user.password);
     if (!result) {
-      return next(new InvalidPasswordError());
+      throw (new InvalidPasswordError());
     }
 
     await user.update({
@@ -139,26 +146,37 @@ async function patchUserPassword(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function withdrawal(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { user } = req;
     const groupList = await user.getGroups();
     if (groupList != 0) {
-      return next(new BelongToGroupError());
+      throw (new BelongToGroupError());
     }
 
     const previousProfileImage = [user.profileImage];
-    await PersonalSchedule.destroy({ where: { userId: user.userId } });
-    await user.destroy();
+    await PersonalSchedule.destroy({ where: { userId: user.userId } }, { transaction });
+    await user.destroy({ transaction });
     await deleteBucketImage(previousProfileImage);
 
+    await transaction.commit();
     return res.status(204).json({ message: '성공적으로 탈퇴되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -201,7 +219,7 @@ async function patchUserSetUp(req, res, next) {
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: bodyError } = validateUserSettingSchema(req.body);
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { user } = req;
@@ -209,14 +227,17 @@ async function patchUserSetUp(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     await UserGroup.update(req.body, { where: { userId: user.userId, groupId } });
 
     return res.status(200).json({ message: '성공적으로 수정되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -224,7 +245,7 @@ async function patchIntroduction(req, res, next) {
   try {
     const { error: bodyError } = validateUserIntroductionSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { user } = req;
@@ -236,7 +257,10 @@ async function patchIntroduction(req, res, next) {
       introduction: modifiedUser.introduction,
     });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 

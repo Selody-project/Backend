@@ -2,6 +2,7 @@ const request = require('request');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const jwksClient = require('jwks-rsa');
+const { sequelize } = require('../models/index');
 
 // Model
 const User = require('../models/user');
@@ -11,7 +12,6 @@ const {
   ApiError, DataFormatError,
   DuplicateEmailError, DuplicateNicknameError,
   InvalidIdPasswordError, InvalidTokenError,
-  TokenExpireError,
 } = require('../errors');
 
 // Validator
@@ -55,9 +55,11 @@ function getKey(header, callback) {
 }
 
 async function getGoogleUserInfo(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { access_token: accessToken } = req.body;
-    if (!accessToken) throw new InvalidTokenError();
+    if (!accessToken) throw (new InvalidTokenError());
 
     jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
       if (err) {
@@ -66,79 +68,92 @@ async function getGoogleUserInfo(req, res, next) {
       const userEmail = decoded.email;
       const nickname = decoded.email.split('@')[0];
 
-      const user = await User.findOne({ where: { email: userEmail } });
-      if (!user) {
-        req.user = await User.create({
+      const [user, created] = await User.findCreateFind({
+        where: { email: userEmail },
+        defaults: {
           email: userEmail,
           nickname,
           provider: 'GOOGLE',
           profileImage: decoded.picture,
-        });
-      } else {
+        },
+        transaction,
+      });
+
+      if (!created) {
         user.profileImage = decoded.picture;
-        req.user = user;
       }
-      next();
+
+      await transaction.commit();
+      return next();
     });
   } catch (err) {
-    if (err.name === 'TokenExpireError') {
-      return next(new TokenExpireError());
-    }
-    if (err.name === 'InvalidTokenError') {
-      return next(new InvalidTokenError());
-    }
+    await transaction.rollback();
 
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function joinSocialUser(req, res, next) {
+  let transaction;
   try {
-    const user = await User.findOne({ where: { email: req.body.email } });
+    const user = await User.findOne({ where: { email: req.body.email }, transaction });
     if (!user) {
       const nickname = `naver-${req.body.id}`.slice(0, 15);
-      req.user = await User.create({
-        email: req.body.email,
-        nickname,
-        provider: 'NAVER',
-        snsId: req.body.id,
-        profileImage: req.body.profile_image,
+
+      const [createdUser] = await User.findCreateFind({
+        where: { email: req.body.email },
+        defaults: {
+          email: req.body.email,
+          nickname,
+          provider: 'NAVER',
+          snsId: req.body.id,
+          profileImage: req.body.profile_image,
+        },
+        transaction,
       });
+      req.user = createdUser;
     } else {
       user.profileImage = req.body.profile_image;
       req.user = user;
     }
-    next();
+
+    await transaction.commit();
+    return next();
   } catch (err) {
-    if (err.name === 'TokenExpireError') {
-      return next(new TokenExpireError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
     }
-    return next(new InvalidTokenError());
+    return next(err);
   }
 }
 
 async function join(req, res, next) {
-  const { error: bodyError } = validateJoinSchema(req.body);
-  if (bodyError) {
-    return next(new DataFormatError());
-  }
-
-  const { email, nickname, password } = req.body;
-
-  if (nickname) {
-    const user = await User.findOne({ where: { nickname } });
-    if (user) {
-      return next(new DuplicateNicknameError());
+  let transaction;
+  try {
+    const { error: bodyError } = validateJoinSchema(req.body);
+    if (bodyError) {
+      throw (new DataFormatError());
     }
-  }
-  if (email) {
-    const user = await User.findOne({ where: { email } });
-    if (user) {
-      return next(new DuplicateEmailError());
+
+    const { email, nickname, password } = req.body;
+    if (nickname) {
+      const user = await User.findOne({ where: { nickname } });
+      if (user) {
+        throw (new DuplicateNicknameError());
+      }
     }
-  }
-  if (email && nickname && password) {
-    try {
+    if (email) {
+      const user = await User.findOne({ where: { email } });
+      if (user) {
+        throw (new DuplicateEmailError());
+      }
+    }
+    if (email && nickname && password) {
       const hash = await bcrypt.hash(password, 12);
       req.user = await User.create({
         email,
@@ -148,11 +163,16 @@ async function join(req, res, next) {
       });
       req.nickname = nickname;
       return next();
-    } catch (err) {
+    }
+
+    return res.status(200).send({ message: '사용가능한 이메일/닉네임 입니다.' });
+  } catch (err) {
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
       return next(new ApiError());
     }
-  } else {
-    return res.status(200).send({ message: '사용가능한 이메일/닉네임 입니다.' });
+    return next(err);
   }
 }
 
@@ -160,14 +180,14 @@ async function login(req, res, next) {
   try {
     const { error: bodyError } = validateLoginSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { email, password } = req.body;
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return next(new InvalidIdPasswordError());
+      throw (new InvalidIdPasswordError());
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -176,9 +196,12 @@ async function login(req, res, next) {
       return next();
     }
 
-    return next(new InvalidIdPasswordError());
+    throw (new InvalidIdPasswordError());
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 

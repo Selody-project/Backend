@@ -35,7 +35,7 @@ async function getSingleGroupSchedule(req, res, next) {
   try {
     const { error: paramError } = validateGroupScheduleIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { schedule_id: scheduleId, group_id: groupId } = req.params;
@@ -46,17 +46,20 @@ async function getSingleGroupSchedule(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, schedule });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -65,7 +68,7 @@ async function getGroupSchedule(req, res, next) {
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: queryError } = validateScheduleDateSchema(req.query);
     if (paramError || queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -73,7 +76,7 @@ async function getGroupSchedule(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const { startDateTime, endDateTime } = req.query;
@@ -98,7 +101,10 @@ async function getGroupSchedule(req, res, next) {
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -107,7 +113,7 @@ async function getGroupScheduleSummary(req, res, next) {
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: queryError } = validateScheduleDateSchema(req.query);
     if (paramError || queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -115,7 +121,7 @@ async function getGroupScheduleSummary(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const { startDateTime, endDateTime } = req.query;
@@ -149,7 +155,10 @@ async function getGroupScheduleSummary(req, res, next) {
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, ...response });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -157,7 +166,7 @@ async function deleteGroupSchedule(req, res, next) {
   try {
     const { error: paramError } = validateGroupScheduleIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { schedule_id: scheduleId, group_id: groupId } = req.params;
@@ -168,23 +177,26 @@ async function deleteGroupSchedule(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     await schedule.destroy();
 
     return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -194,23 +206,23 @@ async function postScheduleProposal(req, res, next) {
     const { error: bodyError } = validateScheduleProposalSchema(req.body);
 
     if (paramError) {
-      return next(new DataFormatError(paramError.details[0].message));
+      throw (new DataFormatError(paramError.details[0].message));
     }
 
     if (bodyError) {
-      return next(new DataFormatError(bodyError.details[0].message));
+      throw (new DataFormatError(bodyError.details[0].message));
     }
 
     const { group_id: groupId } = req.params;
     const { user } = req;
     const group = await Group.findByPk(groupId);
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const {
@@ -236,7 +248,10 @@ async function postScheduleProposal(req, res, next) {
 
     return res.status(200).json(pendingSchedule);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -244,7 +259,7 @@ async function getScheduleProposal(req, res, next) {
   try {
     const { error: paramError } = validateScheduleProposalIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, proposal_id: proposalId } = req.params;
@@ -254,16 +269,19 @@ async function getScheduleProposal(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!pendingSchedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     return res.status(200).json(pendingSchedule);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -271,7 +289,7 @@ async function getScheduleProposalsList(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -295,11 +313,11 @@ async function getScheduleProposalsList(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!pendingSchedules) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const response = await Promise.all(pendingSchedules.map(async (pendingSchedule) => {
@@ -326,7 +344,10 @@ async function getScheduleProposalsList(req, res, next) {
     }));
     return res.status(200).json(response);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -334,7 +355,7 @@ async function deleteScheduleProposal(req, res, next) {
   try {
     const { error: paramError } = validateScheduleProposalIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, proposal_id: proposalId } = req.params;
@@ -349,17 +370,20 @@ async function deleteScheduleProposal(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!pendingSchedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     await pendingSchedule.destroy();
     return res.status(204).end();
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -368,7 +392,7 @@ async function postScheduleProposalVote(req, res, next) {
     const { error: paramError } = validateScheduleProposalIdSchema(req.params);
     const { error: bodyError } = validateVoteSchema(req.body);
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, proposal_id: proposalId } = req.params;
@@ -384,11 +408,11 @@ async function postScheduleProposalVote(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!pendingSchedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const { attendance } = req.body;
@@ -410,7 +434,10 @@ async function postScheduleProposalVote(req, res, next) {
 
     return res.status(200).end();
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -419,7 +446,7 @@ async function postScheduleProposalConfirm(req, res, next) {
     const { error: paramError } = validateScheduleProposalIdSchema(req.params);
     const { error: bodyError } = validateGroupScheduleConfirmSchema(req.body);
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, proposal_id: proposalId } = req.params;
@@ -435,16 +462,16 @@ async function postScheduleProposalConfirm(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!pendingSchedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const {
@@ -474,7 +501,10 @@ async function postScheduleProposalConfirm(req, res, next) {
 
     return res.status(201).json(response);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -484,7 +514,7 @@ async function getScheduleProposals(req, res, next) {
     const { error: queryError } = validateEventProposalSchema(req.query);
 
     if (paramError || queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -492,12 +522,12 @@ async function getScheduleProposals(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || accessLevel === 'regular') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const groupMembers = (await UserGroup.findAll({
@@ -534,7 +564,10 @@ async function getScheduleProposals(req, res, next) {
 
     return res.status(200).json(proposal);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
