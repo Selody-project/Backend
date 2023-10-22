@@ -20,7 +20,7 @@ async function postPersonalSchedule(req, res, next) {
   try {
     const { error: bodyError } = validateScheduleSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError(bodyError.details[0].message));
+      throw (new DataFormatError(bodyError.details[0].message));
     }
 
     const { user } = req;
@@ -48,7 +48,10 @@ async function postPersonalSchedule(req, res, next) {
 
     return res.status(201).json(response);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -56,7 +59,7 @@ async function getSingleUserSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { schedule_id: scheduleId } = req.params;
@@ -64,12 +67,15 @@ async function getSingleUserSchedule(req, res, next) {
     const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     return res.status(200).json(schedule);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -77,7 +83,7 @@ async function getUserPersonalSchedule(req, res, next) {
   try {
     const { error: queryError } = validateScheduleDateSchema(req.query);
     if (queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { user } = req;
@@ -108,7 +114,10 @@ async function getUserPersonalSchedule(req, res, next) {
     }
     return res.status(200).json(userSchedule);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -116,7 +125,7 @@ async function getUserPersonalScheduleSummary(req, res, next) {
   try {
     const { error: queryError } = validateScheduleDateSchema(req.query);
     if (queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { user } = req;
@@ -156,7 +165,10 @@ async function getUserPersonalScheduleSummary(req, res, next) {
     }
     return res.status(200).json(userSchedule);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -166,7 +178,7 @@ async function putPersonalSchedule(req, res, next) {
     const { error: bodyError } = validateScheduleSchema(req.body);
 
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { schedule_id: scheduleId } = req.params;
@@ -174,7 +186,7 @@ async function putPersonalSchedule(req, res, next) {
     const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
-      return next(new ScheduleNotFoundError());
+      throw (new ScheduleNotFoundError());
     }
 
     const {
@@ -201,7 +213,10 @@ async function putPersonalSchedule(req, res, next) {
 
     return res.status(201).json(response);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -209,7 +224,7 @@ async function deletePersonalSchedule(req, res, next) {
   try {
     const { error: paramError } = validateScheduleIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { schedule_id: scheduleId } = req.params;
@@ -217,14 +232,17 @@ async function deletePersonalSchedule(req, res, next) {
     const schedule = await PersonalSchedule.findOne({ where: { userId: user.userId, id: scheduleId } });
 
     if (!schedule) {
-      return next(new NotFoundError());
+      throw (new NotFoundError());
     }
 
     await schedule.destroy();
 
     return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 module.exports = {

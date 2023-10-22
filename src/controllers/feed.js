@@ -30,7 +30,9 @@ const {
 } = require('../utils/validators');
 
 async function postGroupPost(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     if (!req.body?.data) {
       throw (new DataFormatError());
     }
@@ -60,21 +62,24 @@ async function postGroupPost(req, res, next) {
     let post;
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      post = await Post.create({ author: req.nickname, content, image: fileUrl });
+      post = await Post.create({ author: req.nickname, content, image: fileUrl }, { transaction });
     } else {
-      post = await Post.create({ author: req.nickname, content });
+      post = await Post.create({ author: req.nickname, content }, { transaction });
     }
 
-    await user.addPosts(post);
-    await group.addPosts(post);
+    await user.addPosts(post, { transaction });
+    await group.addPosts(post, { transaction });
 
     const response = {
       ...{ message: '성공적으로 등록되었습니다.' },
       ...post.dataValues,
     };
+
+    await transaction.commit();
     return res.status(201).json(response);
   } catch (err) {
     await deleteBucketImage(req.fileUrl);
+    await transaction.rollback();
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -86,7 +91,7 @@ async function getSinglePost(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
@@ -97,11 +102,11 @@ async function getSinglePost(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
@@ -122,7 +127,10 @@ async function getSinglePost(req, res, next) {
       },
     });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -131,7 +139,7 @@ async function getGroupPosts(req, res, next) {
     const { error: paramError } = validateGroupIdSchema(req.params);
     const { error: queryError } = validateLastRecordIdSchema(req.query);
     if (paramError || queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -143,7 +151,7 @@ async function getGroupPosts(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const pageSize = 9;
@@ -183,12 +191,17 @@ async function getGroupPosts(req, res, next) {
     const accessLevel = await getAccessLevel(user, group);
     return res.status(200).json({ accessLevel, isEnd, feed });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function putGroupPost(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     if (!req.body?.data) {
       throw (new DataFormatError());
     }
@@ -205,7 +218,7 @@ async function putGroupPost(req, res, next) {
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findOne({ where: { groupId, postId } }),
+      Post.findOne({ where: { groupId, postId }, transaction }),
     ]);
 
     if (!group) {
@@ -227,18 +240,22 @@ async function putGroupPost(req, res, next) {
     let modifiedPost;
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      modifiedPost = await post.update({ content, image: fileUrl });
+      modifiedPost = await post.update({ content, image: fileUrl }, { transaction });
     } else {
-      modifiedPost = await post.update({ content, image: null });
+      modifiedPost = await post.update({ content, image: null }, { transaction });
     }
     await deleteBucketImage(previousPostImages);
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedPost.dataValues,
     };
+
+    await transaction.commit();
     return res.status(200).json(response);
   } catch (err) {
     await deleteBucketImage(req.fileUrl);
+    await transaction.rollback();
+
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -247,10 +264,13 @@ async function putGroupPost(req, res, next) {
 }
 
 async function deleteGroupPost(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
+
     const { error: paramError } = validatePostIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
@@ -261,24 +281,31 @@ async function deleteGroupPost(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, post))) {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
     const previousPostImage = post.image?.split(', ');
-    await post.destroy();
+    await post.destroy({ transaction });
 
     await deleteBucketImage(previousPostImage);
+
+    await transaction.commit();
     return res.status(204).end();
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -394,45 +421,54 @@ async function deleteGroupPostLike(req, res, next) {
 }
 
 async function postComment(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validatePostIdSchema(req.params);
     const { error: bodyError } = validateCommentSchema(req.body);
 
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findOne({ where: { groupId, postId } }),
+      Post.findOne({ where: { groupId, postId }, transaction }),
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const { content } = req.body;
-    const comment = await post.createComment({ content });
-    await user.addComments(comment);
+    const comment = await post.createComment({ content }, { transaction });
+    await user.addComments(comment, { transaction });
 
     const response = {
       ...{ message: '성공적으로 등록되었습니다.' },
       ...comment.dataValues,
     };
+
+    await transaction.commit();
     return res.status(201).json(response);
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -440,7 +476,7 @@ async function getSingleComment(req, res, next) {
   try {
     const { error: paramError } = validateCommentIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
@@ -452,15 +488,15 @@ async function getSingleComment(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     if (!comment) {
-      return next(new CommentNotFoundError());
+      throw (new CommentNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
@@ -468,7 +504,10 @@ async function getSingleComment(req, res, next) {
 
     return res.status(200).json({ accessLevel, comment });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -476,7 +515,7 @@ async function getPostComment(req, res, next) {
   try {
     const { error: paramError } = validatePostIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId } = req.params;
@@ -487,11 +526,11 @@ async function getPostComment(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
@@ -508,17 +547,22 @@ async function getPostComment(req, res, next) {
 
     return res.status(200).json({ accessLevel, comments });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function putComment(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateCommentIdSchema(req.params);
     const { error: bodyError } = validateCommentSchema(req.body);
 
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
@@ -526,43 +570,51 @@ async function putComment(req, res, next) {
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
       Post.findOne({ where: { groupId, postId } }),
-      Comment.findOne({ where: { postId, commentId } }),
+      Comment.findOne({ where: { postId, commentId }, transaction }),
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     if (!comment) {
-      return next(new CommentNotFoundError());
+      throw (new CommentNotFoundError());
     }
 
     if (!isMine(user, comment)) {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const { content } = req.body;
-    const modifiedComment = await comment.update({ content });
+    const modifiedComment = await comment.update({ content }, { transaction });
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedComment.dataValues,
     };
 
+    await transaction.commit();
     return res.status(200).json(response);
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function deleteComment(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateCommentIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, post_id: postId, comment_id: commentId } = req.params;
@@ -570,31 +622,37 @@ async function deleteComment(req, res, next) {
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
       Post.findOne({ where: { groupId, postId } }),
-      Comment.findOne({ where: { postId, commentId } }),
+      Comment.findOne({ where: { postId, commentId }, transaction }),
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!post) {
-      return next(new PostNotFoundError());
+      throw (new PostNotFoundError());
     }
 
     if (!comment) {
-      return next(new CommentNotFoundError());
+      throw (new CommentNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'viewer' || (accessLevel === 'regular' && !isMine(user, comment))) {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
-    await comment.destroy();
+    await comment.destroy({ transaction });
 
+    await transaction.commit();
     return res.status(204).end();
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -602,7 +660,7 @@ async function getUserFeed(req, res, next) {
   try {
     const { error: queryError } = validateLastRecordIdSchema(req.query);
     if (queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { user } = req;
@@ -661,7 +719,10 @@ async function getUserFeed(req, res, next) {
 
     return res.status(200).json({ isEnd, feed });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 

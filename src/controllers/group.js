@@ -2,6 +2,7 @@ const { Sequelize } = require('sequelize');
 
 const { Op } = Sequelize;
 const { deleteBucketImage } = require('../middleware/s3');
+const { sequelize } = require('../models/index');
 
 const maxGroupCount = 50;
 
@@ -30,7 +31,9 @@ const {
 const { getAccessLevel } = require('../utils/accessLevel');
 
 async function postGroup(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     if (!req.body?.data) {
       throw (new DataFormatError());
     }
@@ -38,7 +41,7 @@ async function postGroup(req, res, next) {
 
     const { error: bodyError } = validateGroupSchema(req.body);
     if (bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { name, description } = req.body;
@@ -46,7 +49,7 @@ async function postGroup(req, res, next) {
 
     const groupCount = await user.countGroups();
     if (groupCount >= maxGroupCount) {
-      return next(new ExceedGroupCountError());
+      throw (new ExceedGroupCountError());
     }
 
     let group;
@@ -54,23 +57,26 @@ async function postGroup(req, res, next) {
       const fileUrl = req.fileUrl.join(', ');
       group = await Group.create({
         name, description, member: 1, leader: user.userId, image: fileUrl,
-      });
+      }, { transaction });
     } else {
       group = await Group.create({
         name, description, member: 1, leader: user.userId, image: process.env.DEFAULT_GROUP_IMAGE,
-      });
+      }, { transaction });
     }
 
-    await user.addGroup(group, { through: { accessLevel: 'owner' } });
+    await user.addGroup(group, { through: { accessLevel: 'owner' }, transaction });
 
     const response = {
       ...{ message: '성공적으로 생성되었습니다.' },
       ...group.dataValues,
     };
 
+    await transaction.commit();
     return res.status(200).json(response);
   } catch (err) {
+    await transaction.rollback();
     await deleteBucketImage(req.fileUrl);
+
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -82,7 +88,7 @@ async function getGroupDetail(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -90,7 +96,7 @@ async function getGroupDetail(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     group.dataValues.feedCount = await Post.count({ where: { groupId } });
@@ -114,7 +120,10 @@ async function getGroupDetail(req, res, next) {
     const response = { accessLevel, information: { group, leaderInfo, memberInfo } };
     return res.status(200).json(response);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -122,7 +131,7 @@ async function getGroupList(req, res, next) {
   try {
     const { error: queryError } = validateLastRecordIdSchema(req.query);
     if (queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     let { last_record_id: lastRecordId } = req.query;
@@ -153,12 +162,17 @@ async function getGroupList(req, res, next) {
     }));
     return res.status(200).json({ isEnd, groups });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function putGroup(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     if (!req.body?.data) {
       throw (new DataFormatError());
     }
@@ -187,19 +201,23 @@ async function putGroup(req, res, next) {
     let modifiedGroup;
     if (req.fileUrl !== null) {
       const fileUrl = req.fileUrl.join(', ');
-      modifiedGroup = await group.update({ name, description, image: fileUrl });
+      modifiedGroup = await group.update({ name, description, image: fileUrl }, { transaction });
       await deleteBucketImage(previousGroupImage);
     } else {
-      modifiedGroup = await group.update({ name, description });
+      modifiedGroup = await group.update({ name, description }, { transaction });
     }
 
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedGroup.dataValues,
     };
+
+    await transaction.commit();
     return res.status(200).json(response);
   } catch (err) {
+    await transaction.rollback();
     await deleteBucketImage(req.fileUrl);
+
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -208,10 +226,12 @@ async function putGroup(req, res, next) {
 }
 
 async function deleteGroup(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -219,28 +239,37 @@ async function deleteGroup(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
     const previousGroupImage = [group.image];
-    await group.destroy();
+    await group.destroy({ transaction });
     await deleteBucketImage(previousGroupImage);
+
+    await transaction.commit();
     return res.status(204).json({ message: '성공적으로 삭제되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function deleteGroupUser(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -248,12 +277,12 @@ async function deleteGroupUser(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel === 'owner') {
-      return next(new UserIsLeaderError());
+      throw (new UserIsLeaderError());
     }
 
     await UserGroup.destroy({
@@ -261,13 +290,20 @@ async function deleteGroupUser(req, res, next) {
         userId: user.userId,
         groupId,
       },
+      transaction,
     });
 
-    await group.update({ member: group.member - 1 });
+    await group.update({ member: group.member - 1 }, { transaction });
 
+    await transaction.commit();
     return res.status(204).json({ message: '성공적으로 추방하였습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -275,14 +311,14 @@ async function getGroupMembers(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const members = await group.getUsers({
@@ -307,7 +343,10 @@ async function getGroupMembers(req, res, next) {
 
     return res.status(200).json(parsedMembers);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -315,14 +354,14 @@ async function getPendingMembers(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const members = await group.getUsers({
@@ -346,15 +385,20 @@ async function getPendingMembers(req, res, next) {
     const parsedMembers = await Promise.all(promises);
     return res.status(200).json(parsedMembers);
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function postGroupJoinRequest(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -362,12 +406,12 @@ async function postGroupJoinRequest(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const groupCount = await user.countGroups();
     if (groupCount >= maxGroupCount) {
-      return next(new ExceedGroupCountError());
+      throw (new ExceedGroupCountError());
     }
 
     const userBelongGroup = await UserGroup.findOne({
@@ -378,22 +422,30 @@ async function postGroupJoinRequest(req, res, next) {
     });
 
     if (userBelongGroup) {
-      return next(new InvalidGroupJoinError());
+      throw (new InvalidGroupJoinError());
     }
 
-    await group.addUser(user, { through: { isPendingMember: 1 } });
+    await group.addUser(user, { through: { isPendingMember: 1 }, transaction });
 
+    await transaction.commit();
     return res.status(200).json({ message: '성공적으로 신청되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function postGroupJoinApprove(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupJoinRequestSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, user_id: applicantId } = req.params;
@@ -404,32 +456,40 @@ async function postGroupJoinApprove(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!applicant) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
-    await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId } });
-    await group.update({ member: (group.member + 1) });
+    await UserGroup.update({ isPendingMember: 0 }, { where: { userId: applicantId }, transaction });
+    await group.update({ member: (group.member + 1) }, { transaction });
 
+    await transaction.commit();
     return res.status(200).json({ message: '성공적으로 수락하였습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function postGroupJoinReject(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupJoinRequestSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, user_id: applicantId } = req.params;
@@ -440,23 +500,29 @@ async function postGroupJoinReject(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!applicant) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
-    await UserGroup.destroy({ where: { userId: applicantId } });
+    await UserGroup.destroy({ where: { userId: applicantId }, transaction });
 
+    await transaction.commit();
     return res.status(200).json({ message: '성공적으로 거절하였습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -464,7 +530,7 @@ async function getInviteLink(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -472,12 +538,12 @@ async function getInviteLink(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel == 'viewer') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
     return res.status(200).json({
@@ -485,7 +551,10 @@ async function getInviteLink(req, res, next) {
       exp: group.inviteExp,
     });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -493,7 +562,7 @@ async function postInviteLink(req, res, next) {
   try {
     const { error: paramError } = validateGroupIdSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId } = req.params;
@@ -501,12 +570,12 @@ async function postInviteLink(req, res, next) {
     const group = await Group.findByPk(groupId);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel == 'viewer') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -526,16 +595,19 @@ async function postInviteLink(req, res, next) {
         break;
       }
     }
-
     const inviteExp = new Date();
     inviteExp.setDate(new Date().getDate() + 1);
     await group.update({ inviteCode, inviteExp });
+
     return res.status(200).json({
       inviteCode,
       exp: inviteExp,
     });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -543,18 +615,18 @@ async function getGroupPreviewWithInviteCode(req, res, next) {
   try {
     const { error: paramError } = validateGroupInviteCodeSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { inviteCode } = req.params;
     const group = await Group.findOne({ where: { inviteCode } });
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
+      throw (new ExpiredCodeError());
     }
 
     return res.status(200).json({
@@ -565,15 +637,20 @@ async function getGroupPreviewWithInviteCode(req, res, next) {
       image: group.image,
     });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function postJoinGroupWithInviteCode(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupJoinInviteCodeSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, inviteCode } = req.params;
@@ -581,36 +658,45 @@ async function postJoinGroupWithInviteCode(req, res, next) {
     const group = await Group.findOne({ where: { inviteCode, groupId } });
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
     if (group.inviteExp < new Date()) {
-      return next(new ExpiredCodeError());
+      throw (new ExpiredCodeError());
     }
-    const userGroup = await UserGroup.findOne({ where: { userId: user.userId, groupId: group.groupId } });
+    const userGroup = await UserGroup.findOne({ where: { userId: user.userId, groupId: group.groupId }, transaction });
     if (userGroup?.isPendingMember === 0) {
-      return next(new InvalidGroupJoinError());
+      throw (new InvalidGroupJoinError());
     }
     if (userGroup?.isPendingMember === 1) {
-      await userGroup.update({ isPendingMember: 1 });
+      await userGroup.update({ isPendingMember: 1 }, { transaction });
     } else {
       const groupCount = await user.countGroups();
       if (groupCount >= maxGroupCount) {
-        return next(new ExceedGroupCountError());
+        throw (new ExceedGroupCountError());
       }
-      await user.addGroup(group);
-      await group.update({ member: (group.member + 1) });
+      await user.addGroup(group, { transaction });
+      await group.update({ member: (group.member + 1) }, { transaction });
     }
+
+    await transaction.commit();
     return res.status(200).json({ message: '성공적으로 가입되었습니다.' });
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
 async function deleteGroupMember(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupJoinRequestSchema(req.params);
     if (paramError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, user_id: userId } = req.params;
@@ -622,29 +708,35 @@ async function deleteGroupMember(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
 
     if (!member) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     const accessLevel = await getAccessLevel(user, group);
     if (accessLevel !== 'owner') {
-      return next(new UnauthorizedError());
+      throw (new UnauthorizedError());
     }
 
     const memberAccessLevel = await getAccessLevel(member, group);
     if (memberAccessLevel === 'owner' || memberAccessLevel === 'admin') {
-      return next(new NoBanPermission());
+      throw (new NoBanPermission());
     }
 
-    await group.removeUser(member);
-    await group.update({ member: (group.member - 1) });
+    await group.removeUser(member, { transaction });
+    await group.update({ member: (group.member - 1) }, { transaction });
 
+    await transaction.commit();
     return res.status(204).end();
   } catch (err) {
-    return next(new ApiError());
+    await transaction.rollback();
+
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -652,7 +744,7 @@ async function searchGroup(req, res, next) {
   try {
     const { error: queryError } = validateGroupdSearchKeyword(req.query);
     if (queryError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { keyword } = req.query;
@@ -691,7 +783,10 @@ async function searchGroup(req, res, next) {
 
     return res.status(200).json({ isEnd, groups });
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
@@ -700,7 +795,7 @@ async function patchUserAccessLevel(req, res, next) {
     const { error: paramError } = validateGroupMemberSchema(req.params);
     const { error: bodyError } = validateAccessLevelSchema(req.body);
     if (paramError || bodyError) {
-      return next(new DataFormatError());
+      throw (new DataFormatError());
     }
 
     const { group_id: groupId, user_id: userId } = req.params;
@@ -725,15 +820,15 @@ async function patchUserAccessLevel(req, res, next) {
     ]);
 
     if (!group) {
-      return next(new GroupNotFoundError());
+      throw (new GroupNotFoundError());
     }
     if (!member) {
-      return next(new UserNotFoundError());
+      throw (new UserNotFoundError());
     }
 
     const userAccessLevel = await getAccessLevel(user, group);
     if (userAccessLevel !== 'owner') {
-      return next(new EditPermissionError());
+      throw (new EditPermissionError());
     }
 
     const { access_level: accessLevel } = req.body;
@@ -745,7 +840,10 @@ async function patchUserAccessLevel(req, res, next) {
 
     return res.status(204).end();
   } catch (err) {
-    return next(new ApiError());
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
   }
 }
 
