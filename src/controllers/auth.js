@@ -99,6 +99,7 @@ async function getGoogleUserInfo(req, res, next) {
 async function joinSocialUser(req, res, next) {
   let transaction;
   try {
+    transaction = await sequelize.transaction();
     const user = await User.findOne({ where: { email: req.body.email }, transaction });
     if (!user) {
       const nickname = `naver-${req.body.id}`.slice(0, 15);
@@ -135,6 +136,7 @@ async function joinSocialUser(req, res, next) {
 async function join(req, res, next) {
   let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: bodyError } = validateJoinSchema(req.body);
     if (bodyError) {
       throw (new DataFormatError());
@@ -162,6 +164,7 @@ async function join(req, res, next) {
         provider: 'local',
       });
       req.nickname = nickname;
+      await transaction.commit();
       return next();
     }
 
