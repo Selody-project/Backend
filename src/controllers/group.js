@@ -791,7 +791,9 @@ async function searchGroup(req, res, next) {
 }
 
 async function patchUserAccessLevel(req, res, next) {
+  let transaction;
   try {
+    transaction = await sequelize.transaction();
     const { error: paramError } = validateGroupMemberSchema(req.params);
     const { error: bodyError } = validateAccessLevelSchema(req.body);
     if (paramError || bodyError) {
@@ -832,14 +834,21 @@ async function patchUserAccessLevel(req, res, next) {
     }
 
     const { access_level: accessLevel } = req.body;
+    if (accessLevel === 'owner') {
+      user.accessLevel = 'regular';
+      await user.save({ transaction });
+    }
     const userGroup = member.UserGroups[0];
     if (userGroup) {
       userGroup.accessLevel = accessLevel;
-      await userGroup.save();
+      await userGroup.save({ transaction });
     }
 
+    await transaction.commit();
     return res.status(204).end();
   } catch (err) {
+    await transaction.rollback();
+
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
