@@ -113,9 +113,9 @@ async function getGroupDetail(req, res, next) {
     })).forEach((member) => {
       const { userId, nickname } = member.dataValues;
       if (userId === group.leader) {
-        leaderInfo = { userId, nickname };
+        leaderInfo = { userId, nickname, image: member.profileImage };
       }
-      memberInfo.push({ userId, nickname });
+      memberInfo.push({ userId, nickname, image: member.profileImage });
     });
     const response = { accessLevel, information: { group, leaderInfo, memberInfo } };
     return res.status(200).json(response);
@@ -335,6 +335,7 @@ async function getGroupMembers(req, res, next) {
         member: {
           nickname: member.nickname,
           userId: member.userId,
+          image: member.profileImage,
           isPendingMember: member.UserGroup.isPendingMember,
         },
       };
@@ -378,6 +379,7 @@ async function getPendingMembers(req, res, next) {
         member: {
           nickname: member.nickname,
           userId: member.userId,
+          image: member.profileImage,
           isPendingMember: member.UserGroup.isPendingMember,
         },
       };
@@ -420,12 +422,16 @@ async function postGroupJoinRequest(req, res, next) {
         groupId: group.groupId,
       },
     });
-
-    if (userBelongGroup) {
+    if (!userBelongGroup) {
+      await group.addUser(user, { through: { isPendingMember: 1 }, transaction });
+    } else if (userBelongGroup.isPendingMember === 0) {
       throw (new InvalidGroupJoinError());
-    }
+    } else {
+      await userBelongGroup.destroy({ transaction });
 
-    await group.addUser(user, { through: { isPendingMember: 1 }, transaction });
+      await transaction.commit();
+      return res.status(200).json({ message: '성공적으로 취소되었습니다.' });
+    }
 
     await transaction.commit();
     return res.status(200).json({ message: '성공적으로 신청되었습니다.' });

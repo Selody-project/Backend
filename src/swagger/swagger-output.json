@@ -500,16 +500,19 @@
                         },
                         "leaderInfo": {
                           "userId": "유저 식별자",
-                          "nickname": "유저 닉네임"
+                          "nickname": "유저 닉네임",
+                          "image": "유저 프로필 이미지"
                         },
                         "memberInfo": [
                           {
                             "userId": "유저 식별자",
-                            "nickname": "유저 닉네임"
+                            "nickname": "유저 닉네임",
+                            "image": "유저 프로필 이미지"
                           },
                           {
                             "userId": "유저 식별자",
-                            "nickname": "유저 닉네임"
+                            "nickname": "유저 닉네임",
+                            "image": "유저 프로필 이미지"
                           }
                         ]
                       }
@@ -666,6 +669,7 @@
                         "member": {
                           "userId": "유저 식별자",
                           "nickname": "유저 닉네임",
+                          "image": "유저 프로필 이미지",
                           "isPendingMember": 0
                         }
                       },
@@ -674,6 +678,7 @@
                         "member": { 
                           "userId": "유저 식별자",
                           "nickname": "유저 닉네임",
+                          "image": "유저 프로필 이미지",
                           "isPendingMember": 0
                         }
                       }
@@ -724,6 +729,7 @@
                         "member": {
                           "userId": "유저 식별자",
                           "nickname": "유저 닉네임",
+                          "image": "유저 프로필 이미지",
                           "isPendingMember": 1
                         }
                       },
@@ -732,6 +738,7 @@
                         "member": {
                           "userId": "유저 식별자",
                           "nickname": "유저 닉네임",
+                          "image": "유저 프로필 이미지",
                           "isPendingMember": 1
                         }
                       }
@@ -756,8 +763,8 @@
         }
       },
       "post": {
-        "description": "",
-        "summary": "그룹 가입 신청",
+        "description": "이미 가입 신청이 되어 있는 경우에는 api 호출 시, 신청이 취소됩니다.",
+        "summary": "그룹 가입 신청 또는 취소",
         "tags": ["Group"],
         "parameters": [
           {
