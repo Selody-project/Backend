@@ -142,15 +142,18 @@ describe('Test /api/group endpoints', () => {
           leaderInfo: {
             nickname: 'test-user1',
             userId: 1,
+            image: 'profileImageLink',
           },
           memberInfo: [
             {
               nickname: 'test-user1',
               userId: 1,
+              image: 'profileImageLink',
             },
             {
               nickname: 'test-user2',
               userId: 2,
+              image: 'profileImageLink',
             },
           ],
         },
@@ -819,8 +822,13 @@ describe('Test /api/group endpoints', () => {
   describe('Test POST /api/group/:group_id/members/request', () => {
     it('Successfully completed the application for registration.  ', async () => {
       const groupId = 4;
-      const res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
+      let res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
+      expect(res.body).toEqual({ message: '성공적으로 신청되었습니다.' });
       expect(res.status).toEqual(200);
+      
+      res = (await request(app).post(`/api/group/${groupId}/members/request`).set('Cookie', cookie));
+      expect(res.body).toEqual({ message: '성공적으로 취소되었습니다.' });
+      expect(res.status).toEqual(200); 
     });
 
     it('Successfully failed to complete the application for registration. (Group Not Found) ', async () => {
@@ -1525,13 +1533,13 @@ describe('Test /api/group endpoints', () => {
         {
           accessLevel: 'owner',
           member: {
-            isPendingMember: 0, nickname: 'test-user1', userId: 1,
+            isPendingMember: 0, nickname: 'test-user1', userId: 1, image: 'profileImageLink',
           },
         },
         {
           accessLevel: 'admin',
           member: {
-            isPendingMember: 0, nickname: 'test-user2', userId: 2,
+            isPendingMember: 0, nickname: 'test-user2', userId: 2, image: 'profileImageLink',
           },
         },
       ];
@@ -1562,7 +1570,7 @@ describe('Test /api/group endpoints', () => {
         {
           accessLevel: 'viewer',
           member: {
-            isPendingMember: 1, nickname: 'test-user5', userId: 5,
+            isPendingMember: 1, nickname: 'test-user5', userId: 5, image: 'profileImageLink',
           },
         },
       ];
