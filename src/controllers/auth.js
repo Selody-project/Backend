@@ -1,7 +1,5 @@
 const request = require('request');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const jwksClient = require('jwks-rsa');
 const { sequelize } = require('../models/index');
 
 // Model
@@ -42,53 +40,71 @@ async function getNaverUserInfo(req, res, next) {
   }
 }
 
-// Google 로그인 토큰 파싱
-const client = jwksClient({
-  jwksUri: 'https://www.googleapis.com/oauth2/v3/certs',
-});
-
-function getKey(header, callback) {
-  client.getSigningKey(header.kid, (err, key) => {
-    const signingKey = key.publicKey || key.rsaPublicKey;
-    callback(null, signingKey);
-  });
-}
-
 async function getGoogleUserInfo(req, res, next) {
-  let transaction;
   try {
-    transaction = await sequelize.transaction();
     const { access_token: accessToken } = req.body;
     if (!accessToken) throw (new InvalidTokenError());
 
-    jwt.verify(accessToken, getKey, { algorithms: ['RS256'] }, async (err, decoded) => {
-      if (err) {
-        return res.status(401).json({ message: '토큰이 유효하지 않습니다.' });
+    // 사용자 정보 요청
+    const userInfoURL = 'https://www.googleapis.com/oauth2/v3/userinfo';
+
+    const userInfoOptions = {
+      url: userInfoURL,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    let userInfo;
+    request(userInfoOptions, async (error, response, body) => {
+      if (error) {
+        console.error(error);
+        res.status(500).send('Error');
+      } else {
+        userInfo = JSON.parse(body);
+
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const codeLength = 12;
+        let randomString = '';
+        let duplicate = null;
+
+        while (true) {
+          randomString = '';
+          for (let i = 0; i < codeLength; i += 1) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            randomString += characters.charAt(randomIndex);
+          }
+          // eslint-disable-next-line no-await-in-loop
+          duplicate = await User.findOne({ where: { nickname: `google-${randomString}}` } });
+          if (!duplicate) {
+            break;
+          }
+        }
+
+        const { email } = userInfo;
+        const name = `google-${randomString}`;
+        const { picture } = userInfo;
+        const { sub } = userInfo;
+
+        const [user, created] = await User.findCreateFind({
+          where: { email },
+          defaults: {
+            email,
+            nickname: name,
+            provider: 'GOOGLE',
+            snsId: sub,
+            profileImage: picture,
+          },
+        });
+
+        if (!created) {
+          user.profileImage = picture;
+        }
+        req.user = user;
+        return next();
       }
-      const userEmail = decoded.email;
-      const nickname = decoded.email.split('@')[0];
-
-      const [user, created] = await User.findCreateFind({
-        where: { email: userEmail },
-        defaults: {
-          email: userEmail,
-          nickname,
-          provider: 'GOOGLE',
-          profileImage: decoded.picture,
-        },
-        transaction,
-      });
-
-      if (!created) {
-        user.profileImage = decoded.picture;
-      }
-
-      await transaction.commit();
-      return next();
     });
   } catch (err) {
-    await transaction.rollback();
-
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -96,31 +112,45 @@ async function getGoogleUserInfo(req, res, next) {
   }
 }
 
-async function joinSocialUser(req, res, next) {
+async function joinNaverUser(req, res, next) {
   let transaction;
   try {
     transaction = await sequelize.transaction();
-    const user = await User.findOne({ where: { email: req.body.email }, transaction });
-    if (!user) {
-      const nickname = `naver-${req.body.id}`.slice(0, 15);
 
-      const [createdUser] = await User.findCreateFind({
-        where: { email: req.body.email },
-        defaults: {
-          email: req.body.email,
-          nickname,
-          provider: 'NAVER',
-          snsId: req.body.id,
-          profileImage: req.body.profile_image,
-        },
-        transaction,
-      });
-      req.user = createdUser;
-    } else {
-      user.profileImage = req.body.profile_image;
-      req.user = user;
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const codeLength = 12;
+    let randomString = '';
+    let duplicate = null;
+
+    while (true) {
+      randomString = '';
+      for (let i = 0; i < codeLength; i += 1) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        randomString += characters.charAt(randomIndex);
+      }
+      // eslint-disable-next-line no-await-in-loop
+      duplicate = await User.findOne({ where: { nickname: `naver-${randomString}}` } });
+      if (!duplicate) {
+        break;
+      }
     }
+    const nickname = `naver-${randomString}`;
 
+    const [user, created] = await User.findCreateFind({
+      where: { email: req.body.email },
+      defaults: {
+        email: req.body.email,
+        nickname,
+        provider: 'NAVER',
+        snsId: req.body.id,
+        profileImage: req.body.profile_image,
+      },
+      transaction,
+    });
+    if (!created) {
+      user.profileImage = req.body.profile_image;
+    }
+    req.user = user;
     await transaction.commit();
     return next();
   } catch (err) {
@@ -162,7 +192,7 @@ async function join(req, res, next) {
         nickname,
         password: hash,
         provider: 'local',
-      });
+      }, { transaction });
       req.nickname = nickname;
       await transaction.commit();
       return next();
@@ -218,9 +248,9 @@ async function logout(req, res, next) {
 
 module.exports = {
   getNaverUserInfo,
+  joinNaverUser,
   getGoogleUserInfo,
   join,
   login,
   logout,
-  joinSocialUser,
 };
