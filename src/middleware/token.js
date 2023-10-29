@@ -60,7 +60,8 @@ async function createToken(req, res, next) {
       postCount,
       groupCount,
     });
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return next(new ApiError());
   }
 }
@@ -79,7 +80,7 @@ async function verifyToken(req, res, next) {
       return next(new UserNotFoundError());
     }
     req.user = user;
-    next();
+    return next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
       return next(new TokenExpireError());
