@@ -7,12 +7,13 @@ const {
   ApiError, FileTooLargeError, ImageLimitExceededError,
 } = require('../errors');
 
+// 파일명에서 특수 문자와 유니코드 문자 제거
 function sanitizeFileName(fileName) {
-  // 파일명에서 특수 문자와 유니코드 문자 제거
   const sanitized = fileName.replace(/[^\w\d.-]/g, '_');
   return sanitized;
 }
 
+// 버킷 연결 설정
 const s3Config = {
   region: process.env.AWS_REGION,
   credentials: {
@@ -23,12 +24,14 @@ const s3Config = {
 
 const s3Client = new S3Client(s3Config);
 
+// 버킷 파일 url로부터 파일 경로 추출
 function getFilePathFromUrl(fileUrl) {
   const urlParts = fileUrl.split('/');
   const filePath = urlParts.slice(3).join('/');
   return filePath;
 }
 
+// 프로필 이미지 업로드 미들웨어
 async function uploadProfileMiddleware(req, res, next) {
   try {
     // 이미지 파일이 없으면 미들웨어를 바로 종료
@@ -71,6 +74,7 @@ async function uploadProfileMiddleware(req, res, next) {
   }
 }
 
+// 그룹 이미지 업로드 미들웨어
 async function uploadGroupMiddleware(req, res, next) {
   try {
     // 이미지 파일이 없으면 미들웨어를 바로 종료
@@ -112,6 +116,7 @@ async function uploadGroupMiddleware(req, res, next) {
   }
 }
 
+// 피드 이미지 업로드 미들웨어
 async function uploadPostMiddleware(req, res, next) {
   try {
     // 이미지 파일이 없으면 미들웨어를 바로 종료
@@ -163,6 +168,7 @@ async function uploadPostMiddleware(req, res, next) {
   }
 }
 
+// 버킷 이미지 삭제 미들웨어
 async function deleteBucketImage(fileUrls) {
   try {
     if (fileUrls !== null && fileUrls !== undefined && fileUrls.length !== 0) {

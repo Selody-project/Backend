@@ -17,6 +17,7 @@ const apiError = require('./middleware/apiError');
 const indexRouter = require('./routes');
 const { sequelize } = require('./models');
 
+// 서버의 TimeZone은 UTC로 고정됩니다.
 process.env.TZ = 'Etc/Universal';
 const appUrl = config.APP_URL;
 const port = config.PORT || 8000;
@@ -25,6 +26,8 @@ const app = express();
 
 app.use(fileUpload());
 
+// 현재 /api 이하의 api에 대한 호출 횟수를 분당 200회로 제한하고 있습니다.
+// 임시로 처리해둔 값입니다.
 app.use('/api/', rateLimit({
   windowMs: 1 * 60 * 1000,
   max: 200,

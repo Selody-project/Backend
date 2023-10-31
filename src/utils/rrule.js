@@ -3,6 +3,7 @@ const {
   RRule,
 } = require('rrule');
 
+// rrule 패키지를 사용하기 위해, 반복 정보를 RRule 객체로 바꿔줌.
 function getRRuleFreq(freq) {
   const RRuleFreq = {
     DAILY: RRule.DAILY,
@@ -14,6 +15,7 @@ function getRRuleFreq(freq) {
   return RRuleFreq[freq];
 }
 
+// rrule 패키지를 사용하기 위해, 요일 반복 정보를 RRule 객체로 바꿔줌.
 function getRRuleByWeekDay(byweekday) {
   if (!byweekday) {
     return [];
@@ -36,6 +38,9 @@ function getRRuleByWeekDay(byweekday) {
   return arr.map((str) => RRuleWeekDay[str]);
 }
 
+// 일정 생성, 수정 시, 해당 일정이 오늘일정, 다가오는 7일 이내에 속하는 일정인지를 판별
+// 해당 값을 정리하여 response에 담아서 전달.
+// 이 메소드는 일정 생성, 수정 컨트롤러에서 사용됩니다.
 async function getScheduleResponse(requestStartDateTime, requestEndDateTime, scheduleData, isGroup = false) {
   const schedule = { ...scheduleData };
   const requestStart = moment.utc(requestStartDateTime).toDate();

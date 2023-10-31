@@ -1269,6 +1269,7 @@
                   "successExample": {
                     "value": {
                       "accessLevel": "viewer, regular, admin, owner와 같은 접근 권한을 리턴",
+                      "earliestDate": "가장 빠른 일정 시간",
                       "schedules": [
                         {
                           "id": "일정 식별자",
