@@ -206,6 +206,10 @@ const groupSchedultConfirmSchema = Joi.object({
   requestEndDateTime: Joi.date().required(),
 });
 
+const groupPublicSchema = Joi.object({
+  isPublicGroup: Joi.boolean().allow(1, 0, true, false).required(),
+});
+
 module.exports = {
   validateLoginSchema: validator(loginSchema),
   validateJoinSchema: validator(joinSchema),
@@ -238,4 +242,5 @@ module.exports = {
   validateScheduleProposalIdSchema: validator(scheduleProposalIdSchema),
   validateVoteSchema: validator(voteSchema),
   validateGroupScheduleConfirmSchema: validator(groupSchedultConfirmSchema),
+  validateGroupPublicSchema: validator(groupPublicSchema),
 };

@@ -985,6 +985,7 @@ describe('Test /api/group endpoints', () => {
         author: 'test-user1',
         content: 'testContent',
         image: null,
+        authorImage: 'profileImageLink',
         message: '성공적으로 등록되었습니다.',
         postId: 12,
       };
@@ -1022,6 +1023,7 @@ describe('Test /api/group endpoints', () => {
       const res = await request(app).put(`/api/group/${groupId}/post/${postId}`).set('Cookie', cookie).field('data', data);
       const expectedResult = {
         author: 'test-user1',
+        authorImage: 'profileImageLink',
         content: 'modified-content',
         groupId: 1,
         image: null,
@@ -1124,6 +1126,7 @@ describe('Test /api/group endpoints', () => {
         accessLevel: 'owner',
         post: {
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content1',
           isMine: true,
           isLiked: false,
@@ -1174,28 +1177,28 @@ describe('Test /api/group endpoints', () => {
         isEnd: true,
         feed: [
           {
-            postId: 1, author: 'test-user1', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
+            postId: 1, author: 'test-user1', authorImage: 'profileImageLink', content: 'test-content1', isMine: true, isLiked: false, likesCount: 0, commentCount: 4, image: 'postImage',
           },
           {
-            postId: 2, author: 'test-user2', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
+            postId: 2, author: 'test-user2', authorImage: 'profileImageLink', content: 'test-content2', isMine: false, isLiked: true, likesCount: 2, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 3, author: 'test-user1', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
+            postId: 3, author: 'test-user1', authorImage: 'profileImageLink', content: 'test-content3', isMine: true, isLiked: true, likesCount: 1, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 4, author: 'test-user1', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 4, author: 'test-user1', authorImage: 'profileImageLink', content: 'test-content4', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 5, author: 'test-user1', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 5, author: 'test-user1', authorImage: 'profileImageLink', content: 'test-content5', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 7, author: 'test-user2', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 7, author: 'test-user2', authorImage: 'profileImageLink', content: 'test-content7', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 8, author: 'test-user2', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 8, author: 'test-user2', authorImage: 'profileImageLink', content: 'test-content8', isMine: false, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
           {
-            postId: 10, author: 'test-user1', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
+            postId: 10, author: 'test-user1', authorImage: 'profileImageLink', content: 'test-content10', isMine: true, isLiked: false, likesCount: 0, commentCount: 0, image: 'postImage',
           },
         ],
       };
@@ -1209,6 +1212,7 @@ describe('Test /api/group endpoints', () => {
           likesCount: post.likesCount,
           commentCount: post.commentCount,
           author: post.author,
+          authorImage: post.authorImage,
           content: post.content,
           image: post.image,
         });
@@ -1296,6 +1300,8 @@ describe('Test /api/group endpoints', () => {
       const expectedResult = {
         commentId: 5,
         content: 'testComment',
+        author: 'test-user1',
+        authorImage: 'profileImageLink',
         depth: 0,
         message: '성공적으로 등록되었습니다.',
         postId: 1,
@@ -1352,6 +1358,8 @@ describe('Test /api/group endpoints', () => {
       }));
       const expectedResult = {
         commentId: 1,
+        author: 'test-user1',
+        authorImage: 'profileImageLink',
         content: 'testComment',
         depth: 0,
         message: '성공적으로 수정되었습니다.',
@@ -1456,6 +1464,99 @@ describe('Test /api/group endpoints', () => {
     });
   });
 
+  describe('Test GET /api/group/:group_id/post/:post_id/comment', () => {
+    it('Successfully retrieved the comment. ', async () => {
+      const groupId = 1;
+      const postId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
+      const expectedResult = {
+        accessLevel: 'owner',
+        comment: [
+          {
+            author: 'test-user1',
+            authorImage: 'profileImageLink',
+            commentId: 1,
+            content: 'test-comment1',
+            depth: 0,
+            isMine: true,
+            postId: 1,
+            userId: 1,
+          },
+          {
+            author: 'test-user1',
+            authorImage: 'profileImageLink',
+            commentId: 2,
+            content: 'test-comment2',
+            depth: 0,
+            isMine: true,
+            postId: 1,
+            userId: 1,
+          },
+          {
+            author: 'test-user2',
+            authorImage: 'profileImageLink',
+            commentId: 3,
+            content: "test-comment3",
+            depth: 0,
+            isMine: false,
+            postId: 1,
+            userId: 2,
+          },
+          {
+            author: 'test-user2',
+            authorImage: 'profileImageLink',
+            commentId: 4,
+            content: 'test-comment4',
+            depth: 0,
+            isMine: false,
+            postId: 1,
+            userId: 2,
+          },
+        ],
+      }
+    ;
+
+      const { accessLevel } = res.body;
+      const result = res.body.comment.map((comment) => ({
+        commentId: comment.commentId,
+        author: comment.author,
+        authorImage: comment.authorImage,
+        postId: comment.postId,
+        userId: comment.userId,
+        content: comment.content,
+        depth: comment.depth,
+        isMine: comment.isMine,
+      }));
+
+      expect(res.status).toEqual(200);
+      expect({ accessLevel, comment: result }).toEqual(expectedResult);
+    });
+
+    it('Successfully failed to retrieved the comment (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const postId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to retrieved the comment (Post Not Found) ', async () => {
+      const groupId = 1;
+      const postId = 10000;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '글을 찾을 수 없습니다.' });
+    });
+
+    it('Successfully failed to retrieved the comment. (DataFormat Error) ', async () => {
+      const groupId = 'abc';
+      const postId = 1;
+      const res = (await request(app).get(`/api/group/${groupId}/post/${postId}/comment`).set('Cookie', cookie));
+      expect(res.status).toEqual(400);
+      expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.' });
+    });
+  });
+
   describe('Test GET /api/group/:group_id/post/:post_id/comment/:comment_id', () => {
     it('Successfully retrieved the comment. ', async () => {
       const groupId = 1;
@@ -1466,6 +1567,8 @@ describe('Test /api/group endpoints', () => {
         accessLevel: 'owner',
         comment: {
           commentId: 1,
+          author: 'test-user1',
+          authorImage: 'profileImageLink', 
           content: 'test-comment1',
           depth: 0,
           postId: 1,
@@ -1477,6 +1580,8 @@ describe('Test /api/group endpoints', () => {
       const { accessLevel } = res.body;
       const comment = {
         commentId: res.body.comment.commentId,
+        author: res.body.comment.author,
+        authorImage: res.body.comment.authorImage,
         postId: res.body.comment.postId,
         userId: res.body.comment.userId,
         content: res.body.comment.content,
@@ -2384,6 +2489,29 @@ describe('Test /api/group endpoints', () => {
 
       expect(res.status).toEqual(400);
       expect(res.body).toEqual({ error: '지원하지 않는 형식의 데이터입니다.'});
+    });
+  });
+
+  describe('Test PATCH /api/group/:group_id/public', () => {
+    it('Successfully updated the group public option.  ', async () => {
+      const groupId = 1;
+      const res = await request(app).patch(`/api/group/${groupId}/public`).set('Cookie', cookie).send({
+        isPublicGroup: true,
+      });
+      expect(res.body).toEqual({ message: '성공적으로 수정되었습니다.' });
+      expect(res.status).toEqual(200);
+
+      const result = await Group.findOne({ where: { groupId } });
+      expect(result.isPublicGroup).toEqual(1);
+    });
+
+    it('Successfully failed to update the group public option. (Group Not Found) ', async () => {
+      const groupId = 10000;
+      const res = await request(app).patch(`/api/group/${groupId}/public`).set('Cookie', cookie).send({
+        isPublicGroup: true,
+      });
+      expect(res.status).toEqual(404);
+      expect(res.body).toEqual({ error: '그룹을 찾을 수 없습니다.' });
     });
   });
 });

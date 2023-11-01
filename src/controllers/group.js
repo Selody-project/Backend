@@ -27,6 +27,7 @@ const {
   validateGroupJoinInviteCodeSchema, validateGroupJoinRequestSchema,
   validateGroupdSearchKeyword, validateGroupInviteCodeSchema,
   validateGroupMemberSchema, validateAccessLevelSchema,
+  validateGroupPublicSchema,
 } = require('../utils/validators');
 const { getAccessLevel } = require('../utils/accessLevel');
 
@@ -316,6 +317,44 @@ async function deleteGroup(req, res, next) {
     // 오류 발생 시 rollback
     await transaction.rollback();
 
+    if (!err || err.status === undefined) {
+      return next(new ApiError());
+    }
+    return next(err);
+  }
+}
+
+// 공개 그룹 여부 변경
+async function patchGroupPublic(req, res, next) {
+  try {
+    const { error: paramError } = validateGroupIdSchema(req.params);
+    const { error: bodyError } = validateGroupPublicSchema(req.body);
+    // 매개변수 또는 body 형식 Error
+    if (paramError || bodyError) {
+      throw (new DataFormatError());
+    }
+
+    const { group_id: groupId } = req.params;
+    const { user } = req;
+    const group = await Group.findByPk(groupId);
+
+    // 그룹을 찾을 수 없을 때 Error
+    if (!group) {
+      throw (new GroupNotFoundError());
+    }
+
+    // 사용자 그룹 권한 조회
+    const accessLevel = await getAccessLevel(user, group);
+    // 방장이 아닌 경우 권함없음 Error
+    if (accessLevel !== 'owner') {
+      throw (new UnauthorizedError());
+    }
+
+    // 그룹 공개 여부 업데이트
+    await group.update(req.body);
+
+    return res.status(200).json({ message: '성공적으로 수정되었습니다.' });
+  } catch (err) {
     if (!err || err.status === undefined) {
       return next(new ApiError());
     }
@@ -1068,6 +1107,7 @@ module.exports = {
   getGroupList,
   getGroupDetail,
   deleteGroup,
+  patchGroupPublic,
   putGroup,
   deleteGroupUser,
   getGroupMembers,
