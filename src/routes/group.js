@@ -4,7 +4,7 @@ const express = require('express');
 const {
   postGroup,
   getGroupDetail, getGroupList,
-  putGroup, deleteGroup,
+  putGroup, deleteGroup, patchGroupPublic,
   getGroupMembers, getPendingMembers,
   postGroupJoinRequest, postGroupJoinApprove, postGroupJoinReject,
   getInviteLink, postInviteLink,
@@ -42,6 +42,7 @@ router.get('/search', searchGroup);
 router.get('/:group_id', getGroupDetail);
 router.put('/:group_id', uploadGroupMiddleware, putGroup);
 router.delete('/:group_id', deleteGroup);
+router.patch('/:group_id/public', patchGroupPublic);
 router.get('/:group_id/members', getGroupMembers);
 router.get('/:group_id/members/request', getPendingMembers);
 router.post('/:group_id/members/request', postGroupJoinRequest);

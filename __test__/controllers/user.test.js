@@ -1242,6 +1242,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 4, 
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content1',
         },
         {
@@ -1252,6 +1253,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 2,
           commentCount: 0, 
           author: 'test-user2',
+          authorImage: 'profileImageLink',
           content: 'test-content2',
         },
         {
@@ -1262,6 +1264,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 1,
           commentCount: 0, 
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content3',
         },
         {
@@ -1272,6 +1275,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content4',
         },
         {
@@ -1282,6 +1286,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content5',
         },
         {
@@ -1292,6 +1297,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user2',
+          authorImage: 'profileImageLink',
           content: 'test-content6',
         },
         {
@@ -1302,6 +1308,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user2',
+          authorImage: 'profileImageLink',
           content: 'test-content7',
         },
         {
@@ -1312,6 +1319,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user2',
+          authorImage: 'profileImageLink',
           content: 'test-content8',
         },
         {
@@ -1322,6 +1330,7 @@ describe('Test /api/user endpoints', () => {
           likesCount: 0,
           commentCount: 0, 
           author: 'test-user1',
+          authorImage: 'profileImageLink',
           content: 'test-content9',
         },
       ];
@@ -1330,6 +1339,7 @@ describe('Test /api/user endpoints', () => {
         postId: post.postId,
         groupId: post.groupId,
         author: post.author,
+        authorImage: post.authorImage,
         content: post.content,
         isMine: post.isMine,
         isLiked: post.isLiked,
