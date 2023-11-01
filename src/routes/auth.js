@@ -21,7 +21,7 @@ router.delete('/logout', verifyToken, logout);
 router.post('/naver', getNaverUserInfo, joinNaverUser, createToken);
 router.post('/google', getGoogleUserInfo, createToken);
 router.get('/token/refresh', renewToken);
-router.get('/token/verify', verifyToken, (req, res) => { res.status(200).end(); });
+router.get('/token/verify', verifyToken, (req, res) => res.status(200).end());
 router.delete('/withdrawal', verifyToken, withdrawal);
 
 module.exports = router;

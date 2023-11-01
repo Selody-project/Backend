@@ -4,6 +4,11 @@ const moment = require('moment');
 
 const validator = (schema) => (payload) => schema.validate(payload, { abortEarly: false });
 
+/*
+  Joi패키지를 사용하여 데이터 유효성 검사를 진행합니다.
+  여기에서 Schema를 정의하고, 각 컨트롤러에서 필요한 Validator를 import하여 사용하면 됩니다.
+*/
+
 const joinSchema = Joi.object({
   userId: Joi.number(),
   email: Joi.string().email().min(0).max(40),
