@@ -11,6 +11,7 @@ const {
 
 // Model
 const Group = require('../models/group');
+const User = require('../models/user');
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const Like = require('../models/like');
@@ -83,6 +84,8 @@ async function postGroupPost(req, res, next) {
     await user.addPosts(post, { transaction });
     await group.addPosts(post, { transaction });
 
+    post.dataValues.author = user.nickname;
+    post.dataValues.authorImage = user.profileImage;
     // 응답 데이터 생성
     const response = {
       ...{ message: '성공적으로 등록되었습니다.' },
@@ -119,7 +122,15 @@ async function getSinglePost(req, res, next) {
     // 그룹과 게시물 동시 조회
     const [group, post] = await Promise.all([
       Group.findByPk(groupId),
-      Post.findOne({ where: { groupId, postId } }),
+      Post.findOne({
+        where: { groupId, postId },
+        include: [
+          {
+            model: User,
+            attributes: ['userId', 'nickname', 'profileImage'],
+          },
+        ],
+      }),
     ]);
 
     // 그룹이 존재하지 않을 때 Error
@@ -152,7 +163,8 @@ async function getSinglePost(req, res, next) {
         isLiked: isLikedValue,
         likesCount,
         commentCount,
-        author: post.author,
+        author: post.User.dataValues.nickname,
+        authorImage: post.User.dataValues.profileImage,
         content: post.content,
         image: post.image,
       },
@@ -199,6 +211,12 @@ async function getGroupPosts(req, res, next) {
         groupId,
         postId: { [Sequelize.Op.lt]: lastRecordId }, // ID가 지정한 ID보다 작은(더 오래된) 레코드 검색
       },
+      include: [
+        {
+          model: User,
+          attributes: ['userId', 'nickname', 'profileImage'],
+        },
+      ],
       limit: pageSize, // 원하는 개수만큼 데이터 가져오기
       order: [['createdAt', 'DESC']], // 최신순으로 정렬
     });
@@ -225,7 +243,8 @@ async function getGroupPosts(req, res, next) {
           isLiked: isLikedValue,
           likesCount,
           commentCount,
-          author: post.author,
+          author: post.User.dataValues.nickname,
+          authorImage: post.User.dataValues.profileImage,
           createdAt: post.createdAt,
           content: post.content,
           image: post.image,
@@ -300,6 +319,9 @@ async function putGroupPost(req, res, next) {
       // 이미지 파일이 없을 때
       modifiedPost = await post.update({ content, image: null }, { transaction });
     }
+
+    modifiedPost.dataValues.author = user.nickname;
+    modifiedPost.dataValues.authorImage = user.profileImage;
 
     // 수정 전에 등록되어 있었던 이미지를 버킷에서 모두 삭제
     await deleteBucketImage(previousPostImages);
@@ -563,6 +585,8 @@ async function postComment(req, res, next) {
     const comment = await post.createComment({ content }, { transaction });
     await user.addComments(comment, { transaction });
 
+    comment.dataValues.author = user.nickname;
+    comment.dataValues.authorImage = user.profileImage;
     const response = {
       ...{ message: '성공적으로 등록되었습니다.' },
       ...comment.dataValues,
@@ -596,7 +620,18 @@ async function getSingleComment(req, res, next) {
     const [group, post, comment] = await Promise.all([
       Group.findByPk(groupId),
       Post.findOne({ where: { postId, groupId } }),
-      Comment.findOne({ where: { commentId, postId } }),
+      Comment.findOne({
+        where: {
+          commentId,
+          postId,
+        },
+        include: [
+          {
+            model: User,
+            attributes: ['userId', 'nickname', 'profileImage'],
+          },
+        ],
+      }),
     ]);
 
     // 그룹을 찾을 수 없을 때 Error
@@ -617,10 +652,20 @@ async function getSingleComment(req, res, next) {
     // 접근 권한 조회
     const accessLevel = await getAccessLevel(user, group);
 
-    // 사용자가 게시물 작성자인지 여부
-    comment.dataValues.isMine = isMine(user, comment);
+    const response = {
+      commentId: comment.commentId,
+      content: comment.content,
+      depth: comment.depth,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      postId: comment.postId,
+      userId: comment.userId,
+      isMine: isMine(user, comment),
+      author: comment.User.dataValues.nickname,
+      authorImage: comment.User.dataValues.profileImage,
+    };
 
-    return res.status(200).json({ accessLevel, comment });
+    return res.status(200).json({ accessLevel, comment: response });
   } catch (err) {
     if (!err || err.status === undefined) {
       return next(new ApiError());
@@ -640,9 +685,20 @@ async function getPostComment(req, res, next) {
 
     const { group_id: groupId, post_id: postId } = req.params;
     const { user } = req;
-    const [group, post] = await Promise.all([
+    const [group, post, comments] = await Promise.all([
       Group.findByPk(groupId),
       Post.findOne({ where: { groupId, postId } }),
+      Comment.findAll({
+        where: {
+          postId,
+        },
+        include: [
+          {
+            model: User,
+            attributes: ['userId', 'nickname', 'profileImage'],
+          },
+        ],
+      }),
     ]);
 
     // 그룹을 찾을 수 없을 때 Error
@@ -657,10 +713,12 @@ async function getPostComment(req, res, next) {
 
     // 사용자 그룹 접근 권한 조회
     const accessLevel = await getAccessLevel(user, group);
-    const comments = (await post.getComments()).map((comment) => ({
+    const response = comments.map((comment) => ({
       commentId: comment.commentId,
       content: comment.content,
       depth: comment.depth,
+      author: comment.User.dataValues.nickname,
+      authorImage: comment.User.dataValues.profileImage,
       createdAt: comment.createdAt,
       updatedAt: comment.updatedAt,
       postId: comment.postId,
@@ -668,7 +726,7 @@ async function getPostComment(req, res, next) {
       isMine: isMine(user, comment), // 사용자가 댓글의 작성자인지 여부
     }));
 
-    return res.status(200).json({ accessLevel, comments });
+    return res.status(200).json({ accessLevel, comment: response });
   } catch (err) {
     if (!err || err.status === undefined) {
       return next(new ApiError());
@@ -722,6 +780,8 @@ async function putComment(req, res, next) {
     // 댓글 수정
     const { content } = req.body;
     const modifiedComment = await comment.update({ content }, { transaction });
+    modifiedComment.dataValues.author = user.nickname;
+    modifiedComment.dataValues.authorImage = user.profileImage;
     const response = {
       ...{ message: '성공적으로 수정되었습니다.' },
       ...modifiedComment.dataValues,
@@ -836,6 +896,12 @@ async function getUserFeed(req, res, next) {
           },
         ],
       },
+      include: [
+        {
+          model: User,
+          attributes: ['userId', 'nickname', 'profileImage'],
+        },
+      ],
       order: [['createdAt', 'DESC']], // 최신 순으로 조회
       limit: pageSize,
     });
@@ -864,7 +930,8 @@ async function getUserFeed(req, res, next) {
           likesCount,
           commentCount,
           title: post.title,
-          author: post.author,
+          author: post.User.dataValues.nickname,
+          authorImage: post.User.dataValues.profileImage,
           createdAt: post.createdAt,
           content: post.content,
           image: post.image,
