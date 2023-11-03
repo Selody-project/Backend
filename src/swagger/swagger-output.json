@@ -3933,31 +3933,48 @@
         "required": ["email", "nickname", "password"],
         "properties": {
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식별자"
           },
           "email": {
-            "type": "VARCHAR(40)"
+            "type": "VARCHAR(40)",
+            "description": "이메일"
           },
           "nickname": {
-            "type": "VARCHAR(15)"
+            "type": "VARCHAR(15)",
+            "description": "닉네임"
           },
           "password": {
-            "type": "VARCHAR(100)"
+            "type": "VARCHAR(100)",
+            "description": "비밀번호"
+          },
+          "introduction": {
+            "type": "VARCHAR(50)",
+            "description": "유저 소개글"
+          },
+          "profileImage": {
+            "type": "TEXT",
+            "description": "프로필 이미지 주소"
           },
           "provider": {
-            "type": "ENUM('local', 'naver', 'google')"
+            "type": "ENUM('local', 'naver', 'google')",
+            "description": "가입 유형"
           },
           "snsId": {
-            "type": "VARCHAR(100)"
+            "type": "VARCHAR(100)",
+            "description": "소셜 로그인을 진행한 경우 유저 식별자"
           },
           "createdAt": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "생성일"
           },
           "updatedAt": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "수정일"
           },
           "deletedAt": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "삭제일"
           }
         },
         "xml": {
@@ -3969,28 +3986,40 @@
         "required": ["name"],
         "properties": {
           "groupId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "그룹 식별자"
           },
           "name": {
-            "type": "VARCHAR(45)"
+            "type": "VARCHAR(45)",
+            "description": "그룹 이름"
           },
           "description": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "그룹 소개"
           },
           "member": {
-            "type": "INT"
+            "type": "INT",
+            "description": "멤버 수"
           },
           "leader": {
-            "type": "INT"
+            "type": "INT",
+            "description": "리더 아이디"
           },
           "inviteCode": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "초대 코드"
           },
           "inviteExp": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "초대 코드 만료일"
           },
           "isPublicGroup": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "그룹 공개 여부"
+          },
+          "image": {
+            "type": "TEXT",
+            "description": "그룹 대표 이미지"
           }
         },
         "xml": {
@@ -4008,37 +4037,48 @@
         ],
         "properties": {
           "id": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "일정 식별자"
           },
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식별자"
           },
           "title": {
-            "type": "VARCHAR(45)"
+            "type": "VARCHAR(45)",
+            "description": "일정 제목"
           },
           "content": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "일정 내용"
           },
           "startDateTime": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "시작 시간"
           },
           "endDateTime": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "종료 시간"
           },
           "recurrence": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "반복 여부"
           },
           "freq": {
-            "type": "VARCHAR(10)"
+            "type": "VARCHAR(10)",
+            "description": "반복 주기"
           },
           "interval": {
-            "type": "integer"
+            "type": "integer",
+            "description": "반복 간격"
           },
           "byweekday": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "반복 요일"
           },
           "until": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "반복 종료일"
           }
         },
         "xml": {
@@ -4056,37 +4096,48 @@
         ],
         "properties": {
           "id": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "일정 식별자"
           },
           "groupId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "그룹 식별자"
           },
           "title": {
-            "type": "VARCHAR(45)"
+            "type": "VARCHAR(45)",
+            "description": "일정 제목"
           },
           "content": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "일정 내용"
           },
           "startDateTime": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "시작 시간"
           },
           "endDateTime": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "종료 시간"
           },
           "recurrence": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "반복 여부"
           },
           "freq": {
-            "type": "VARCHAR(10)"
+            "type": "VARCHAR(10)",
+            "description": "반복 주기"
           },
           "interval": {
-            "type": "integer"
+            "type": "integer",
+            "description": "반복 간격"
           },
           "byweekday": {
-            "type": "TEXT"
+            "type": "TEXT",
+            "description": "반복 요일"
           },
           "until": {
-            "type": "DATETIME"
+            "type": "DATETIME",
+            "description": "반복 종료일"
           }
         },
         "xml": {
@@ -4098,22 +4149,28 @@
         "required": ["userId", "groupId"],
         "properties": {
           "groupId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "그룹 식별자"
           },
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식벽자"
           },
           "shareScheduleOption": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "개인 일정 공유 여부"
           },
           "notificationOption": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "알림 수신 여부"
           },
           "isPendingMember": {
-            "type": "TINYINT(1)"
+            "type": "TINYINT(1)",
+            "description": "가입 대기 여부"
           },
           "accessLevel": {
-            "type": "ENUM('viewer', 'regular', 'admin', 'owner')"
+            "type": "ENUM('viewer', 'regular', 'admin', 'owner')",
+            "description": "사용자 그룹 접근 권한"
           }
         },
         "xml": {
@@ -4125,41 +4182,36 @@
         "required": ["groupId", "userId", "title", "author"],
         "properties": {
           "postId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "피드 식별자"
           },
           "groupId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "그룹 식별자"
           },
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식별자"
           },
           "title": {
-            "type": "VARCHAR(45)"
+            "type": "VARCHAR(45)",
+            "description": "피드 제목"
+          },
+          "content": {
+            "type": "TEXT",
+            "description": "피드 내용"
           },
           "author": {
-            "type": "VARCHAR(45)"
+            "type": "VARCHAR(45)",
+            "description": "피드 작성자"
+          },
+          "image": {
+            "type": "TEXT",
+            "description": "첨부 이미지"
           }
         },
         "xml": {
           "name": "Post"
-        }
-      },
-      "PostDetail": {
-        "type": "object",
-        "required": ["postId", "content"],
-        "properties": {
-          "postDetailId": {
-            "type": "BIGINT"
-          },
-          "postId": {
-            "type": "BIGINT"
-          },
-          "content": {
-            "type": "TEXT"
-          }
-        },
-        "xml": {
-          "name": "PostDetail"
         }
       },
       "Comment": {
@@ -4167,19 +4219,24 @@
         "required": ["userId", "postId", "content"],
         "properties": {
           "commentId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "댓글 식별자"
           },
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식별자"
           },
           "postId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "피드 식별자"
           },
           "content": {
-            "type": "VARCHAR(250)"
+            "type": "VARCHAR(250)",
+            "description": "댓글 내용"
           },
           "depth": {
-            "type": "integer"
+            "type": "integer",
+            "description": "댓글 깊이"
           }
         },
         "xml": {
@@ -4190,17 +4247,99 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "공감 식별자"
           },
           "userId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "유저 식별자"
           },
           "postId": {
-            "type": "BIGINT"
+            "type": "BIGINT",
+            "description": "피드 식별자"
           }
         },
         "xml": {
           "name": "Like"
+        }
+      },
+      "Vote": {
+        "type": "object",
+        "properties": {
+          "voteId": {
+            "type": "BIGINT"
+          },
+          "groupId": {
+            "type": "BIGINT",
+            "description": "그룹 식별자"
+          },
+          "title": {
+            "type": "VARCHAR(45)",
+            "description": "일정 제목"
+          },
+          "content": {
+            "type": "TEXT",
+            "description": "일정 내용"
+          },
+          "startDateTime": {
+            "type": "DATETIME",
+            "description": "시작 시간"
+          },
+          "endDateTime": {
+            "type": "DATETIME",
+            "description": "종료 시간"
+          },
+          "recurrence": {
+            "type": "TINYINT(1)",
+            "description": "반복 여부"
+          },
+          "freq": {
+            "type": "VARCHAR(10)",
+            "description": "반복 주기"
+          },
+          "interval": {
+            "type": "integer",
+            "description": "반복 간격"
+          },
+          "byweekday": {
+            "type": "TEXT",
+            "description": "반복 요일"
+          },
+          "until": {
+            "type": "DATETIME",
+            "description": "반복 종료일"
+          },
+          "votingEndDate": {
+            "type": "DATETIME",
+            "description": "투표 종료일 (기본적으로 createdAt으로부터 7일)"
+          }
+        },
+        "xml": {
+          "name": "Vote"
+        }
+      },
+      "VoteResult": {
+        "type": "object",
+        "properties": {
+          "resultId": {
+            "type": "BIGINT",
+            "description": "투표 결과 식별자"
+          },
+          "userId": {
+            "type": "BIGINT",
+            "description": "유저 식별자"
+          },
+          "voteId": {
+            "type": "BIGINT",
+            "description": "일정 후보 식별자"
+          },
+          "choice": {
+            "type": "TINYINT(1)",
+            "description": "참여 여부"
+          }
+        },
+        "xml": {
+          "name": "VoteResult"
         }
       }
     }
