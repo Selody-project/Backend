@@ -1,27 +1,27 @@
 {
-  "env": {
-    "browser": true,
-    "es2021": true,
-    "node": true
-  },
-  "extends": ["airbnb-base"],
-  "parserOptions": {
-    "ecmaVersion": 12,
-    "sourceType": "module"
-  },
-  "rules": {
-    "max-len": "off",
-    "global-require": "off",
-    "import/no-dynamic-require" : 1,
-    "consistent-return" : 1,
-    "eqeqeq": "off"
-  },
-  "overrides": [
-    {
-      "files": ["**/*.test.js"],
-      "env": {
-        "jest": true
-      }
-    }
-  ]
+    "env": {
+        "browser": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": ["airbnb-base", "prettier"],
+    "parserOptions": {
+        "ecmaVersion": 12,
+        "sourceType": "module"
+    },
+    "rules": {
+        "max-len": "off",
+        "global-require": "off",
+        "import/no-dynamic-require": 1,
+        "consistent-return": 1,
+        "eqeqeq": "off"
+    },
+    "overrides": [
+        {
+            "files": ["**/*.test.js"],
+            "env": {
+                "jest": true
+            }
+        }
+    ]
 }

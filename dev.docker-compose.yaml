@@ -1,0 +1,40 @@
+version: "3"
+
+services:
+    selody-db:
+        image: mysql:8.0
+        container_name: selody-db
+        command: --default-authentication-plugin=mysql_native_password
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: selody
+            MYSQL_TCP_PORT: 3306
+        hostname: mymysql
+        volumes:
+            - $HOME/database:/var/lib/mysql
+        expose:
+            - 3306
+        ports:
+            - 3306:3306
+        networks:
+            - internalnet
+    selody-bakcend:
+        image: "selody-bakcend"
+        container_name: "selody-backend"
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        volumes:
+            - /app/node_modules
+            - .:/app
+        ports:
+            - "8000:8000"
+        depends_on:
+            - selody-db
+        networks:
+            - internalnet
+
+networks:
+    internalnet:
+        driver: bridge
