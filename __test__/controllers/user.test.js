@@ -139,7 +139,7 @@ describe("Test /api/user endpoints", () => {
     });
 
     describe("Test PATCH /api/user/profile/password", () => {
-        it("Successfully modified user password ", async () => {
+        it("Successfully modified user password", async () => {
             const currentPassword = "super_strong_password";
             const newPassword = "newPassword";
             const newPasswordCheck = "newPassword";
@@ -162,7 +162,7 @@ describe("Test /api/user endpoints", () => {
                 });
             expect(res.status).toEqual(200);
         });
-        it("failed to check current password ", async () => {
+        it("failed to check current password", async () => {
             const currentPassword = "super_strong_password_wrong";
             const newPassword = "newPassword";
             const newPasswordCheck = "newPassword";
