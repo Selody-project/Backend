@@ -3108,8 +3108,8 @@
                                         "example": "new_strong_password",
                                         "type": "VARCHAR(100)"
                                     },
-                                    "newPassword": {
-                                        "example": "new_strong_password",
+                                    "newPasswordCheck": {
+                                        "example": "new_strong_passwordCheck",
                                         "type": "VARCHAR(100)"
                                     }
                                 }
