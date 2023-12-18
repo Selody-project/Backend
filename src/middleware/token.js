@@ -172,7 +172,7 @@ async function renewToken(req, res, next) {
         });
     } catch (err) {
         // 만료된 토큰일 경우 Error
-        if (err.name === "TokenExpireError") {
+        if (err.name === "TokenExpiredError") {
             return next(new TokenExpireError());
         }
         // 사용할 수 없는 토큰일 경우 Error
