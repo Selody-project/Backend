@@ -50,7 +50,7 @@ async function createToken(req, res, next) {
 
         // jwt에 유저의 nickname을 담아줍니다.
         const accessToken = token().access(user.nickname);
-        const refreshToken = token().access(user.nickname);
+        const refreshToken = token().refresh(user.nickname);
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000,
