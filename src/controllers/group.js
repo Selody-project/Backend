@@ -41,6 +41,8 @@ const {
     validateGroupPublicSchema,
 } = require("../utils/validators");
 const { getAccessLevel } = require("../utils/accessLevel");
+const Comment = require("../models/comment");
+const Like = require("../models/like");
 
 // 그룹 생성
 async function postGroup(req, res, next) {
@@ -493,18 +495,76 @@ async function getGroupMembers(req, res, next) {
                 },
             ],
         });
-
         // 위 값들을 파싱하여 response를 구성
-        const promises = members.map(async (member) => ({
-            accessLevel: member.UserGroups[0].dataValues.accessLevel,
-            member: {
-                nickname: member.nickname,
-                userId: member.userId,
-                image: member.profileImage,
-                isPendingMember:
-                    member.UserGroups[0].dataValues.isPendingMember,
-            },
-        }));
+        const promises = members.map(async (member) => {
+            const currentGroup = member.UserGroups[0];
+
+            // 요청 중인 멤버가 아니라면, 즉 그룹에 속한 멤버라면
+            // 그룹의 posts 조회 및 각 post마다
+            const getPostCommentsAndCounts = async () => {
+                let commentCount = 0;
+                let likeCount = 0;
+
+                const posts = await Post.findAll({
+                    where: {
+                        groupId: currentGroup.groupId,
+                    },
+                    include: [
+                        {
+                            model: Comment,
+                            // 해당 속성은 필요 없지만, 입력하지 않으면 join을 수행하지 않아 추가함
+                            attributes: ["commentId"],
+                            where: {
+                                userId: member.userId,
+                            },
+                        },
+                        {
+                            model: Like,
+                            // 해당 속성은 필요 없지만, 입력하지 않으면 join을 수행하지 않아 추가함
+                            attributes: ["postId"],
+                            where: {
+                                userId: member.userId,
+                            },
+                        },
+                    ],
+                });
+
+                // posts마다 member가 쓴 comment, like가 있다면 그만큼 더함
+                posts.forEach((post) => {
+                    commentCount += post.Comments.length;
+                    likeCount += post.Likes.length;
+                });
+
+                return { commentCount, likeCount };
+            };
+            // user의 그룹 가입 시기
+            const getUserJoinedDate = async () =>
+                (
+                    await UserGroup.findOne({
+                        where: {
+                            userId: member.userId,
+                            groupId: currentGroup.groupId,
+                        },
+                        attributes: ["createdAt"],
+                    })
+                ).createdAt;
+
+            const [{ commentCount, likeCount }, joinedDate] = await Promise.all(
+                [getPostCommentsAndCounts(), getUserJoinedDate()]
+            );
+
+            return {
+                accessLevel: currentGroup.dataValues.accessLevel,
+                member: {
+                    nickname: member.nickname,
+                    userId: member.userId,
+                    image: member.profileImage,
+                    commentCount,
+                    likeCount,
+                    joinedDate,
+                },
+            };
+        });
         const parsedMembers = await Promise.all(promises);
 
         return res.status(200).json(parsedMembers);

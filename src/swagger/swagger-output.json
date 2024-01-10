@@ -718,7 +718,9 @@
                                                     "userId": "유저 식별자",
                                                     "nickname": "유저 닉네임",
                                                     "image": "유저 프로필 이미지",
-                                                    "isPendingMember": 0
+                                                    "commentCount": "댓글 개수",
+                                                    "likeCount": "좋아요 개수",
+                                                    "joinedDate": "가입한 날짜"
                                                 }
                                             },
                                             {
@@ -727,7 +729,9 @@
                                                     "userId": "유저 식별자",
                                                     "nickname": "유저 닉네임",
                                                     "image": "유저 프로필 이미지",
-                                                    "isPendingMember": 0
+                                                    "commentCount": "댓글 개수",
+                                                    "likeCount": "좋아요 개수",
+                                                    "joinedDate": "가입한 날짜"
                                                 }
                                             }
                                         ]
