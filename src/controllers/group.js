@@ -1212,20 +1212,21 @@ async function patchUserAccessLevel(req, res, next) {
 
         const { access_level: accessLevel } = req.body;
 
+        const userGroup = member.UserGroups[0];
         // 만일 다른 유저의 권한을 방장(owner)로 바꾸고자 한다면,
         // 자신은 자동으로 regular 권한을 가진 일반 유저로 전환됨.
         if (accessLevel === "owner") {
-            const thisUserGroup = await UserGroup.findOne({
+            const myUserGroup = await UserGroup.findOne({
                 where: {
                     userId: user.userId,
                     groupId,
                 },
             });
-            thisUserGroup.accessLevel = "regular";
-            // user.accessLevel = "regular";
-            await thisUserGroup.save({ transaction });
+            myUserGroup.accessLevel = "regular";
+            group.leader = userGroup.userId;
+            await group.save({ transaction });
+            await myUserGroup.save({ transaction });
         }
-        const userGroup = member.UserGroups[0];
         if (userGroup) {
             userGroup.accessLevel = accessLevel;
             await userGroup.save({ transaction });
