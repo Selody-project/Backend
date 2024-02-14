@@ -48,7 +48,7 @@ const yearMonthDayScehma = Joi.object({
 
 const groupSchema = Joi.object({
     name: Joi.string().min(1).max(20).required(),
-    description: Joi.string().max(100),
+    description: Joi.string().allow(null).max(100),
 });
 
 const groupIdSchema = Joi.object({
