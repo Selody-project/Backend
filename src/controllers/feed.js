@@ -909,7 +909,15 @@ async function getUserFeed(req, res, next) {
         }
 
         const { user } = req;
-        const groups = (await user.getGroups()).map((group) => group.groupId);
+        const groups = (
+            await user.getGroups({
+                through: {
+                    where: {
+                        isPendingMember: 0,
+                    },
+                },
+            })
+        ).map((group) => group.groupId);
 
         // 스크롤의 마지막에 해당하는 포스트의 ID를 query값으로 받아옴
         // 첫 페이지 조회 시에는 이 값을 0으로 받아옴
