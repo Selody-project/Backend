@@ -46,6 +46,7 @@ async function getAccessLevel(user, group) {
             where: {
                 userId: user.userId,
                 groupId: group.groupId,
+                isPendingMember: false,
             },
         });
         // 그룹에 속하지 않은 사람들은 따로 처리를 해야함. 일단 null로 처리
