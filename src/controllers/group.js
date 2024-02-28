@@ -841,7 +841,7 @@ async function getInviteLink(req, res, next) {
         // 사용자 그룹 접근 권한 조회
         const accessLevel = await getAccessLevel(user, group);
         // 권한이 없는 경우(read only 권한인 경우) Error
-        if (accessLevel == "viewer") {
+        if (accessLevel == "viewer" || accessLevel === null) {
             throw new UnauthorizedError();
         }
 
@@ -880,7 +880,7 @@ async function postInviteLink(req, res, next) {
         const accessLevel = await getAccessLevel(user, group);
 
         // 권한이 없는 경우(read only 권한인 경우) Error
-        if (accessLevel == "viewer") {
+        if (accessLevel == "viewer" || accessLevel === null) {
             throw new UnauthorizedError();
         }
 
