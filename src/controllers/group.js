@@ -746,11 +746,34 @@ async function postGroupJoinApprove(req, res, next) {
             { isPendingMember: 0 },
             { where: { userId: applicantId }, transaction }
         );
+        const newGroupMember = await User.findOne({
+            where: {
+                userId: applicantId,
+            },
+            attributes: ["userId", "nickname", "profileImage"],
+            include: [
+                {
+                    model: UserGroup,
+                    attributes: ["createdAt"],
+                    where: { groupId },
+                },
+            ],
+        });
         await group.update({ member: group.member + 1 }, { transaction });
 
         // 트랜잭션 커밋
         await transaction.commit();
-        return res.status(200).json({ message: "성공적으로 수락하였습니다." });
+        return res.status(200).json({
+            accessLevel: "viewer",
+            member: {
+                nickname: newGroupMember.nickname,
+                userId: newGroupMember.userId,
+                image: newGroupMember.profileImage,
+                commentCount: 0,
+                likeCount: 0,
+                joinedDate: newGroupMember.UserGroups[0].createdAt,
+            },
+        });
     } catch (err) {
         // 오류 발생 시 rollback
         await transaction.rollback();
