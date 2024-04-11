@@ -2064,6 +2064,7 @@
                                             "feed": [
                                                 {
                                                     "postId": "포스트 식별자",
+                                                    "userId": "유저 식별자",
                                                     "author": "작성자",
                                                     "authorImage": "작성자 프로필 이미지 주소",
                                                     "isMine": "작성자가 본인이라면 true, 아니라면 false",
@@ -2076,6 +2077,7 @@
                                                 },
                                                 {
                                                     "postId": "포스트 식별자",
+                                                    "userId": "유저 식별자",
                                                     "author": "작성자",
                                                     "authorImage": "작성자 프로필 이미지 주소",
                                                     "isMine": "작성자가 본인이라면 true, 아니라면 false",
@@ -2215,6 +2217,7 @@
                                                 "isLiked": "좋아요 여부",
                                                 "likesCount": "좋아요 개수",
                                                 "commentCount": "댓글 개수",
+                                                "userId": "유저 식별자",
                                                 "author": "작성자",
                                                 "authorImage": "작성자 프로필 이미지 주소",
                                                 "content": "포스트 내용",
