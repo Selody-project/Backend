@@ -1246,6 +1246,7 @@ describe("Test /api/group endpoints", () => {
             const expectedPost = {
                 accessLevel: "owner",
                 post: {
+                    userId: 1,
                     author: "test-user1",
                     authorImage: "profileImageLink",
                     content: "test-content1",
