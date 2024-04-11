@@ -1257,6 +1257,7 @@ describe("Test /api/group endpoints", () => {
                     image: "postImage",
                 },
             };
+            delete res.body.post.createdAt;
             expect(res.status).toEqual(200);
             expect(res.body).toEqual(expectedPost);
         });
