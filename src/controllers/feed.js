@@ -176,6 +176,7 @@ async function getSinglePost(req, res, next) {
                 authorImage: post.User.dataValues.profileImage,
                 content: post.content,
                 image: post.image,
+                createdAt: post.createdAt,
             },
         });
     } catch (err) {
